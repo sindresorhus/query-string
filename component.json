@@ -1,0 +1,23 @@
+{
+  "name": "query-string",
+  "version": "0.0.0",
+  "description": "Parse and stringify URL query strings",
+  "repo": "sindresorhus/query-string",
+  "keywords": [
+    "querystring",
+    "query",
+    "string",
+    "qs",
+    "param",
+    "parameter",
+    "url",
+    "uri",
+    "parse",
+    "stringify",
+    "encode",
+    "decode"
+  ],
+  "main": "query-string.js",
+  "scripts": ["query-string.js"],
+  "license": "MIT"
+}
