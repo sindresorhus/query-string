@@ -26,7 +26,9 @@ component install sindresorhus/query-string
 ```
 
 
-## Example using Node.js
+## Examples
+
+### Node.js
 
 ```js
 var queryString = require('query-string');
@@ -39,6 +41,28 @@ console.log(parsed);
 parsed.foo = 'unicorn';
 parsed.ilike = 'pizza';
 console.log(url[0] + '?' + queryString.stringify(parsed));
+// http://sindresorhus.com?foo=unicorn&ilike=pizza
+```
+
+### Bower
+
+```html
+<script src="bower_components/query-string/query-string.js"></script>
+```
+
+```js
+console.log(location.search);
+// http://sindresorhus.com?foo=bar
+
+var parsed = queryString.parse(location.search);
+console.log(parsed);
+// {foo: 'bar'}
+
+parsed.foo = 'unicorn';
+parsed.ilike = 'pizza';
+location.search = queryString.stringify(parsed);
+
+console.log(location.search);
 // http://sindresorhus.com?foo=unicorn&ilike=pizza
 ```
 
