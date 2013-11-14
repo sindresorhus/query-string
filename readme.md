@@ -69,11 +69,11 @@ console.log(location.search);
 
 ## API
 
-### queryString.parse()
+### queryString.parse(*string*)
 
 Parse a query string into an object.
 
-### queryString.stringify()
+### queryString.stringify(*object*)
 
 Stringify an object into a query string.
 
