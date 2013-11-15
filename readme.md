@@ -52,7 +52,7 @@ console.log(url[0] + '?' + queryString.stringify(parsed));
 
 ```js
 console.log(location.search);
-// http://sindresorhus.com?foo=bar
+// ?foo=bar
 
 var parsed = queryString.parse(location.search);
 console.log(parsed);
@@ -63,7 +63,7 @@ parsed.ilike = 'pizza';
 location.search = queryString.stringify(parsed);
 
 console.log(location.search);
-// http://sindresorhus.com?foo=unicorn&ilike=pizza
+// ?foo=unicorn&ilike=pizza
 ```
 
 
