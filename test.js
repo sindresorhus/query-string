@@ -27,6 +27,10 @@ describe('.parse()', function () {
 		assert.deepEqual(qs.parse('?'), {});
 		assert.deepEqual(qs.parse(' '), {});
 	});
+
+	it('should handle `+` correctly', function () {
+		assert.deepEqual(qs.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
+	});
 });
 
 describe('.stringify()', function () {
