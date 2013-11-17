@@ -78,6 +78,23 @@ Parse a query string into an object.
 Stringify an object into a query string.
 
 
+## Nesting
+
+This module intentionally doesn't support nesting as it's not specced and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
+
+You're much off just converting the object to a JSON string:
+
+```js
+queryString.stringify({
+  foo: 'bar',
+  nested: JSON.stringify({
+    unicorn: 'cake'
+  })
+});
+// foo=bar&nested=%7B%22unicorn%22%3A%22cake%22%7D
+```
+
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
