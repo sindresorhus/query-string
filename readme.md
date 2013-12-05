@@ -82,7 +82,7 @@ Stringify an object into a query string.
 
 This module intentionally doesn't support nesting as it's not specced and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
 
-You're much off just converting the object to a JSON string:
+You're much better off just converting the object to a JSON string:
 
 ```js
 queryString.stringify({
