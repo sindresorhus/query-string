@@ -22,16 +22,37 @@
 
 		return str.trim().split('&').reduce(function (ret, param) {
 			var parts = param.replace(/\+/g, ' ').split('=');
+			var key = parts[0];
+			var val = parts[1];
+
+			key = decodeURIComponent(key);
 			// missing `=` should be `null`:
 			// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-			ret[parts[0]] = parts[1] === undefined ? null : decodeURIComponent(parts[1]);
+			val = val === undefined ? null : decodeURIComponent(val);
+
+			if (!ret.hasOwnProperty(key)) {
+				ret[key] = val;
+			} else if (Array.isArray(ret[key])) {
+				ret[key].push(val);
+			} else {
+				ret[key] = [ret[key], val];
+			}
+
 			return ret;
 		}, {});
 	};
 
 	queryString.stringify = function (obj) {
 		return obj ? Object.keys(obj).map(function (key) {
-			return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
+			var val = obj[key];
+
+			if (Array.isArray(val)) {
+				return val.map(function (val2) {
+					return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+				}).join('&');
+			}
+
+			return encodeURIComponent(key) + '=' + encodeURIComponent(val);
 		}).join('&') : '';
 	};
 

@@ -31,6 +31,10 @@ describe('.parse()', function () {
 	it('should handle `+` correctly', function () {
 		assert.deepEqual(qs.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 	});
+
+	it('should handle multiple of the same key', function () {
+		assert.deepEqual(qs.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
+	});
 });
 
 describe('.stringify()', function () {
@@ -46,5 +50,9 @@ describe('.stringify()', function () {
 
 	it('should URI encode', function () {
 		assert.strictEqual(qs.stringify({'foo bar': 'baz faz'}), 'foo%20bar=baz%20faz');
+	});
+
+	it('should handle array value', function () {
+		assert.strictEqual(qs.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 	});
 });
