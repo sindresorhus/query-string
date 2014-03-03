@@ -1,6 +1,6 @@
 {
   "name": "query-string",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Parse and stringify URL query strings",
   "keywords": [
     "browser",
@@ -26,16 +26,13 @@
   "files": [
     "query-string.js"
   ],
-  "main": "query-string",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/sindresorhus/query-string.git"
-  },
+  "main": "query-string.js",
+  "repository": "sindresorhus/query-string",
   "scripts": {
     "test": "mocha"
   },
   "devDependencies": {
-    "mocha": "~1.14.0"
+    "mocha": "*"
   },
   "engines": {
     "node": ">=0.8.0"
