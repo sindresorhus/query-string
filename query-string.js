@@ -56,7 +56,9 @@
 		}).join('&') : '';
 	};
 
-	if (typeof module !== 'undefined' && module.exports) {
+	if (typeof define === 'function' && define.amd) {
+		define([], queryString);
+	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
 		window.queryString = queryString;
