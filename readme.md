@@ -1,4 +1,4 @@
-# query-string [![Build Status](https://secure.travis-ci.org/sindresorhus/query-string.png?branch=master)](http://travis-ci.org/sindresorhus/query-string)
+# query-string [![Build Status](https://travis-ci.org/sindresorhus/query-string.svg?branch=master)](https://travis-ci.org/sindresorhus/query-string)
 
 > Parse and stringify URL [query strings](http://en.wikipedia.org/wiki/Query_string)
 
@@ -7,26 +7,20 @@
 
 Download [manually](https://github.com/sindresorhus/query-string/releases) or with a package-manager.
 
-#### [npm](https://npmjs.org/package/query-string)
-
-```
-npm install --save query-string
+```bash
+$ npm install --save query-string
 ```
 
-#### [Bower](http://bower.io)
-
-```
-bower install --save query-string
+```bash
+$ bower install --save query-string
 ```
 
-#### [Component](https://github.com/component/component)
-
-```
-component install sindresorhus/query-string
+```bash
+$ component install sindresorhus/query-string
 ```
 
 
-## Example
+## Usage
 
 ```js
 console.log(location.search);
@@ -75,4 +69,4 @@ queryString.stringify({
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+[MIT](http://opensource.org/licenses/MIT) © [Sindre Sorhus](http://sindresorhus.com)
