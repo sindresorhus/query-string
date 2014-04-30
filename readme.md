@@ -5,17 +5,15 @@
 
 ## Install
 
-Download [manually](https://github.com/sindresorhus/query-string/releases) or with a package-manager.
-
-```bash
+```sh
 $ npm install --save query-string
 ```
 
-```bash
+```sh
 $ bower install --save query-string
 ```
 
-```bash
+```sh
 $ component install sindresorhus/query-string
 ```
 
@@ -32,6 +30,7 @@ console.log(parsed);
 
 parsed.foo = 'unicorn';
 parsed.ilike = 'pizza';
+
 location.search = queryString.stringify(parsed);
 
 console.log(location.search);

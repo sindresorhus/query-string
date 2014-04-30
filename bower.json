@@ -1,6 +1,5 @@
 {
 	"name": "query-string",
-	"version": "0.3.0",
 	"description": "Parse and stringify URL query strings",
 	"main": "query-string.js",
 	"keywords": [
