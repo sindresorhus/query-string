@@ -14,7 +14,7 @@
 			return {};
 		}
 
-		str = str.trim().replace(/^\?/, '');
+		str = str.trim().replace(/^(\?|#)/, '');
 
 		if (!str) {
 			return {};

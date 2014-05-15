@@ -28,6 +28,13 @@ var parsed = queryString.parse(location.search);
 console.log(parsed);
 // {foo: 'bar'}
 
+console.log(location.hash);
+// #token=bada55cafe
+
+var parsedHash = queryString.parse(location.hash);
+console.log(parsedHash);
+// {token: 'bada55cafe'}
+
 parsed.foo = 'unicorn';
 parsed.ilike = 'pizza';
 
@@ -42,7 +49,7 @@ console.log(location.search);
 
 ### queryString.parse(*string*)
 
-Parse a query string into an object.
+Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
 ### queryString.stringify(*object*)
 
