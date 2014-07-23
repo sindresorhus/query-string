@@ -1,6 +1,6 @@
 {
   "name": "query-string",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Parse and stringify URL query strings",
   "repository": "sindresorhus/query-string",
   "keywords": [
