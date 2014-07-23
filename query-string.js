@@ -57,7 +57,7 @@
 	};
 
 	if (typeof define === 'function' && define.amd) {
-		define([], queryString);
+		define(function() { return queryString; });
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
