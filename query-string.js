@@ -29,7 +29,13 @@
 			// missing `=` should be `null`:
 			// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 			val = val === undefined ? null : decodeURIComponent(val);
-
+			
+			if (val === 'true') {
+				val = true;
+			} else if (val === 'false') {
+				val = false;
+			}
+			
 			if (!ret.hasOwnProperty(key)) {
 				ret[key] = val;
 			} else if (Array.isArray(ret[key])) {
