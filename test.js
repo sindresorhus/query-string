@@ -40,6 +40,10 @@ describe('.parse()', function () {
 	it('should handle multiple of the same key', function () {
 		assert.deepEqual(qs.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 	});
+	
+	it('should handle string booleans', function () {
+		assert.deepEqual(qs.parse('falsy=false&truthy=true'), {falsy: false, truthy: true});
+	});
 });
 
 describe('.stringify()', function () {
