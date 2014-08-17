@@ -1,8 +1,6 @@
-/*global describe, it */
 'use strict';
 var assert = require('assert');
 var qs = require('./query-string');
-
 
 describe('.parse()', function () {
 	it('should handle query strings starting with a `?`', function () {
