@@ -49,7 +49,7 @@ console.log(location.search);
 
 ### queryString.parse(*string*)
 
-Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
+Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` *([doesn't work in Firefox](https://github.com/sindresorhus/query-string/issues/13))* directly.
 
 ### queryString.stringify(*object*)
 
