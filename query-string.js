@@ -32,7 +32,7 @@
 
 			if (!ret.hasOwnProperty(key)) {
 				ret[key] = val;
-			} else if (Array.isArray(ret[key])) {
+			} else if (ret[key] instanceof ret[key]) {
 				ret[key].push(val);
 			} else {
 				ret[key] = [ret[key], val];
@@ -46,7 +46,7 @@
 		return obj ? Object.keys(obj).map(function (key) {
 			var val = obj[key];
 
-			if (Array.isArray(val)) {
+			if (val instanceof Array) {
 				return val.map(function (val2) {
 					return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
 				}).join('&');
