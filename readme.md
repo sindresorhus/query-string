@@ -5,35 +5,29 @@
 
 ## Install
 
-```sh
+```
 $ npm install --save query-string
-```
-
-```sh
-$ bower install --save query-string
-```
-
-```sh
-$ component install sindresorhus/query-string
 ```
 
 
 ## Usage
 
 ```js
+var queryString = require('query-string');
+
 console.log(location.search);
-// ?foo=bar
+//=> ?foo=bar
 
 var parsed = queryString.parse(location.search);
 console.log(parsed);
-// {foo: 'bar'}
+//=> {foo: 'bar'}
 
 console.log(location.hash);
-// #token=bada55cafe
+//=> #token=bada55cafe
 
 var parsedHash = queryString.parse(location.hash);
 console.log(parsedHash);
-// {token: 'bada55cafe'}
+//=> {token: 'bada55cafe'}
 
 parsed.foo = 'unicorn';
 parsed.ilike = 'pizza';
@@ -41,7 +35,7 @@ parsed.ilike = 'pizza';
 location.search = queryString.stringify(parsed);
 
 console.log(location.search);
-// ?foo=unicorn&ilike=pizza
+//=> ?foo=unicorn&ilike=pizza
 ```
 
 
@@ -69,7 +63,7 @@ queryString.stringify({
     unicorn: 'cake'
   })
 });
-// foo=bar&nested=%7B%22unicorn%22%3A%22cake%22%7D
+//=> foo=bar&nested=%7B%22unicorn%22%3A%22cake%22%7D
 ```
 
 

@@ -1,61 +1,61 @@
 'use strict';
 var assert = require('assert');
-var qs = require('./query-string');
+var qs = require('./');
 
 describe('.parse()', function () {
-	it('should handle query strings starting with a `?`', function () {
+	it('query strings starting with a `?`', function () {
 		assert.deepEqual(qs.parse('?foo=bar'), {foo: 'bar'});
 	});
 
-	it('should handle query strings starting with a `#`', function () {
+	it('query strings starting with a `#`', function () {
 		assert.deepEqual(qs.parse('#foo=bar'), {foo: 'bar'});
 	});
 
-	it('should parse a qseter', function () {
+	it('parse a query string', function () {
 		assert.deepEqual(qs.parse('foo=bar'), {foo: 'bar'});
 	});
 
-	it('should parse multiple qseters', function () {
+	it('parse multiple query string', function () {
 		assert.deepEqual(qs.parse('foo=bar&key=val'), {foo: 'bar', key: 'val'});
 	});
 
-	it('should parse qseters without a value', function () {
+	it('parse query string without a value', function () {
 		assert.deepEqual(qs.parse('foo'), {foo: null});
 		assert.deepEqual(qs.parse('foo&key'), {foo: null, key: null});
 		assert.deepEqual(qs.parse('foo=bar&key'), {foo: 'bar', key: null});
 	});
 
-	it('should return empty object if no qss can be found', function () {
+	it('return empty object if no qss can be found', function () {
 		assert.deepEqual(qs.parse('?'), {});
 		assert.deepEqual(qs.parse('#'), {});
 		assert.deepEqual(qs.parse(' '), {});
 	});
 
-	it('should handle `+` correctly', function () {
+	it('handle `+` correctly', function () {
 		assert.deepEqual(qs.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 	});
 
-	it('should handle multiple of the same key', function () {
+	it('handle multiple of the same key', function () {
 		assert.deepEqual(qs.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 	});
 });
 
 describe('.stringify()', function () {
-	it('should stringify', function () {
+	it('stringify', function () {
 		assert.strictEqual(qs.stringify({foo: 'bar'}), 'foo=bar');
 		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}), 'foo=bar&bar=baz');
 	});
 
-	it('should handle different types', function () {
+	it('different types', function () {
 		assert.strictEqual(qs.stringify(), '');
 		assert.strictEqual(qs.stringify(0), '');
 	});
 
-	it('should URI encode', function () {
+	it('URI encode', function () {
 		assert.strictEqual(qs.stringify({'foo bar': 'baz faz'}), 'foo%20bar=baz%20faz');
 	});
 
-	it('should handle array value', function () {
+	it('handle array value', function () {
 		assert.strictEqual(qs.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 	});
 });
