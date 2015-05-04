@@ -61,6 +61,6 @@
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = queryString;
 	} else {
-		window.queryString = queryString;
+		self.queryString = queryString;
 	}
 })();
