@@ -1,6 +1,6 @@
 {
   "name": "query-string",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Parse and stringify URL query strings",
   "keywords": [
     "browser",
