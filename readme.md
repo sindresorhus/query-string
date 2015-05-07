@@ -47,7 +47,7 @@ Parse a query string into an object. Leading `?` or `#` are ignored, so you can 
 
 ### queryString.stringify(*object*, *[sorted]*)
 
-Stringify an object into a query string.
+Stringify an object into a query string, optionally sorting the param keys.
 
 
 ## Nesting
