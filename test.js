@@ -43,12 +43,7 @@ describe('.parse()', function () {
 describe('.stringify()', function () {
 	it('stringify', function () {
 		assert.strictEqual(qs.stringify({foo: 'bar'}), 'foo=bar');
-		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}), 'foo=bar&bar=baz');
-	});
-
-	it('sort keys', function () {
-		assert.strictEqual(qs.stringify({foo: 'bar'}, true), 'foo=bar');
-		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}, true), 'bar=baz&foo=bar');
+		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}), 'bar=baz&foo=bar');
 	});
 
 	it('different types', function () {

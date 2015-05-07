@@ -45,9 +45,9 @@ console.log(location.search);
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
-### queryString.stringify(*object*, *[sorted]*)
+### queryString.stringify(*object*)
 
-Stringify an object into a query string, optionally sorting the param keys.
+Stringify an object into a query string, sorting the param keys.
 
 
 ## Nesting
