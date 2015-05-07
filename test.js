@@ -43,7 +43,7 @@ describe('.parse()', function () {
 describe('.stringify()', function () {
 	it('stringify', function () {
 		assert.strictEqual(qs.stringify({foo: 'bar'}), 'foo=bar');
-		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}), 'foo=bar&bar=baz');
+		assert.strictEqual(qs.stringify({foo: 'bar', bar: 'baz'}), 'bar=baz&foo=bar');
 	});
 
 	it('different types', function () {
