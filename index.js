@@ -33,8 +33,13 @@ exports.parse = function (str) {
 	}, {});
 };
 
-exports.stringify = function (obj) {
-	return obj ? Object.keys(obj).map(function (key) {
+exports.stringify = function (obj, sorted) {
+	if (!obj) return '';
+
+	var keys = Object.keys(obj);
+	if (sorted) keys.sort();
+
+	return keys.map(function (key) {
 		var val = obj[key];
 
 		if (Array.isArray(val)) {
@@ -44,5 +49,5 @@ exports.stringify = function (obj) {
 		}
 
 		return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-	}).join('&') : '';
+	}).join('&');
 };
