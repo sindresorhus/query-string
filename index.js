@@ -11,6 +11,10 @@ exports.parse = function (str) {
 		return {};
 	}
 
+	if (str[0] == '&') {
+		str = str.substr(1, str.length);
+	}
+
 	return str.trim().split('&').reduce(function (ret, param) {
 		var parts = param.replace(/\+/g, ' ').split('=');
 		var key = parts[0];
