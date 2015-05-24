@@ -11,6 +11,10 @@ describe('.parse()', function () {
 		assert.deepEqual(qs.parse('#foo=bar'), {foo: 'bar'});
 	});
 
+	it('remove & from starts', function () {
+		assert.deepEqual(qs.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
+	});
+
 	it('parse a query string', function () {
 		assert.deepEqual(qs.parse('foo=bar'), {foo: 'bar'});
 	});
@@ -37,10 +41,6 @@ describe('.parse()', function () {
 
 	it('handle multiple of the same key', function () {
 		assert.deepEqual(qs.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
-	});
-
-	it('remove & from starts', function () {
-		assert.deepEqual(qs.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 	});
 });
 
