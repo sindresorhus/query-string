@@ -5,11 +5,7 @@ exports.parse = function (str) {
 		return {};
 	}
 
-	if (str[0] === '&') {
-		str = str.substr(1, str.length);
-	}
-
-	str = str.trim().replace(/^(\?|#)/, '');
+	str = str.trim().replace(/^(\?|#|&)/, '');
 
 	if (!str) {
 		return {};
