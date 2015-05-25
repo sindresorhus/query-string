@@ -11,7 +11,7 @@ describe('.parse()', function () {
 		assert.deepEqual(qs.parse('#foo=bar'), {foo: 'bar'});
 	});
 
-	it('remove & from starts', function () {
+	it('query strings starting with a `&', function () {
 		assert.deepEqual(qs.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 	});
 
