@@ -31,6 +31,7 @@ describe('.parse()', function () {
 
 	it('return empty object if no qss can be found', function () {
 		assert.deepEqual(qs.parse('?'), {});
+		assert.deepEqual(qs.parse('&'), {});
 		assert.deepEqual(qs.parse('#'), {});
 		assert.deepEqual(qs.parse(' '), {});
 	});
