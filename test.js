@@ -11,6 +11,10 @@ describe('.parse()', function () {
 		assert.deepEqual(qs.parse('#foo=bar'), {foo: 'bar'});
 	});
 
+	it('query strings starting with a `&', function () {
+		assert.deepEqual(qs.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
+	});
+
 	it('parse a query string', function () {
 		assert.deepEqual(qs.parse('foo=bar'), {foo: 'bar'});
 	});
@@ -27,6 +31,7 @@ describe('.parse()', function () {
 
 	it('return empty object if no qss can be found', function () {
 		assert.deepEqual(qs.parse('?'), {});
+		assert.deepEqual(qs.parse('&'), {});
 		assert.deepEqual(qs.parse('#'), {});
 		assert.deepEqual(qs.parse(' '), {});
 	});
