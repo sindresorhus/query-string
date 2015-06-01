@@ -14,7 +14,7 @@ exports.parse = function (str) {
 	return str.trim().split('&').reduce(function (ret, param) {
 		var parts = param.replace(/\+/g, ' ').split('=');
 		var key = parts[0];
-		var val = parts[1];
+		var val = parts.slice(1).join('=');
 
 		key = decodeURIComponent(key);
 		// missing `=` should be `null`:
