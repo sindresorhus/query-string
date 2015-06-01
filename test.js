@@ -43,6 +43,10 @@ describe('.parse()', function () {
 	it('handle multiple of the same key', function () {
 		assert.deepEqual(qs.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 	});
+
+	it('query strings params including embedded `=`', function () {
+		assert.deepEqual(qs.parse('?param=http%3A%2F%2Fsomeurl%3Fid%3D2837'), {param: 'http://someurl?id=2837'});
+	});
 });
 
 describe('.stringify()', function () {
