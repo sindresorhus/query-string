@@ -7,7 +7,19 @@
 */
 (function () {
 	'use strict';
+
 	var queryString = {};
+
+	queryString.getQueryString = function (maybeUrl) {
+		if(!maybeUrl) {
+			return;
+		}
+
+		var pos = maybeUrl.indexOf('?');
+		if(pos > -1) {
+			return maybeUrl.substring(pos + 1);
+		}
+	};
 
 	queryString.parse = function (str) {
 		if (typeof str !== 'string') {
