@@ -70,18 +70,18 @@ describe('.stringify()', function () {
 });
 
 describe('.getQueryString()', function () {
-  it('should extract qs from url', function () {
-    assert.equal(qs.getQueryString('http://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
-    assert.equal(qs.getQueryString('http://foo.bar/?'), '');
-  });
+	it('should extract qs from url', function () {
+		assert.equal(qs.getQueryString('http://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
+		assert.equal(qs.getQueryString('http://foo.bar/?'), '');
+	});
 
-  it('should handle urls without qs', function () {
-    assert.equal(qs.getQueryString('http://foo.bar/'), null);
-  });
+	it('should handle urls without qs', function () {
+		assert.equal(qs.getQueryString('http://foo.bar/'), null);
+	});
 
-  it('should handle bad input', function () {
-    assert.equal(qs.getQueryString(''), null);
-    assert.equal(qs.getQueryString(undefined), null);
-    assert.equal(qs.getQueryString(null), null);
-  });
+	it('should handle bad input', function () {
+		assert.equal(qs.getQueryString(''), null);
+		assert.equal(qs.getQueryString(undefined), null);
+		assert.equal(qs.getQueryString(null), null);
+	});
 });

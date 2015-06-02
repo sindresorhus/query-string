@@ -1,14 +1,14 @@
 'use strict';
 
 exports.getQueryString = function (maybeUrl) {
-  if(!maybeUrl) {
-    return;
-  }
+	if (!maybeUrl) {
+		return;
+	}
 
-  var pos = maybeUrl.indexOf('?');
-  if(pos > -1) {
-    return maybeUrl.substring(pos + 1);
-  }
+	var pos = maybeUrl.indexOf('?');
+	if (pos !== -1) {
+		return maybeUrl.substring(pos + 1);
+	}
 };
 
 exports.parse = function (str) {
