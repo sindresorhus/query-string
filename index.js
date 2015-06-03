@@ -1,14 +1,7 @@
 'use strict';
 
 exports.extract = function (maybeUrl) {
-	if (!maybeUrl) {
-		return;
-	}
-
-	var pos = maybeUrl.indexOf('?');
-	if (pos !== -1) {
-		return maybeUrl.substring(pos + 1);
-	}
+	return maybeUrl.split('?')[1] || '';
 };
 
 exports.parse = function (str) {

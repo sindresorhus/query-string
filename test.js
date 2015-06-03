@@ -75,13 +75,17 @@ describe('.extract()', function () {
 		assert.equal(qs.extract('http://foo.bar/?'), '');
 	});
 
-	it('should handle urls without qs', function () {
-		assert.equal(qs.extract('http://foo.bar/'), null);
+	it('should handle strings not containing qs', function () {
+		assert.equal(qs.extract('http://foo.bar/'), '');
+		assert.equal(qs.extract(''), '');
 	});
 
-	it('should handle bad input', function () {
-		assert.equal(qs.extract(''), null);
-		assert.equal(qs.extract(undefined), null);
-		assert.equal(qs.extract(null), null);
+	it('should throw for invalid values', function() {
+		assert.throws(function() {
+			qs.extract(null);
+		}, TypeError);
+		assert.throws(function() {
+			qs.extract(undefined);
+		}, TypeError);
 	});
 });
