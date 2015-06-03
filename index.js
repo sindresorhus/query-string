@@ -11,7 +11,7 @@ exports.parse = function (str) {
 		return {};
 	}
 
-	return str.trim().split('&').reduce(function (ret, param) {
+	return str.split('&').reduce(function (ret, param) {
 		var parts = param.replace(/\+/g, ' ').split('=');
 		var key = parts[0];
 		var val = parts[1];
