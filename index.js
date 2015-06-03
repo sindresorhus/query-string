@@ -1,6 +1,6 @@
 'use strict';
 
-exports.getQueryString = function (maybeUrl) {
+exports.extract = function (maybeUrl) {
 	if (!maybeUrl) {
 		return;
 	}
