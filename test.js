@@ -68,3 +68,24 @@ describe('.stringify()', function () {
 		assert.strictEqual(qs.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 	});
 });
+
+describe('.extract()', function () {
+	it('should extract qs from url', function () {
+		assert.equal(qs.extract('http://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
+		assert.equal(qs.extract('http://foo.bar/?'), '');
+	});
+
+	it('should handle strings not containing qs', function () {
+		assert.equal(qs.extract('http://foo.bar/'), '');
+		assert.equal(qs.extract(''), '');
+	});
+
+	it('should throw for invalid values', function() {
+		assert.throws(function() {
+			qs.extract(null);
+		}, TypeError);
+		assert.throws(function() {
+			qs.extract(undefined);
+		}, TypeError);
+	});
+});

@@ -1,5 +1,9 @@
 'use strict';
 
+exports.extract = function (maybeUrl) {
+	return maybeUrl.split('?')[1] || '';
+};
+
 exports.parse = function (str) {
 	if (typeof str !== 'string') {
 		return {};
