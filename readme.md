@@ -41,13 +41,17 @@ console.log(location.search);
 
 ## API
 
-### queryString.parse(*string*)
+### .parse(*string*)
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
-### queryString.stringify(*object*)
+### .stringify(*object*)
 
 Stringify an object into a query string, sorting the keys.
+
+### .extract(*string*)
+
+Extract a query string from a URL that can be passed into `.parse()`.
 
 
 ## Nesting
@@ -58,10 +62,10 @@ You're much better off just converting the object to a JSON string:
 
 ```js
 queryString.stringify({
-  foo: 'bar',
-  nested: JSON.stringify({
-    unicorn: 'cake'
-  })
+	foo: 'bar',
+	nested: JSON.stringify({
+		unicorn: 'cake'
+	})
 });
 //=> foo=bar&nested=%7B%22unicorn%22%3A%22cake%22%7D
 ```
