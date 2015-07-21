@@ -30,6 +30,9 @@
   "scripts": {
     "test": "mocha"
   },
+  "dependencies": {
+    "strict-uri-encode": "^1.0.0"
+  },
   "devDependencies": {
     "mocha": "*"
   },
