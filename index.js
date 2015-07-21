@@ -1,5 +1,7 @@
 'use strict';
 
+var strictUriEncode = require('strict-uri-encode');
+
 exports.extract = function (maybeUrl) {
 	return maybeUrl.split('?')[1] || '';
 };
@@ -43,10 +45,10 @@ exports.stringify = function (obj) {
 
 		if (Array.isArray(val)) {
 			return val.sort().map(function (val2) {
-				return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+				return strictUriEncode(key) + '=' + strictUriEncode(val2);
 			}).join('&');
 		}
 
-		return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+		return strictUriEncode(key) + '=' + strictUriEncode(val);
 	}).join('&') : '';
 };
