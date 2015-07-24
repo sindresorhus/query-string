@@ -1,8 +1,8 @@
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 
-exports.extract = function (maybeUrl) {
-	return maybeUrl.split('?')[1] || '';
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
 };
 
 exports.parse = function (str) {
@@ -22,6 +22,7 @@ exports.parse = function (str) {
 		var val = parts[1];
 
 		key = decodeURIComponent(key);
+
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		val = val === undefined ? null : decodeURIComponent(val);
