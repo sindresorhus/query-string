@@ -81,11 +81,11 @@ describe('.extract()', function () {
 		assert.equal(qs.extract(''), '');
 	});
 
-	it('should throw for invalid values', function() {
-		assert.throws(function() {
+	it('should throw for invalid values', function () {
+		assert.throws(function () {
 			qs.extract(null);
 		}, TypeError);
-		assert.throws(function() {
+		assert.throws(function () {
 			qs.extract(undefined);
 		}, TypeError);
 	});
