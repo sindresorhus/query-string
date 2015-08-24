@@ -68,6 +68,9 @@ describe('.stringify()', function () {
 	it('handle array value', function () {
 		assert.strictEqual(qs.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 	});
+	it('handles empty array value', function () {
+		assert.strictEqual(qs.stringify({abc: 'abc', foo: []}), 'abc=abc');
+	});
 });
 
 describe('.extract()', function () {
