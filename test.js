@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 'use strict';
 var assert = require('assert');
 var qs = require('./');
@@ -62,7 +63,7 @@ describe('.stringify()', function () {
 
 	it('URI encode', function () {
 		assert.strictEqual(qs.stringify({'foo bar': 'baz faz'}), 'foo%20bar=baz%20faz');
-		assert.strictEqual(qs.stringify({'foo bar': "baz'faz"}), 'foo%20bar=baz%27faz');
+		assert.strictEqual(qs.stringify({'foo bar': 'baz\'faz'}), 'foo%20bar=baz%27faz');
 	});
 
 	it('handle array value', function () {

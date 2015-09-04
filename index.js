@@ -50,7 +50,7 @@ exports.stringify = function (obj) {
 		}
 
 		return strictUriEncode(key) + '=' + strictUriEncode(val);
-	}).filter(function(x) {
+	}).filter(function (x) {
 		return x.length > 0;
 	}).join('&') : '';
 };
