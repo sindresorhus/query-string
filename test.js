@@ -73,6 +73,10 @@ describe('.stringify()', function () {
 	it('handle empty array value', function () {
 		assert.strictEqual(qs.stringify({abc: 'abc', foo: []}), 'abc=abc');
 	});
+
+	it('should not encode undefined values', function () {
+		assert.strictEqual(qs.stringify({abc: undefined, foo: 'baz'}), 'foo=baz');
+	});
 });
 
 describe('.extract()', function () {

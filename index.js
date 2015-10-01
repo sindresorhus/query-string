@@ -43,6 +43,10 @@ exports.stringify = function (obj) {
 	return obj ? Object.keys(obj).sort().map(function (key) {
 		var val = obj[key];
 
+		if (val === undefined) {
+			return '';
+		}
+
 		if (Array.isArray(val)) {
 			return val.sort().map(function (val2) {
 				return strictUriEncode(key) + '=' + strictUriEncode(val2);
