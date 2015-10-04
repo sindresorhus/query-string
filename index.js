@@ -18,8 +18,8 @@ exports.parse = function (str) {
 
 	return str.split('&').reduce(function (ret, param) {
 		var parts = param.replace(/\+/g, ' ').split('=');
-		var key = parts[0];
-		var val = parts[1];
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
 
 		key = decodeURIComponent(key);
 
