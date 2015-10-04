@@ -17,11 +17,11 @@ exports.parse = function (str) {
 	}
 
 	return str.split('&').reduce(function (ret, param) {
-		var parts = param.replace(/\+/g, ' ').split('=');
+		var parts = param.replace(/\+/g, ' ').split(/\=(.+)?/);
 		// Firefox (pre 40) decodes `%3D` to `=`
 		// https://github.com/sindresorhus/query-string/pull/37
-		var key = parts.shift();
-		var val = parts.length > 0 ? parts.join('=') : undefined;
+		var key = parts[0];
+		var val = parts[1];
 
 		key = decodeURIComponent(key);
 
