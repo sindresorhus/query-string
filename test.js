@@ -77,6 +77,10 @@ describe('.stringify()', function () {
 	it('should not encode undefined values', function () {
 		assert.strictEqual(qs.stringify({abc: undefined, foo: 'baz'}), 'foo=baz');
 	});
+
+	it('should encode null values as just a key', function () {
+		assert.strictEqual(qs.stringify({xyz: null, abc: null, foo: 'baz'}), 'abc&foo=baz&xyz');
+	});
 });
 
 describe('.extract()', function () {
