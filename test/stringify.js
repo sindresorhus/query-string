@@ -28,3 +28,13 @@ test('handle empty array value', t => {
 	t.same(fn.stringify({abc: 'abc', foo: []}), 'abc=abc');
 	t.end();
 });
+
+test('should not encode undefined values', t => {
+	t.same(fn.stringify({abc: undefined, foo: 'baz'}), 'foo=baz');
+	t.end();
+});
+
+test('should encode null values as just a key', t => {
+	t.same(fn.stringify({xyz: null, abc: null, foo: 'baz'}), 'abc&foo=baz&xyz');
+	t.end();
+});
