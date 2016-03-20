@@ -54,9 +54,21 @@ exports.stringify = function (obj) {
 		}
 
 		if (Array.isArray(val)) {
-			return val.slice().sort().map(function (val2) {
-				return strictUriEncode(key) + '=' + strictUriEncode(val2);
-			}).join('&');
+			var result = [];
+
+			val.slice().sort().forEach(function (val2) {
+				if (val2 === undefined) {
+					return;
+				}
+
+				if (val2 === null) {
+					result.push(strictUriEncode(key));
+				} else {
+					result.push(strictUriEncode(key) + '=' + strictUriEncode(val2));
+				}
+			});
+
+			return result.join('&');
 		}
 
 		return strictUriEncode(key) + '=' + strictUriEncode(val);
