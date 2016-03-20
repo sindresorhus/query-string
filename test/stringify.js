@@ -31,3 +31,15 @@ test('should not encode undefined values', t => {
 test('should encode null values as just a key', t => {
 	t.same(fn.stringify({xyz: null, abc: null, foo: 'baz'}), 'abc&foo=baz&xyz');
 });
+
+test('handle null values in array', t => {
+	t.same(fn.stringify({foo: null, bar: [null, 'baz']}), 'bar=baz&bar&foo');
+});
+
+test('handle undefined values in array', t => {
+	t.same(fn.stringify({foo: null, bar: [undefined, 'baz']}), 'bar=baz&foo');
+});
+
+test('handle undefined and null values in array', t => {
+	t.same(fn.stringify({foo: null, bar: [undefined, null, 'baz']}), 'bar=baz&bar&foo');
+});
