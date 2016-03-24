@@ -30,12 +30,17 @@ console.log(parsedHash);
 //=> {token: 'bada55cafe'}
 
 parsed.foo = 'unicorn';
-parsed.ilike = 'pizza';
+parsed.ilike = 'pizza+coke';
 
 location.search = queryString.stringify(parsed);
 
 console.log(location.search);
-//=> '?foo=unicorn&ilike=pizza'
+//=> '?foo=unicorn&ilike=pizza%2Bcoke'
+
+location.search = queryString.stringify(parsed, { lowercaseHex: true });
+
+console.log(location.search);
+//=> '?foo=unicorn&ilike=pizza%2bcoke'
 ```
 
 
@@ -45,9 +50,11 @@ console.log(location.search);
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
-### .stringify(*object*)
+### .stringify(*object*[, *options*])
 
 Stringify an object into a query string, sorting the keys.
+
+By default, URL encoded characters will be uppercase. Set `options.lowercaseHex` to `true` to make them lowercase.
 
 ### .extract(*string*)
 

@@ -14,6 +14,11 @@ test('different types', t => {
 test('URI encode', t => {
 	t.same(fn.stringify({'foo bar': 'baz faz'}), 'foo%20bar=baz%20faz');
 	t.same(fn.stringify({'foo bar': 'baz\'faz'}), 'foo%20bar=baz%27faz');
+	t.same(fn.stringify({'foo bar': 'baz/faz'}), 'foo%20bar=baz%2Ffaz');
+});
+
+test('lowercaseHex', t => {
+	t.same(fn.stringify({'foo bar': 'Baz/faz'}, {lowercaseHex: true}), 'foo%20bar=Baz%2ffaz');
 });
 
 test('handle array value', t => {
