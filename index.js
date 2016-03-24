@@ -41,8 +41,12 @@ exports.parse = function (str) {
 	}, {});
 };
 
-exports.stringify = function (obj) {
-	return obj ? Object.keys(obj).sort().map(function (key) {
+var hexRegex = /%[0-9A-F]{2}/g;
+
+exports.stringify = function (obj, options) {
+	options = options || {};
+
+	var queryString = obj ? Object.keys(obj).sort().map(function (key) {
 		var val = obj[key];
 
 		if (val === undefined) {
@@ -75,4 +79,12 @@ exports.stringify = function (obj) {
 	}).filter(function (x) {
 		return x.length > 0;
 	}).join('&') : '';
+
+	if (options.lowercaseHex === true) {
+		return queryString.replace(hexRegex, function (hex) {
+			return hex.toLowerCase();
+		});
+	}
+
+	return queryString;
 };
