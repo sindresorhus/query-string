@@ -65,6 +65,6 @@ test('query strings params including raw `=`', t => {
 
 test('object properties', t => {
 	t.notOk(fn.parse().prototype);
-	tsame(t, fn.parse('hasOwnProperty=foo'), {hasOwnProperty: 'fo'});
+	tsame(t, fn.parse('hasOwnProperty=foo'), {hasOwnProperty: 'foo'});
 	tsame(t, fn.parse('__proto__=bar'), {__proto__: 'bar'});
 });
