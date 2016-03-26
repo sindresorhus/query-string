@@ -4,7 +4,11 @@ import fn from '../';
 // https://github.com/sindresorhus/query-string/pull/48#issuecomment-198242935
 function tsame(t, actual, expected) {
 	Object.keys(expected).forEach(key => {
-		t.is(actual[key], expected[key]);
+		if (Array.isArray(expected[key])) {
+			t.same(actual[key], expected[key]);
+		} else {
+			t.is(actual[key], expected[key]);
+		}
 	});
 }
 
