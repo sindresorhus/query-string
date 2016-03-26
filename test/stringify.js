@@ -43,3 +43,13 @@ test('handle undefined values in array', t => {
 test('handle undefined and null values in array', t => {
 	t.same(fn.stringify({foo: null, bar: [undefined, null, 'baz']}), 'bar=baz&bar&foo');
 });
+
+test('strict encoding', t => {
+	t.same(fn.stringify({foo: '\'bar\''}), 'foo=%27bar%27');
+	t.same(fn.stringify({foo: ['\'bar\'', '!baz']}), 'foo=%21baz&foo=%27bar%27');
+});
+
+test('loose encoding', t => {
+	t.same(fn.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
+	t.same(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=!baz&foo=\'bar\'');
+});

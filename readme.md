@@ -47,9 +47,17 @@ Parse a query string into an object. Leading `?` or `#` are ignored, so you can 
 
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
-### .stringify(*object*)
+### .stringify(*object*, *[options]*)
 
 Stringify an object into a query string, sorting the keys.
+
+#### strict
+
+Type: `boolean`<br />
+Default: `true`
+
+Strictly encode URI components with [strict-uri-encode](https://github.com/kevva/strict-uri-encode). It uses [encodeURIComponent](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)
+if set to false. You probably [don't care](https://github.com/sindresorhus/query-string/issues/42) about this option.
 
 ### .extract(*string*)
 
