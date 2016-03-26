@@ -45,6 +45,8 @@ console.log(location.search);
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
+The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
+
 ### .stringify(*object*)
 
 Stringify an object into a query string, sorting the keys.

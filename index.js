@@ -6,17 +6,21 @@ exports.extract = function (str) {
 };
 
 exports.parse = function (str) {
+	// Create an object with no prototype
+	// https://github.com/sindresorhus/query-string/issues/47
+	var ret = Object.create(null);
+
 	if (typeof str !== 'string') {
-		return {};
+		return ret;
 	}
 
 	str = str.trim().replace(/^(\?|#|&)/, '');
 
 	if (!str) {
-		return {};
+		return ret;
 	}
 
-	return str.split('&').reduce(function (ret, param) {
+	str.split('&').forEach(function (param) {
 		var parts = param.replace(/\+/g, ' ').split('=');
 		// Firefox (pre 40) decodes `%3D` to `=`
 		// https://github.com/sindresorhus/query-string/pull/37
@@ -29,16 +33,16 @@ exports.parse = function (str) {
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		val = val === undefined ? null : decodeURIComponent(val);
 
-		if (!ret.hasOwnProperty(key)) {
+		if (ret[key] !== undefined) {
 			ret[key] = val;
 		} else if (Array.isArray(ret[key])) {
 			ret[key].push(val);
 		} else {
 			ret[key] = [ret[key], val];
 		}
+	});
 
-		return ret;
-	}, {});
+	return ret;
 };
 
 exports.stringify = function (obj) {
