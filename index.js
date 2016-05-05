@@ -1,8 +1,12 @@
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 
-function encode(value, strict) {
-	return strict ? strictUriEncode(value) : encodeURIComponent(value);
+function encode(value, opts) {
+	if (opts.encode) {
+		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+	}
+
+	return value;
 }
 
 exports.extract = function (str) {
@@ -52,7 +56,14 @@ exports.parse = function (str) {
 exports.stringify = function (obj, opts) {
 	opts = opts || {};
 
-	var strict = opts.strict !== false;
+	// Default encode to true to maintain previous behavior
+	if (opts.encode === undefined) {
+		opts.encode = true;
+	}
+
+	if (opts.strict === undefined) {
+		opts.strict = true;
+	}
 
 	return obj ? Object.keys(obj).sort().map(function (key) {
 		var val = obj[key];
@@ -74,16 +85,16 @@ exports.stringify = function (obj, opts) {
 				}
 
 				if (val2 === null) {
-					result.push(encode(key, strict));
+					result.push(encode(key, opts));
 				} else {
-					result.push(encode(key, strict) + '=' + encode(val2, strict));
+					result.push(encode(key, opts) + '=' + encode(val2, opts));
 				}
 			});
 
 			return result.join('&');
 		}
 
-		return encode(key, strict) + '=' + encode(val, strict);
+		return encode(key, opts) + '=' + encode(val, opts);
 	}).filter(function (x) {
 		return x.length > 0;
 	}).join('&') : '';
