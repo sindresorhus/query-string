@@ -54,16 +54,12 @@ exports.parse = function (str) {
 };
 
 exports.stringify = function (obj, opts) {
-	opts = opts || {};
+	var defaults = {
+		encode: true,
+		strict: true
+	};
 
-	// Default encode to true to maintain previous behavior
-	if (opts.encode === undefined) {
-		opts.encode = true;
-	}
-
-	if (opts.strict === undefined) {
-		opts.strict = true;
-	}
+	opts = Object.assign(defaults, opts);
 
 	return obj ? Object.keys(obj).sort().map(function (key) {
 		var val = obj[key];
