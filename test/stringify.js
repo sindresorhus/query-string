@@ -16,6 +16,10 @@ test('URI encode', t => {
 	t.deepEqual(fn.stringify({'foo bar': 'baz\'faz'}), 'foo%20bar=baz%27faz');
 });
 
+test('no encoding', t => {
+	t.deepEqual(fn.stringify({'foo:bar': 'baz:faz'}, {encode: false}), 'foo:bar=baz:faz');
+});
+
 test('handle array value', t => {
 	t.deepEqual(fn.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 });

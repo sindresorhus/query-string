@@ -59,6 +59,13 @@ Default: `true`
 Strictly encode URI components with [strict-uri-encode](https://github.com/kevva/strict-uri-encode). It uses [encodeURIComponent](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)
 if set to false. You probably [don't care](https://github.com/sindresorhus/query-string/issues/42) about this option.
 
+#### encode
+
+Type: `boolean`<br>
+Default: `true`
+
+[URL encode](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) the keys and values.
+
 ### .extract(*string*)
 
 Extract a query string from a URL that can be passed into `.parse()`.
