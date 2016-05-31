@@ -87,6 +87,16 @@ queryString.stringify({
 //=> 'foo=bar&nested=%7B%22unicorn%22%3A%22cake%22%7D'
 ```
 
+However, there is support for multiple instances of the same key:
+
+```js
+queryString.parse('likes=cake&name=bob&likes=icecream');
+//=> {likes: ['cake', 'icecream'], name: 'bob'}
+
+queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
+//=> 'color=chartreuse&color=taupe&id=515'
+```
+
 
 ## License
 
