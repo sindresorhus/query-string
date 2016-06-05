@@ -24,6 +24,10 @@ test('handle array value', t => {
 	t.deepEqual(fn.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 });
 
+test('should not sort array value', t => {
+	t.deepEqual(fn.stringify({abc: 'abc', foo: ['baz', 'bar']}), 'abc=abc&foo=baz&foo=bar');
+});
+
 test('handle empty array value', t => {
 	t.deepEqual(fn.stringify({abc: 'abc', foo: []}), 'abc=abc');
 });
@@ -37,7 +41,7 @@ test('should encode null values as just a key', t => {
 });
 
 test('handle null values in array', t => {
-	t.deepEqual(fn.stringify({foo: null, bar: [null, 'baz']}), 'bar=baz&bar&foo');
+	t.deepEqual(fn.stringify({foo: null, bar: [null, 'baz']}), 'bar&bar=baz&foo');
 });
 
 test('handle undefined values in array', t => {
@@ -45,15 +49,15 @@ test('handle undefined values in array', t => {
 });
 
 test('handle undefined and null values in array', t => {
-	t.deepEqual(fn.stringify({foo: null, bar: [undefined, null, 'baz']}), 'bar=baz&bar&foo');
+	t.deepEqual(fn.stringify({foo: null, bar: [undefined, null, 'baz']}), 'bar&bar=baz&foo');
 });
 
 test('strict encoding', t => {
 	t.deepEqual(fn.stringify({foo: '\'bar\''}), 'foo=%27bar%27');
-	t.deepEqual(fn.stringify({foo: ['\'bar\'', '!baz']}), 'foo=%21baz&foo=%27bar%27');
+	t.deepEqual(fn.stringify({foo: ['\'bar\'', '!baz']}), 'foo=%27bar%27&foo=%21baz');
 });
 
 test('loose encoding', t => {
 	t.deepEqual(fn.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
-	t.deepEqual(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=!baz&foo=\'bar\'');
+	t.deepEqual(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=\'bar\'&foo=!baz');
 });

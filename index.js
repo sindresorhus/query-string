@@ -76,7 +76,7 @@ exports.stringify = function (obj, opts) {
 		if (Array.isArray(val)) {
 			var result = [];
 
-			val.slice().sort().forEach(function (val2) {
+			val.slice().forEach(function (val2) {
 				if (val2 === undefined) {
 					return;
 				}
