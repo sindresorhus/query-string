@@ -24,7 +24,7 @@ test('handle array value', t => {
 	t.deepEqual(fn.stringify({abc: 'abc', foo: ['bar', 'baz']}), 'abc=abc&foo=bar&foo=baz');
 });
 
-test('should not sort array value', t => {
+test('array order', t => {
 	t.deepEqual(fn.stringify({abc: 'abc', foo: ['baz', 'bar']}), 'abc=abc&foo=baz&foo=bar');
 });
 
