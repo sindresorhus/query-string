@@ -56,3 +56,7 @@ test('object properties', t => {
 	t.falsy(fn.parse().prototype);
 	t.deepEqual(fn.parse('hasOwnProperty=foo'), {hasOwnProperty: 'foo'});
 });
+
+test('handle decodeURIComponent error correctly', t => {
+	t.deepEqual(fn.parse('?param=%'), {param: '%'});
+});
