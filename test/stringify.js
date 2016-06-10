@@ -37,7 +37,7 @@ test('should not encode undefined values', t => {
 });
 
 test('should encode null values as just a key', t => {
-	t.deepEqual(fn.stringify({xyz: null, abc: null, foo: 'baz'}), 'abc&foo=baz&xyz');
+	t.deepEqual(fn.stringify({'x y z': null, 'abc': null, 'foo': 'baz'}), 'abc&foo=baz&x%20y%20z');
 });
 
 test('handle null values in array', t => {
