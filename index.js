@@ -70,7 +70,7 @@ exports.stringify = function (obj, opts) {
 		}
 
 		if (val === null) {
-			return key;
+			return encode(key, opts);
 		}
 
 		if (Array.isArray(val)) {
