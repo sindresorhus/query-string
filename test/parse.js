@@ -18,13 +18,22 @@ test('parse a query string', t => {
 });
 
 test('parse multiple query string', t => {
-	t.deepEqual(fn.parse('foo=bar&key=val'), {foo: 'bar', key: 'val'});
+	t.deepEqual(fn.parse('foo=bar&key=val'), {
+		foo: 'bar',
+		key: 'val'
+	});
 });
 
 test('parse query string without a value', t => {
 	t.deepEqual(fn.parse('foo'), {foo: null});
-	t.deepEqual(fn.parse('foo&key'), {foo: null, key: null});
-	t.deepEqual(fn.parse('foo=bar&key'), {foo: 'bar', key: null});
+	t.deepEqual(fn.parse('foo&key'), {
+		foo: null,
+		key: null
+	});
+	t.deepEqual(fn.parse('foo=bar&key'), {
+		foo: 'bar',
+		key: null
+	});
 	t.deepEqual(fn.parse('a&a'), {a: [null, null]});
 	t.deepEqual(fn.parse('a=&a'), {a: ['', null]});
 });
