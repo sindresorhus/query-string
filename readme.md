@@ -35,7 +35,7 @@ parsed.ilike = 'pizza';
 location.search = queryString.stringify(parsed);
 
 console.log(location.search);
-//=> '?foo=unicorn&ilike=pizza'
+//=> 'foo=unicorn&ilike=pizza'
 ```
 
 
