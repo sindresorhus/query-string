@@ -32,8 +32,11 @@ console.log(parsedHash);
 parsed.foo = 'unicorn';
 parsed.ilike = 'pizza';
 
-location.search = queryString.stringify(parsed);
+const stringified = queryString.stringify(parsed);
+//=> 'foo=unicorn&ilike=pizza'
 
+location.search = stringified;
+// note that `location.search` automatically prepends a question mark
 console.log(location.search);
 //=> '?foo=unicorn&ilike=pizza'
 ```
