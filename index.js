@@ -36,7 +36,8 @@ exports.parse = function (str) {
 		var key = parts.shift();
 		var val = parts.length > 0 ? parts.join('=') : undefined;
 
-		key = decodeURIComponent(key);
+		key = decodeURIComponent(key)
+			.replace(/\[\]$/,"");
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
@@ -80,11 +81,12 @@ exports.stringify = function (obj, opts) {
 				if (val2 === undefined) {
 					return;
 				}
+				var arrayKey = encode(key, encode) + '[]';
 
 				if (val2 === null) {
-					result.push(encode(key, opts));
+					result.push(arrayKey);
 				} else {
-					result.push(encode(key, opts) + '=' + encode(val2, opts));
+					result.push(arrayKey + '=' + encode(val2, opts));
 				}
 			});
 

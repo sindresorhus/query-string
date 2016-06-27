@@ -10,7 +10,7 @@ test('query strings starting with a `#`', t => {
 });
 
 test('query strings starting with a `&`', t => {
-	t.deepEqual(fn.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
+	t.deepEqual(fn.parse('&foo[]=bar&foo[]=baz'), {foo: ['bar', 'baz']});
 });
 
 test('parse a query string', t => {
@@ -34,8 +34,8 @@ test('parse query string without a value', t => {
 		foo: 'bar',
 		key: null
 	});
-	t.deepEqual(fn.parse('a&a'), {a: [null, null]});
-	t.deepEqual(fn.parse('a=&a'), {a: ['', null]});
+	t.deepEqual(fn.parse('a[]&a[]'), {a: [null, null]});
+	t.deepEqual(fn.parse('a[]=&a[]'), {a: ['', null]});
 });
 
 test('return empty object if no qss can be found', t => {
@@ -50,7 +50,7 @@ test('handle `+` correctly', t => {
 });
 
 test('handle multiple of the same key', t => {
-	t.deepEqual(fn.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
+	t.deepEqual(fn.parse('foo[]=bar&foo[]=baz'), {foo: ['bar', 'baz']});
 });
 
 test('query strings params including embedded `=`', t => {
