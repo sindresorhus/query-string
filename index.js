@@ -37,7 +37,7 @@ exports.parse = function (str) {
 		var val = parts.length > 0 ? parts.join('=') : undefined;
 
 		key = decodeURIComponent(key)
-			.replace(/\[\]$/,"");
+			.replace(/\[\]$/, '');
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
