@@ -62,7 +62,19 @@ exports.stringify = function (obj, opts) {
 
 	opts = objectAssign(defaults, opts);
 
-	return obj ? Object.keys(obj).sort().map(function (key) {
+	if (!obj) {
+		return '';
+	} else if (Array.isArray(obj)) {
+		return obj.map(function (obj) {
+			return stringifyObject(obj, opts);
+		}).join('&');
+	}
+
+	return stringifyObject(obj, opts);
+};
+
+function stringifyObject(obj, opts) {
+	return Object.keys(obj).sort().map(function (key) {
 		var val = obj[key];
 
 		if (val === undefined) {
@@ -94,5 +106,5 @@ exports.stringify = function (obj, opts) {
 		return encode(key, opts) + '=' + encode(val, opts);
 	}).filter(function (x) {
 		return x.length > 0;
-	}).join('&') : '';
-};
+	}).join('&');
+}
