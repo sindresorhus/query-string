@@ -27,14 +27,14 @@ test('handle array value', t => {
 	t.is(fn.stringify({
 		abc: 'abc',
 		foo: ['bar', 'baz']
-	}), 'abc=abc&foo=bar&foo=baz');
+	}), 'abc=abc&foo[]=bar&foo[]=baz');
 });
 
 test('array order', t => {
 	t.is(fn.stringify({
 		abc: 'abc',
 		foo: ['baz', 'bar']
-	}), 'abc=abc&foo=baz&foo=bar');
+	}), 'abc=abc&foo[]=baz&foo[]=bar');
 });
 
 test('handle empty array value', t => {
@@ -63,29 +63,29 @@ test('handle null values in array', t => {
 	t.is(fn.stringify({
 		foo: null,
 		bar: [null, 'baz']
-	}), 'bar&bar=baz&foo');
+	}), 'bar[]&bar[]=baz&foo');
 });
 
 test('handle undefined values in array', t => {
 	t.is(fn.stringify({
 		foo: null,
 		bar: [undefined, 'baz']
-	}), 'bar=baz&foo');
+	}), 'bar[]=baz&foo');
 });
 
 test('handle undefined and null values in array', t => {
 	t.is(fn.stringify({
 		foo: null,
 		bar: [undefined, null, 'baz']
-	}), 'bar&bar=baz&foo');
+	}), 'bar[]&bar[]=baz&foo');
 });
 
 test('strict encoding', t => {
 	t.is(fn.stringify({foo: '\'bar\''}), 'foo=%27bar%27');
-	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}), 'foo=%27bar%27&foo=%21baz');
+	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}), 'foo[]=%27bar%27&foo[]=%21baz');
 });
 
 test('loose encoding', t => {
 	t.is(fn.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
-	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=\'bar\'&foo=!baz');
+	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo[]=\'bar\'&foo[]=!baz');
 });

@@ -103,7 +103,7 @@ queryString.parse('likes=cake&name=bob&likes=icecream');
 //=> {likes: ['cake', 'icecream'], name: 'bob'}
 
 queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
-//=> 'color=chartreuse&color=taupe&id=515'
+//=> 'color[]=chartreuse&color[]=taupe&id=515'
 ```
 
 
