@@ -54,7 +54,7 @@ console.log(location.search);
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
-The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
+The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`. To have the default `prototype`, use [`Object.assign({}, returnedObject)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign) but be careful to not let users to break your code by injecting query strings such as `hasOwnProperty=oops`.
 
 ### .stringify(*object*, *[options]*)
 
