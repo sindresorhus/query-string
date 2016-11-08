@@ -23,6 +23,13 @@ test('no encoding', t => {
 	t.is(fn.stringify({'foo:bar': 'baz:faz'}, {encode: false}), 'foo:bar=baz:faz');
 });
 
+test('no sorting', t => {
+	t.is(fn.stringify({
+		xyz: 'xyz',
+		abc: 'abc'
+	}, {sortKeys: false}), 'xyz=xyz&abc=abc');
+});
+
 test('handle array value', t => {
 	t.is(fn.stringify({
 		abc: 'abc',
@@ -54,8 +61,8 @@ test('should not encode undefined values', t => {
 test('should encode null values as just a key', t => {
 	t.is(fn.stringify({
 		'x y z': null,
-		'abc': null,
-		'foo': 'baz'
+		abc: null,
+		foo: 'baz'
 	}), 'abc&foo=baz&x%20y%20z');
 });
 

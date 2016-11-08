@@ -58,7 +58,7 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 ### .stringify(*object*, *[options]*)
 
-Stringify an object into a query string, sorting the keys.
+Stringify an object into a query string, sorting the keys by default.
 
 #### strict
 
@@ -74,6 +74,13 @@ Type: `boolean`<br>
 Default: `true`
 
 [URL encode](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) the keys and values.
+
+#### sortKeys
+
+Type: `boolean`<br>
+Default: `true`
+
+Set to `false` to avoid sorting the keys.
 
 ### .extract(*string*)
 

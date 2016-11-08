@@ -57,42 +57,49 @@ exports.parse = function (str) {
 exports.stringify = function (obj, opts) {
 	var defaults = {
 		encode: true,
+		sortKeys: true,
 		strict: true
 	};
 
 	opts = objectAssign(defaults, opts);
 
-	return obj ? Object.keys(obj).sort().map(function (key) {
-		var val = obj[key];
+	if (obj) {
+		var keys = Object.keys(obj);
+		keys = opts.sortKeys ? keys.sort() : keys;
+		return keys.map(function (key) {
+			var val = obj[key];
 
-		if (val === undefined) {
-			return '';
-		}
+			if (val === undefined) {
+				return '';
+			}
 
-		if (val === null) {
-			return encode(key, opts);
-		}
+			if (val === null) {
+				return encode(key, opts);
+			}
 
-		if (Array.isArray(val)) {
-			var result = [];
+			if (Array.isArray(val)) {
+				var result = [];
 
-			val.slice().forEach(function (val2) {
-				if (val2 === undefined) {
-					return;
-				}
+				val.slice().forEach(function (val2) {
+					if (val2 === undefined) {
+						return;
+					}
 
-				if (val2 === null) {
-					result.push(encode(key, opts));
-				} else {
-					result.push(encode(key, opts) + '=' + encode(val2, opts));
-				}
-			});
+					if (val2 === null) {
+						result.push(encode(key, opts));
+					} else {
+						result.push(encode(key, opts) + '=' + encode(val2, opts));
+					}
+				});
 
-			return result.join('&');
-		}
+				return result.join('&');
+			}
 
-		return encode(key, opts) + '=' + encode(val, opts);
-	}).filter(function (x) {
-		return x.length > 0;
-	}).join('&') : '';
+			return encode(key, opts) + '=' + encode(val, opts);
+		}).filter(function (x) {
+			return x.length > 0;
+		}).join('&');
+	}
+
+	return '';
 };
