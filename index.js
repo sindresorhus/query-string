@@ -84,7 +84,7 @@ exports.stringify = function (obj, opts) {
 				if (val2 === null) {
 					result.push(encode(key, opts));
 				} else {
-					result.push(encode(key, opts) + '=' + encode(val2, opts));
+					result.push(encode(key, opts) + '[]=' + encode(val2, opts));
 				}
 			});
 
