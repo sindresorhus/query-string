@@ -54,8 +54,8 @@ test('should not encode undefined values', t => {
 test('should encode null values as just a key', t => {
 	t.is(fn.stringify({
 		'x y z': null,
-		'abc': null,
-		'foo': 'baz'
+		abc: null,
+		foo: 'baz'
 	}), 'abc&foo=baz&x%20y%20z');
 });
 
@@ -88,4 +88,37 @@ test('strict encoding', t => {
 test('loose encoding', t => {
 	t.is(fn.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
 	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=\'bar\'&foo=!baz');
+});
+
+test('array stringify representation with array indexes', t => {
+	t.is(fn.stringify({
+		foo: null,
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'index'
+	}), 'bar[0]=one&bar[1]=two&foo');
+});
+
+test('array stringify representation with array brackets', t => {
+	t.is(fn.stringify({
+		foo: null,
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'bracket'
+	}), 'bar[]=one&bar[]=two&foo');
+});
+
+test('array stringify representation with a bad array format', t => {
+	t.is(fn.stringify({
+		foo: null,
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'badinput'
+	}), 'bar=one&bar=two&foo');
+});
+
+test('array stringify representation with array indexes and sparse array', t => {
+	const a = ['one', 'two'];
+	a[10] = 'three';
+	t.is(fn.stringify({bar: a}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
 });
