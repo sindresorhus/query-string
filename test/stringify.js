@@ -89,3 +89,16 @@ test('loose encoding', t => {
 	t.is(fn.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
 	t.is(fn.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=\'bar\'&foo=!baz');
 });
+
+test('array of objects order', t => {
+	t.is(fn.stringify([
+		{a: 'b'},
+		{x: 'y'},
+		{y: 'z'}
+	]), 'a=b&x=y&y=z');
+	t.is(fn.stringify([
+		{x: 'y'},
+		{a: 'b'},
+		{y: 'z'}
+	]), 'x=y&a=b&y=z');
+});

@@ -80,6 +80,20 @@ Default: `true`
 Extract a query string from a URL that can be passed into `.parse()`.
 
 
+## Ordering
+
+Ordering is supported by passing array of objects in format `[{key1: 'value1', key2: 'value2']`
+
+```js
+queryString.stringify([
+	{x: 'y'},
+	{a: 'b'},
+	{y: 'z'}
+]);
+//=> 'x=y&a=b&y=z'
+```
+
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
