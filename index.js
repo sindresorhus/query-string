@@ -2,6 +2,19 @@
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
 
+// A better `typeof`
+// e.g.
+// var s = new String('hello')
+// typeof s === 'object'
+// typeOf(s) === 'string'
+var typeOf = (function () {
+	var toString = Object.prototype.toString;
+	var reg = /^\[object\s(\w+)\]$/;
+	return function (o) {
+		return toString.call(o).match(reg)[1].toLowerCase();
+	};
+})();
+
 function encode(value, opts) {
 	if (opts.encode) {
 		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
@@ -15,11 +28,16 @@ exports.extract = function (str) {
 };
 
 exports.parse = function (str) {
+	if (typeOf(str) === 'object') {
+		// this feature is same as https://github.com/ljharb/qs
+		return str;
+	}
+
 	// Create an object with no prototype
 	// https://github.com/sindresorhus/query-string/issues/47
 	var ret = Object.create(null);
 
-	if (typeof str !== 'string') {
+	if (typeOf(str) !== 'string') {
 		return ret;
 	}
 
