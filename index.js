@@ -1,5 +1,4 @@
 'use strict';
-
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
 

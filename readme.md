@@ -4,7 +4,7 @@
 
 ---
 
-<p align="center"><b>🔥 Want to strengthen your core JavaScript skills and master ES6?</b><br>I would personally recommend this awesome <a href="https://ES6.io/friend/AWESOME">ES6 course</a> by Wes Bos.</p>
+<p align="center"><b>🔥 Want to strengthen your core JavaScript skills and master ES6?</b><br>I would personally recommend this awesome <a href="https://ES6.io/friend/AWESOME">ES6 course</a> by Wes Bos. You might also like his <a href="https://ReactForBeginners.com/friend/AWESOME">React course</a>.</p>
 
 ---
 
@@ -61,21 +61,27 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a _bracketed_ array representation.
-* `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
+
+- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+
 ```js
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-// => foo: [1,2,3]
+//=> foo: [1,2,3]
 ```
-* `index`: stands for parsing taking the index into account, such as:
+
+- `index`: stands for parsing taking the index into account, such as:
+
 ```js
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-// => foo: [1,2,3]
+//=> foo: [1,2,3]
 ```
-* `none`: is the __default__ option and removes any bracket representation, such as:
+
+- `none`: is the **default** option and removes any bracket representation, such as:
+
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
-// => foo: [1,2,3]
+//=> foo: [1,2,3]
 ```
 
 ### .stringify(*object*, *[options]*)
@@ -102,18 +108,24 @@ Default: `true`
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a _bracketed_ array representation.
-* `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
+
+- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+
 ```js
 queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
 // => foo[]=1&foo[]=2&foo[]=3
 ```
-* `index`: stands for parsing taking the index into account, such as:
+
+- `index`: stands for parsing taking the index into account, such as:
+
 ```js
 queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
 // => foo[0]=1&foo[1]=2&foo[3]=3
 ```
-* `none`: is the __default__ option and removes any bracket representation, such as:
+
+- `none`: is the __default__ option and removes any bracket representation, such as:
+
 ```js
 queryString.stringify({foo: [1,2,3]});
 // => foo=1&foo=2&foo=3
