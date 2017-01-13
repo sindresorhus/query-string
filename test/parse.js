@@ -53,6 +53,21 @@ test('handle multiple of the same key', t => {
 	t.deepEqual(fn.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
+test('handle multiple values and preserve appearence order', t => {
+	t.deepEqual(fn.parse('a=value&a='), {a: ['value', '']});
+	t.deepEqual(fn.parse('a=&a=value'), {a: ['', 'value']});
+});
+
+test('handle multiple values and preserve appearance order with brackets', t => {
+	t.deepEqual(fn.parse('a[]=value&a[]=', {arrayFormat: 'bracket'}), {a: ['value', '']});
+	t.deepEqual(fn.parse('a[]=&a[]=value', {arrayFormat: 'bracket'}), {a: ['', 'value']});
+});
+
+test('handle multiple values and preserve appearance order with indexes', t => {
+	t.deepEqual(fn.parse('a[0]=value&a[1]=', {arrayFormat: 'index'}), {a: ['value', '']});
+	t.deepEqual(fn.parse('a[1]=&a[0]=value', {arrayFormat: 'index'}), {a: ['value', '']});
+});
+
 test('query strings params including embedded `=`', t => {
 	t.deepEqual(fn.parse('?param=http%3A%2F%2Fsomeurl%3Fid%3D2837'), {param: 'http://someurl?id=2837'});
 });
