@@ -96,11 +96,11 @@ function encode(value, opts) {
 	return value;
 }
 
-function sorter(input) {
+function keysSorter(input) {
 	if (Array.isArray(input)) {
 		return input.sort();
 	} else if (typeof input === 'object') {
-		return sorter(Object.keys(input)).sort(function (a, b) {
+		return keysSorter(Object.keys(input)).sort(function (a, b) {
 			return Number(a) - Number(b);
 		}).map(function (key) {
 			return input[key];
@@ -148,10 +148,12 @@ exports.parse = function (str, opts) {
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
-		if (Boolean(ret[key]) && typeof ret[key] === 'object') {
-			result[key] = sorter(ret[key]);
+		var val = ret[key];
+		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
+			// Sort object keys, not values
+			result[key] = keysSorter(val);
 		} else {
-			result[key] = ret[key];
+			result[key] = val;
 		}
 
 		return result;
