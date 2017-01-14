@@ -150,7 +150,7 @@ exports.parse = function (str, opts) {
 	return Object.keys(ret).sort().reduce(function (result, key) {
 		var val = ret[key];
 		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
-			// We need to sort keys in object, not values
+			// Sort object keys, not values
 			result[key] = keysSorter(val);
 		} else {
 			result[key] = val;
