@@ -115,7 +115,7 @@ exports.extract = function (str) {
 };
 
 exports.parse = function (str, opts) {
-	opts = objectAssign({arrayFormat: 'none'}, opts);
+	opts = objectAssign({arrayFormat: 'none', validItems: []}, opts);
 
 	var formatter = parserForArrayFormat(opts);
 
@@ -147,13 +147,18 @@ exports.parse = function (str, opts) {
 		formatter(decodeURIComponent(key), val, ret);
 	});
 
+	opts.validItems = opts.validItems.length > 0 ? opts.validItems : Object.keys(ret);
 	return Object.keys(ret).sort().reduce(function (result, key) {
 		var val = ret[key];
 		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
 			// Sort object keys, not values
-			result[key] = keysSorter(val);
+			if (opts.validItems.indexOf(key) != -1) {
+				result[key] = keysSorter(val);
+			}
 		} else {
-			result[key] = val;
+			if (opts.validItems.indexOf(key) != -1) {
+				result[key] = val;
+			}
 		}
 
 		return result;
