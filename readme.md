@@ -163,6 +163,22 @@ queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
 ```
 
 
+## Falsy values
+
+Sometimes you want to unset a key, or maybe just make it present without assigning a value to it. Here is how falsy values are stringified:
+
+```js
+queryString.stringify({foo: false});
+//=> 'foo=false'
+
+queryString.stringify({foo: null});
+//=> 'foo'
+
+queryString.stringify({foo: undefined});
+//=> ''
+```
+
+
 ## License
 
 MIT © [Sindre Sorhus](https://sindresorhus.com)
