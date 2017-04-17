@@ -69,7 +69,7 @@ function parserForArrayFormat(opts) {
 				key = key.replace(/\[\]$/, '');
 
 				if (!result || accumulator[key] === undefined) {
-					accumulator[key] = value;
+					accumulator[key] = [value];
 					return;
 				}
 

@@ -93,6 +93,10 @@ test('query strings having indexed arrays keeping index order', t => {
 	t.deepEqual(fn.parse('foo[1]=bar&foo[0]=baz'), {'foo[1]': 'bar', 'foo[0]': 'baz'});
 });
 
+test('query string having a single bracketed value and format option as `bracket`', t => {
+	t.deepEqual(fn.parse('foo[]=bar', {arrayFormat: 'bracket'}), {foo: ['bar']});
+});
+
 test('query strings having brackets arrays and format option as `bracket`', t => {
 	t.deepEqual(fn.parse('foo[]=bar&foo[]=baz', {
 		arrayFormat: 'bracket'
