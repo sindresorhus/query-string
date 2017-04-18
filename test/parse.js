@@ -24,6 +24,13 @@ test('parse multiple query string', t => {
 	});
 });
 
+test('parse multiple query string with ; as delimiter', t => {
+	t.deepEqual(fn.parse('foo=bar;key=val'), {
+		foo: 'bar',
+		key: 'val'
+	});
+});
+
 test('parse query string without a value', t => {
 	t.deepEqual(fn.parse('foo'), {foo: null});
 	t.deepEqual(fn.parse('foo&key'), {
