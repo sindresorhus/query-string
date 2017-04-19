@@ -97,6 +97,14 @@ test('query string having a single bracketed value and format option as `bracket
 	t.deepEqual(fn.parse('foo[]=bar', {arrayFormat: 'bracket'}), {foo: ['bar']});
 });
 
+test('query string not having a bracketed value and format option as `bracket`', t => {
+	t.deepEqual(fn.parse('foo=bar', {arrayFormat: 'bracket'}), {foo: 'bar'});
+});
+
+test('query string having a bracketed value and a single value and format option as `bracket`', t => {
+	t.deepEqual(fn.parse('foo=bar&baz[]=bar', {arrayFormat: 'bracket'}), {foo: 'bar', baz: ['bar']});
+});
+
 test('query strings having brackets arrays and format option as `bracket`', t => {
 	t.deepEqual(fn.parse('foo[]=bar&foo[]=baz', {
 		arrayFormat: 'bracket'
