@@ -44,7 +44,7 @@ const stringified = queryString.stringify(parsed);
 location.search = stringified;
 // note that `location.search` automatically prepends a question mark
 console.log(location.search);
-//=> '?foo=unicorn&ilike=pizza'
+//=> 'foo=unicorn&ilike=pizza'
 ```
 
 
