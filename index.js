@@ -144,7 +144,11 @@ exports.parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeURIComponent(val);
+		try {
+			val = val === undefined ? null : decodeURIComponent(val);
+		} catch (err) {
+			val = null;
+		}
 
 		formatter(decodeURIComponent(key), val, ret);
 	});
