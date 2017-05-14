@@ -129,7 +129,7 @@ exports.parse = function (str, opts) {
 		return ret;
 	}
 
-	str = str.trim().replace(/^(\?|#|&)/, '');
+	str = str.trim().replace(/^(\?|#|&|%)/, '');
 
 	if (!str) {
 		return ret;
@@ -150,7 +150,13 @@ exports.parse = function (str, opts) {
 			val = null;
 		}
 
-		formatter(decodeURIComponent(key), val, ret);
+		try {
+			key = decodeURIComponent(key);
+		} catch (err) {
+			return;
+		}
+
+		formatter(key, val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {

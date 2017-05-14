@@ -42,6 +42,7 @@ test('return empty object if no qss can be found', t => {
 	t.deepEqual(fn.parse('?'), {});
 	t.deepEqual(fn.parse('&'), {});
 	t.deepEqual(fn.parse('#'), {});
+	t.deepEqual(fn.parse('%'), {});
 	t.deepEqual(fn.parse(' '), {});
 });
 
@@ -78,6 +79,10 @@ test('query strings params including raw `=`', t => {
 
 test('query strings params invalid `%`', t => {
 	t.deepEqual(fn.parse('param=%'), {param: null});
+});
+
+test('query strings keys invalid `%`', t => {
+	t.deepEqual(fn.parse('param%=param'), {});
 });
 
 test('object properties', t => {
