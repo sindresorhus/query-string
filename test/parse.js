@@ -78,11 +78,11 @@ test('query strings params including raw `=`', t => {
 });
 
 test('query strings params invalid `%`', t => {
-	t.deepEqual(fn.parse('param=%'), {param: null});
+	t.deepEqual(fn.parse('param=%'), {param: '%'});
 });
 
 test('query strings keys invalid `%`', t => {
-	t.deepEqual(fn.parse('param%=param'), {});
+	t.deepEqual(fn.parse('param%=param%%'), {'param%': 'param%%'});
 });
 
 test('object properties', t => {
