@@ -137,7 +137,7 @@ exports.parse = function (str, opts) {
 		return ret;
 	}
 
-	str = str.trim().replace(/^(\?|#|&|%)/, '');
+	str = str.trim().replace(/^(\?|#|&)/, '');
 
 	if (!str) {
 		return ret;

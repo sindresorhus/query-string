@@ -42,7 +42,6 @@ test('return empty object if no qss can be found', t => {
 	t.deepEqual(fn.parse('?'), {});
 	t.deepEqual(fn.parse('&'), {});
 	t.deepEqual(fn.parse('#'), {});
-	t.deepEqual(fn.parse('%'), {});
 	t.deepEqual(fn.parse(' '), {});
 });
 
