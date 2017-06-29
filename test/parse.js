@@ -169,3 +169,8 @@ test('circuit original -> parse - > stringify -> sorted original', t => {
 
 	t.deepEqual(fn.stringify(fn.parse(original, options), options), sortedOriginal);
 });
+
+test('decode keys and values', t => {
+	t.deepEqual(fn.parse('st%C3%A5le=foo'), {ståle: 'foo'});
+	t.deepEqual(fn.parse('foo=%7B%ab%%7C%de%%7D+%%7Bst%C3%A5le%7D%'), {foo: '{%ab%|%de%} %{ståle}%'});
+});
