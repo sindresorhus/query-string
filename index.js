@@ -112,6 +112,14 @@ function keysSorter(input) {
 	return input;
 }
 
+function tryDecodeURIComponent(value) {
+	try {
+		return decodeURIComponent(value);
+	} catch (err) {
+		return value;
+	}
+}
+
 exports.extract = function (str) {
 	return str.split('?')[1] || '';
 };
@@ -144,9 +152,9 @@ exports.parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeURIComponent(val);
+		val = val === undefined ? null : tryDecodeURIComponent(val);
 
-		formatter(decodeURIComponent(key), val, ret);
+		formatter(tryDecodeURIComponent(key), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {

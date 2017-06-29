@@ -54,6 +54,12 @@ console.log(location.search);
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
+If decoding fails it will use the original key/value. When this occurs parsing is not an escape character
+```js
+queryString.parse('utm_source%=%%');
+//=> utm_source%: '%%'
+```
+
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
 #### arrayFormat

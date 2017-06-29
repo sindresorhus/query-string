@@ -76,6 +76,14 @@ test('query strings params including raw `=`', t => {
 	t.deepEqual(fn.parse('?param=http://someurl?id=2837'), {param: 'http://someurl?id=2837'});
 });
 
+test('query strings params invalid `%`', t => {
+	t.deepEqual(fn.parse('param=%'), {param: '%'});
+});
+
+test('query strings keys invalid `%`', t => {
+	t.deepEqual(fn.parse('param%=param%%'), {'param%': 'param%%'});
+});
+
 test('object properties', t => {
 	t.falsy(fn.parse().prototype);
 	t.deepEqual(fn.parse('hasOwnProperty=foo'), {hasOwnProperty: 'foo'});
