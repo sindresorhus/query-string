@@ -12,7 +12,7 @@
 ## Install
 
 ```
-$ npm install --save query-string
+$ npm install query-string
 ```
 
 
