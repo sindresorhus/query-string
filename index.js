@@ -1,6 +1,7 @@
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
+var decodeComponent = require('decode-uri-component');
 
 function encoderForArrayFormat(opts) {
 	switch (opts.arrayFormat) {
@@ -144,9 +145,9 @@ exports.parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeURIComponent(val);
+		val = val === undefined ? null : decodeComponent(val);
 
-		formatter(decodeURIComponent(key), val, ret);
+		formatter(decodeComponent(key), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
