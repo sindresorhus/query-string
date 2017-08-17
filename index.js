@@ -204,3 +204,10 @@ exports.stringify = function (obj, opts) {
 		return x.length > 0;
 	}).join('&') : '';
 };
+
+exports.parseUrl = function (str, opts) {
+	return {
+		url: str.split('?')[0] || '',
+		queryParams: this.parse(this.extract(str), opts)
+	};
+};
