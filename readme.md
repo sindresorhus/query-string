@@ -138,6 +138,22 @@ queryString.stringify({foo: [1,2,3]});
 Extract a query string from a URL that can be passed into `.parse()`.
 
 
+### .parseUrl(*string*, *[options]*)
+
+Extract the url and the query string as an object.
+
+Uses `.parse()`. For more information about *[options]* see the [parse function documentation](https://github.com/sindresorhus/query-string#parsestring-options).
+
+#### returns
+
+Type: `object`<br>
+Default: `{ url: '', queryParams: {}}`
+
+- `url`: stands for URL.
+
+- `queryParams`: stands for the result of `parse()` on the query string.
+
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
