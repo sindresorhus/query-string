@@ -133,6 +133,31 @@ queryString.stringify({foo: [1,2,3]});
 // => foo=1&foo=2&foo=3
 ```
 
+#### sort
+
+Type: `function`
+
+Supports both `Function` as a custom sorting function or `false` for disabling sorting.
+
+- `Function`: is a custom sorting function, such as:
+
+```js
+const order = ['c', 'a', 'b'];
+queryString.stringify({ a: 1, b: 2, c: 3}, {
+	sort: (m, n) => order.indexOf(m) >= order.indexOf(n)
+});
+// => 'c=3&a=1&b=2'
+```
+
+- `false`: is the way to disable sorting, i.e.
+
+```js
+queryString.stringify({ b: 1, c: 2, a: 3}, {sort: false});
+// => 'c=3&a=1&b=2'
+```
+
+If omitted, keys are sorted using `Array.prototype.sort`, i.e. by converting them to strings and comparing strings in Unicode code point order.
+
 ### .extract(*string*)
 
 Extract a query string from a URL that can be passed into `.parse()`.

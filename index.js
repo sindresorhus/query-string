@@ -172,9 +172,13 @@ exports.stringify = function (obj, opts) {
 
 	opts = objectAssign(defaults, opts);
 
+	if (opts.sort === false) {
+		opts.sort = function () {};
+	}
+
 	var formatter = encoderForArrayFormat(opts);
 
-	return obj ? Object.keys(obj).sort().map(function (key) {
+	return obj ? Object.keys(obj).sort(opts.sort).map(function (key) {
 		var val = obj[key];
 
 		if (val === undefined) {
