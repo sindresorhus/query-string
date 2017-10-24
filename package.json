@@ -1,6 +1,6 @@
 {
   "name": "query-string",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Parse and stringify URL query strings",
   "license": "MIT",
   "repository": "sindresorhus/query-string",
