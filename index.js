@@ -114,7 +114,11 @@ function keysSorter(input) {
 }
 
 exports.extract = function (str) {
-	return str.split('?')[1] || '';
+	var queryStart = str.indexOf('?');
+	if (queryStart === -1) {
+		return '';
+	}
+	return str.slice(queryStart + 1);
 };
 
 exports.parse = function (str, opts) {
