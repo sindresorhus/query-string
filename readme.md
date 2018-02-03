@@ -140,18 +140,16 @@ Extract a query string from a URL that can be passed into `.parse()`.
 
 ### .parseUrl(*string*, *[options]*)
 
-Extract the url and the query string as an object.
+Extract the URL and the query string as an object.
 
-Uses `.parse()`. For more information about *[options]* see the [parse function documentation](https://github.com/sindresorhus/query-string#parsestring-options).
+The `options` are the same as for `.parse()`.
 
-#### returns
+Returns an object with a `url` and `queryParams` property.
 
-Type: `object`<br>
-Default: `{ url: '', queryParams: {}}`
-
-- `url`: stands for URL.
-
-- `queryParams`: stands for the result of `parse()` on the query string.
+```js
+queryString.parseUrl('http://foo.bar?foo=bar')
+//=> {url: 'http://foo.bar', queryParams: {foo: 'bar'}}
+```
 
 
 ## Nesting
