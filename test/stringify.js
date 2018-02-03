@@ -122,3 +122,20 @@ test('array stringify representation with array indexes and sparse array', t => 
 	a[10] = 'three';
 	t.is(fn.stringify({bar: a}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
 });
+
+test('should sort keys in given order', t => {
+	const order = ['c', 'a', 'b'];
+	const sort = (key1, key2) => order.indexOf(key1) >= order.indexOf(key2);
+
+	t.is(fn.stringify({a: 'foo', b: 'bar', c: 'baz'}, {sort}), 'c=baz&a=foo&b=bar');
+});
+
+test('should disable sorting', t => {
+	t.is(fn.stringify({
+		c: 'foo',
+		b: 'bar',
+		a: 'baz'
+	}, {
+		sort: false
+	}), 'c=foo&b=bar&a=baz');
+});
