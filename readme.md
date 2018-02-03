@@ -163,6 +163,20 @@ If omitted, keys are sorted using `Array#sort`, which means, converting them to 
 Extract a query string from a URL that can be passed into `.parse()`.
 
 
+### .parseUrl(*string*, *[options]*)
+
+Extract the URL and the query string as an object.
+
+The `options` are the same as for `.parse()`.
+
+Returns an object with a `url` and `query` property.
+
+```js
+queryString.parseUrl('http://foo.bar?foo=bar')
+//=> {url: 'http://foo.bar', query: {foo: 'bar'}}
+```
+
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
