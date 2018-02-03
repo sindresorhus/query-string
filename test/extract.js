@@ -1,18 +1,23 @@
 import test from 'ava';
-import fn from '../';
+import m from '..';
 
-test('should extract query string from url', t => {
-	t.is(fn.extract('http://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
-	t.is(fn.extract('http://foo.bar/?'), '');
-	t.is(fn.extract('http://foo.bar/?regex=ab?c'), 'regex=ab?c');
+test('extracts query string from url', t => {
+	t.is(m.extract('https://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
+	t.is(m.extract('https://foo.bar/?'), '');
+	t.is(m.extract('https://foo.bar/?regex=ab?c'), 'regex=ab?c');
 });
 
-test('should handle strings not containing query string', t => {
-	t.is(fn.extract('http://foo.bar/'), '');
-	t.is(fn.extract(''), '');
+test('handles strings not containing query string', t => {
+	t.is(m.extract('https://foo.bar'), '');
+	t.is(m.extract(''), '');
 });
 
-test('should throw for invalid values', t => {
-	t.throws(fn.extract.bind(fn, null), TypeError);
-	t.throws(fn.extract.bind(fn, undefined), TypeError);
+test('throws for invalid values', t => {
+	t.throws(() => {
+		m.extract(null);
+	}, TypeError);
+
+	t.throws(() => {
+		m.extract(undefined);
+	}, TypeError);
 });
