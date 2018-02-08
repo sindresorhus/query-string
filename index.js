@@ -99,6 +99,14 @@ function encode(value, opts) {
 	return value;
 }
 
+function decode(value, opts) {
+	if (opts.decode) {
+		return decodeComponent(value);
+	}
+
+	return value;
+}
+
 function keysSorter(input) {
 	if (Array.isArray(input)) {
 		return input.sort();
@@ -122,7 +130,7 @@ exports.extract = function (str) {
 };
 
 exports.parse = function (str, opts) {
-	opts = objectAssign({arrayFormat: 'none'}, opts);
+	opts = objectAssign({decode: true, arrayFormat: 'none'}, opts);
 
 	var formatter = parserForArrayFormat(opts);
 
@@ -149,9 +157,9 @@ exports.parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeComponent(val);
+		val = val === undefined ? null : decode(val, opts);
 
-		formatter(decodeComponent(key), val, ret);
+		formatter(decode(key, opts), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
