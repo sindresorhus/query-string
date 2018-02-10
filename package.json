@@ -40,6 +40,7 @@
 	},
 	"devDependencies": {
 		"ava": "^0.17.0",
+		"fast-check": "0.0.10",
 		"xo": "^0.16.0"
 	}
 }
