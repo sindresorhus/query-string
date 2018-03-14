@@ -10,7 +10,7 @@
 		"url": "sindresorhus.com"
 	},
 	"engines": {
-		"node": ">=0.10.0"
+		"node": ">=6"
 	},
 	"scripts": {
 		"test": "xo && ava"
@@ -27,19 +27,18 @@
 		"param",
 		"parameter",
 		"url",
-		"uri",
 		"parse",
 		"stringify",
 		"encode",
-		"decode"
+		"decode",
+		"searchparams"
 	],
 	"dependencies": {
 		"decode-uri-component": "^0.2.0",
-		"object-assign": "^4.1.0",
-		"strict-uri-encode": "^1.0.0"
+		"strict-uri-encode": "^2.0.0"
 	},
 	"devDependencies": {
-		"ava": "^0.17.0",
-		"xo": "^0.16.0"
+		"ava": "*",
+		"xo": "*"
 	}
 }

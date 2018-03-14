@@ -54,8 +54,8 @@ test('should not encode undefined values', t => {
 test('should encode null values as just a key', t => {
 	t.is(m.stringify({
 		'x y z': null,
-		'abc': null,
-		'foo': 'baz'
+		abc: null,
+		foo: 'baz'
 	}), 'abc&foo=baz&x%20y%20z');
 });
 

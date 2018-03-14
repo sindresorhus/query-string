@@ -72,10 +72,6 @@ test('query strings params including embedded `=`', t => {
 	t.deepEqual(m.parse('?param=https%3A%2F%2Fsomeurl%3Fid%3D2837'), {param: 'https://someurl?id=2837'});
 });
 
-test('query strings params including raw `=`', t => {
-	t.deepEqual(m.parse('?param=https://someurl?id=2837'), {param: 'https://someurl?id=2837'});
-});
-
 test('object properties', t => {
 	t.falsy(m.parse().prototype);
 	t.deepEqual(m.parse('hasOwnProperty=foo'), {hasOwnProperty: 'foo'});
