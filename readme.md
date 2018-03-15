@@ -15,7 +15,7 @@
 $ npm install query-string
 ```
 
-The latest version targets Node.js 6 or later and modern browsers. If you want support for older browsers, use version 5: `npm install query-string@5`.
+The latest version targets Node.js 6 or later and modern browsers (supporting among others [`Object.assign`](https://kangax.github.io/compat-table/es6/#test-Object_static_methods_Object.assign_a_href=_https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign_title=_MDN_documentation_img_src=_../mdn.png_alt=_MDN_(Mozilla_Development_Network)_logo_width=_15_height=_13_/_/a_nbsp;) and [arrow functions](https://kangax.github.io/compat-table/es6/#test-arrow_functions), so excluding Internet Explorer). If you want support for older browsers, use version 5: `npm install query-string@5`.
 
 <a href="https://www.patreon.com/sindresorhus">
 	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
