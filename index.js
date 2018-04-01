@@ -21,7 +21,7 @@ function encoderForArrayFormat(options) {
 			};
 		case 'bracket':
 			return (key, value) => {
-				return value === null ? encode(key, options) : [
+				return value === null ? [encode(key, options), '[]'].join('') : [
 					encode(key, options),
 					'[]=',
 					encode(value, options)
