@@ -90,7 +90,7 @@ function parserForArrayFormat(options) {
 
 function encode(value, options) {
 	if (options.encode) {
-		return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
+		return options.strict ? strictUriEncode(value) : encodeURI(value);
 	}
 
 	return value;
@@ -168,7 +168,6 @@ exports.stringify = (obj, options) => {
 		strict: true,
 		arrayFormat: 'none'
 	};
-
 	options = Object.assign(defaults, options);
 
 	if (options.sort === false) {

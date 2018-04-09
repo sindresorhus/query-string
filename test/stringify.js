@@ -83,11 +83,13 @@ test('handle undefined and null values in array', t => {
 test('strict encoding', t => {
 	t.is(m.stringify({foo: '\'bar\''}), 'foo=%27bar%27');
 	t.is(m.stringify({foo: ['\'bar\'', '!baz']}), 'foo=%27bar%27&foo=%21baz');
+	t.is(m.stringify({date: '28/09/1979'}), 'date=28%2F09%2F1979');
 });
 
 test('loose encoding', t => {
 	t.is(m.stringify({foo: '\'bar\''}, {strict: false}), 'foo=\'bar\'');
 	t.is(m.stringify({foo: ['\'bar\'', '!baz']}, {strict: false}), 'foo=\'bar\'&foo=!baz');
+	t.is(m.stringify({date: '28/09/1979'}, {strict: false}), 'date=28/09/1979');
 });
 
 test('array stringify representation with array indexes', t => {
