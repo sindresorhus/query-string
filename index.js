@@ -142,6 +142,9 @@ function parse(input, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : decodeComponent(value);
+		if (options.postProcess && typeof options.postProcess === 'function') {
+			value = options.postProcess(value);
+		}
 
 		formatter(decodeComponent(key), value, ret);
 	}
@@ -172,7 +175,8 @@ exports.stringify = (obj, options) => {
 	options = Object.assign(defaults, options);
 
 	if (options.sort === false) {
-		options.sort = () => {};
+		options.sort = () => {
+		};
 	}
 
 	const formatter = encoderForArrayFormat(options);

@@ -143,6 +143,12 @@ test('query strings having ordered index arrays and format option as `index`', t
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
 });
 
+test('query string having bracketed values and a single value and a postProcess function that uppercases', t => {
+	t.deepEqual(m.parse('foo=bar&baz[]=bar&baz[]=moo', {
+		postProcess: v => typeof v === 'string' ? v.toUpperCase() : v
+	}), {foo: 'BAR', 'baz[]': ['BAR', 'MOO']});
+});
+
 test('circuit parse -> stringify', t => {
 	const original = 'foo[3]=foo&foo[2]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
