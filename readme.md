@@ -92,6 +92,20 @@ queryString.parse('foo=1&foo=2&foo=3');
 //=> foo: [1,2,3]
 ```
 
+#### postProcess
+
+A function that post-processes the values. The caller must make sure that this function can handle all kinds of datatypes.
+
+```js
+queryString.parse('foo=bar', {postProcess: v => typeof v === 'string' ? v.toUpperCase() : v});
+//=> foo: 'BAR'
+```
+
+```js
+queryString.parse('foo[]=bar&foo[]=baz', {postProcess: v => typeof v === 'string' ? v.toUpperCase() : v});
+//=> foo: ['BAR', 'BAZ']
+```
+
 ### .stringify(*object*, *[options]*)
 
 Stringify an object into a query string, sorting the keys.
