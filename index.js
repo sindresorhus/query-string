@@ -1,11 +1,11 @@
 'use strict';
-const strictUriEncode = require('strict-uri-encode');
-const decodeComponent = require('decode-uri-component');
+var strictUriEncode = require('strict-uri-encode');
+var decodeComponent = require('decode-uri-component');
 
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
-			return (key, value, index) => {
+			return function (key, value, index) {
 				return value === null ? [
 					encode(key, options),
 					'[',
@@ -20,7 +20,7 @@ function encoderForArrayFormat(options) {
 				].join('');
 			};
 		case 'bracket':
-			return (key, value) => {
+			return function (key, value) {
 				return value === null ? encode(key, options) : [
 					encode(key, options),
 					'[]=',
@@ -28,7 +28,7 @@ function encoderForArrayFormat(options) {
 				].join('');
 			};
 		default:
-			return (key, value) => {
+			return function (key, value) {
 				return value === null ? encode(key, options) : [
 					encode(key, options),
 					'=',
@@ -39,11 +39,11 @@ function encoderForArrayFormat(options) {
 }
 
 function parserForArrayFormat(options) {
-	let result;
+	var result;
 
 	switch (options.arrayFormat) {
 		case 'index':
-			return (key, value, accumulator) => {
+			return function (key, value, accumulator) {
 				result = /\[(\d*)\]$/.exec(key);
 
 				key = key.replace(/\[\d*\]$/, '');
@@ -60,7 +60,7 @@ function parserForArrayFormat(options) {
 				accumulator[key][result[1]] = value;
 			};
 		case 'bracket':
-			return (key, value, accumulator) => {
+			return function (key, value, accumulator) {
 				result = /(\[\])$/.exec(key);
 				key = key.replace(/\[\]$/, '');
 
@@ -77,7 +77,7 @@ function parserForArrayFormat(options) {
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
 		default:
-			return (key, value, accumulator) => {
+			return function (key, value, accumulator) {
 				if (accumulator[key] === undefined) {
 					accumulator[key] = value;
 					return;
@@ -103,15 +103,15 @@ function keysSorter(input) {
 
 	if (typeof input === 'object') {
 		return keysSorter(Object.keys(input))
-			.sort((a, b) => Number(a) - Number(b))
-			.map(key => input[key]);
+			.sort(function (a, b) { return Number(a) - Number(b) })
+			.map(function (key) { return input[key] });
 	}
 
 	return input;
 }
 
 function extract(input) {
-	const queryStart = input.indexOf('?');
+	var queryStart = input.indexOf('?');
 	if (queryStart === -1) {
 		return '';
 	}
@@ -121,10 +121,10 @@ function extract(input) {
 function parse(input, options) {
 	options = Object.assign({arrayFormat: 'none'}, options);
 
-	const formatter = parserForArrayFormat(options);
+	var formatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
-	const ret = Object.create(null);
+	var ret = Object.create(null);
 
 	if (typeof input !== 'string') {
 		return ret;
@@ -136,18 +136,20 @@ function parse(input, options) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
-		let [key, value] = param.replace(/\+/g, ' ').split('=');
+	input.split('&').forEach(function (param) {
+		var splitEqual = param.replace(/\+/g, ' ').split('=');
+		var key = splitEqual[0]
+		var value = splitEqual[1]
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : decodeComponent(value);
 
 		formatter(decodeComponent(key), value, ret);
-	}
+	})
 
-	return Object.keys(ret).sort().reduce((result, key) => {
-		const value = ret[key];
+	return Object.keys(ret).sort().reduce(function (result, key) {
+		var value = ret[key];
 		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
 			// Sort object keys, not values
 			result[key] = keysSorter(value);
@@ -162,8 +164,8 @@ function parse(input, options) {
 exports.extract = extract;
 exports.parse = parse;
 
-exports.stringify = (obj, options) => {
-	const defaults = {
+exports.stringify = function (obj, options) {
+	var defaults = {
 		encode: true,
 		strict: true,
 		arrayFormat: 'none'
@@ -172,13 +174,13 @@ exports.stringify = (obj, options) => {
 	options = Object.assign(defaults, options);
 
 	if (options.sort === false) {
-		options.sort = () => {};
+		options.sort = function () {};
 	}
 
 	const formatter = encoderForArrayFormat(options);
 
-	return obj ? Object.keys(obj).sort(options.sort).map(key => {
-		const value = obj[key];
+	return obj ? Object.keys(obj).sort(options.sort).map(function (key) {
+		var value = obj[key];
 
 		if (value === undefined) {
 			return '';
@@ -189,24 +191,24 @@ exports.stringify = (obj, options) => {
 		}
 
 		if (Array.isArray(value)) {
-			const result = [];
+			var result = [];
 
-			for (const value2 of value.slice()) {
+			value.slice().forEach(function (value2) {
 				if (value2 === undefined) {
-					continue;
+					return;
 				}
 
 				result.push(formatter(key, value2, result.length));
-			}
+			})
 
 			return result.join('&');
 		}
 
 		return encode(key, options) + '=' + encode(value, options);
-	}).filter(x => x.length > 0).join('&') : '';
+	}).filter(function (x) { return x.length > 0 }).join('&') : '';
 };
 
-exports.parseUrl = (input, options) => {
+exports.parseUrl = function (input, options) {
 	return {
 		url: input.split('?')[0] || '',
 		query: parse(extract(input), options)
