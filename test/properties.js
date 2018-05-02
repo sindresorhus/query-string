@@ -23,8 +23,8 @@ const optionsArbitrary = fc.record({
 	arrayFormat: fc.constantFrom('bracket', 'index', 'none'),
 	strict: fc.boolean(),
 	encode: fc.boolean(),
-	sort: fc.boolean()
-});
+	sort: fc.constant(false)
+}, {withDeletedKeys: true});
 
 test('should read correctly from stringified query params', t => {
 	t.notThrows(() => fc.assert(
