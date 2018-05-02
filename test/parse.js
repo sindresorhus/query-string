@@ -72,10 +72,6 @@ test('query strings params including embedded `=`', t => {
 	t.deepEqual(m.parse('?param=https%3A%2F%2Fsomeurl%3Fid%3D2837'), {param: 'https://someurl?id=2837'});
 });
 
-test('query strings params including raw `=`', t => {
-	t.deepEqual(m.parse('?param=https://someurl?id=2837'), {param: 'https://someurl?id=2837'});
-});
-
 test('object properties', t => {
 	t.falsy(m.parse().prototype);
 	t.deepEqual(m.parse('hasOwnProperty=foo'), {hasOwnProperty: 'foo'});
@@ -109,6 +105,15 @@ test('query strings having brackets arrays and format option as `bracket`', t =>
 	t.deepEqual(m.parse('foo[]=bar&foo[]=baz', {
 		arrayFormat: 'bracket'
 	}), {foo: ['bar', 'baz']});
+});
+
+test('query strings having brackets arrays with null and format option as `bracket`', t => {
+	t.deepEqual(m.parse('bar[]&foo[]=a&foo[]&foo[]=', {
+		arrayFormat: 'bracket'
+	}), {
+		foo: ['a', null, ''],
+		bar: [null]
+	});
 });
 
 test('query strings having indexed arrays and format option as `index`', t => {

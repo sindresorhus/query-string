@@ -54,8 +54,8 @@ test('should not encode undefined values', t => {
 test('should encode null values as just a key', t => {
 	t.is(m.stringify({
 		'x y z': null,
-		'abc': null,
-		'foo': 'baz'
+		abc: null,
+		foo: 'baz'
 	}), 'abc&foo=baz&x%20y%20z');
 });
 
@@ -106,6 +106,15 @@ test('array stringify representation with array brackets', t => {
 	}, {
 		arrayFormat: 'bracket'
 	}), 'bar[]=one&bar[]=two&foo');
+});
+
+test('array stringify representation with array brackets and null value', t => {
+	t.is(m.stringify({
+		foo: ['a', null, ''],
+		bar: [null]
+	}, {
+		arrayFormat: 'bracket'
+	}), 'bar[]&foo[]=a&foo[]&foo[]=');
 });
 
 test('array stringify representation with a bad array format', t => {
