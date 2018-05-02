@@ -62,7 +62,12 @@ Parse a query string into an object. Leading `?` or `#` are ignored, so you can 
 
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
-URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
+#### decode
+
+Type: `boolean`<br>
+Default: `true`
+
+Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
 
 #### arrayFormat
 

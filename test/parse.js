@@ -179,3 +179,7 @@ test('decode keys and values', t => {
 	t.deepEqual(m.parse('st%C3%A5le=foo'), {ståle: 'foo'});
 	t.deepEqual(m.parse('foo=%7B%ab%%7C%de%%7D+%%7Bst%C3%A5le%7D%'), {foo: '{%ab%|%de%} %{ståle}%'});
 });
+
+test('disable decoding of keys and values', t => {
+	t.deepEqual(m.parse('tags=postal%20office,burger%2C%20fries%20and%20coke', {decode: false}), {tags: 'postal%20office,burger%2C%20fries%20and%20coke'});
+});
