@@ -108,6 +108,15 @@ test('array stringify representation with array brackets', t => {
 	}), 'bar[]=one&bar[]=two&foo');
 });
 
+test('array stringify representation with array brackets and null value', t => {
+	t.is(m.stringify({
+		foo: ['a', null, ''],
+		bar: [null]
+	}, {
+		arrayFormat: 'bracket'
+	}), 'bar[]&foo[]=a&foo[]&foo[]=');
+});
+
 test('array stringify representation with a bad array format', t => {
 	t.is(m.stringify({
 		foo: null,

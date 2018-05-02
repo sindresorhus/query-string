@@ -107,6 +107,15 @@ test('query strings having brackets arrays and format option as `bracket`', t =>
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having brackets arrays with null and format option as `bracket`', t => {
+	t.deepEqual(m.parse('bar[]&foo[]=a&foo[]&foo[]=', {
+		arrayFormat: 'bracket'
+	}), {
+		foo: ['a', null, ''],
+		bar: [null]
+	});
+});
+
 test('query strings having indexed arrays and format option as `index`', t => {
 	t.deepEqual(m.parse('foo[0]=bar&foo[1]=baz', {
 		arrayFormat: 'index'
