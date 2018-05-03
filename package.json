@@ -1,8 +1,10 @@
 {
 	"name": "query-string",
-	"version": "6.1.0",
+	"version": "6.2.0",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
+	"main": "index.cjs.js",
+	"jsnext:main": "index.es.js",
 	"repository": "sindresorhus/query-string",
 	"author": {
 		"name": "Sindre Sorhus",
@@ -16,7 +18,8 @@
 		"test": "xo && ava"
 	},
 	"files": [
-		"index.js"
+		"index.cjs.js",
+		"index.es.js"
 	],
 	"keywords": [
 		"browser",
