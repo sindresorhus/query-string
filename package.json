@@ -13,11 +13,10 @@
 		"node": ">=6"
 	},
 	"scripts": {
-		"test": "xo && ava"
+		"test": "xo && ava",
+		"format": "prettier index.js --write"
 	},
-	"files": [
-		"index.js"
-	],
+	"files": ["index.js"],
 	"keywords": [
 		"browser",
 		"querystring",
