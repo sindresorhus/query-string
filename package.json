@@ -13,11 +13,13 @@
 		"node": ">=6"
 	},
 	"scripts": {
-		"test": "xo && ava"
+		"test": "xo && ava",
+		"prepublish": "npx babel index.js --out-dir build"
 	},
 	"files": [
 		"index.js"
 	],
+	"main": "build/index.js",
 	"keywords": [
 		"browser",
 		"querystring",
@@ -34,6 +36,8 @@
 		"searchparams"
 	],
 	"dependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-es2015": "^6.24.1",
 		"decode-uri-component": "^0.2.0",
 		"strict-uri-encode": "^2.0.0"
 	},
