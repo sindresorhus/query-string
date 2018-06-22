@@ -2,6 +2,16 @@
 
 > Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
 
+Doesn't support webpack:
+
+```
+Failed to minify the code from this file:
+
+ 	./node_modules/query-string/index.js:8
+
+Read more here: http://bit.ly/2tRViJ9
+```
+
 ---
 
 <p align="center"><b>🔥 Want to strengthen your core JavaScript skills and master ES6?</b><br>I would personally recommend this awesome <a href="https://ES6.io/friend/AWESOME">ES6 course</a> by Wes Bos.<br>Also check out his <a href="https://LearnNode.com/friend/AWESOME">Node.js</a>, <a href="https://ReactForBeginners.com/friend/AWESOME">React</a>, <a href="https://SublimeTextBook.com/friend/AWESOME">Sublime</a> courses.</p>
