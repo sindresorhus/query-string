@@ -29,5 +29,5 @@ const optionsArbitrary = fc.record({
 test('should read correctly from stringified query params', t => {
 	t.notThrows(() => fc.assert(
 		fc.property(queryParamsArbitrary, optionsArbitrary,
-		(obj, opts) => deepEqual(m.parse(m.stringify(obj, opts), opts), obj))));
+			(obj, opts) => deepEqual(m.parse(m.stringify(obj, opts), opts), obj))));
 });
