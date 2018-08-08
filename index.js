@@ -197,6 +197,16 @@ exports.stringify = (obj, options) => {
 		}
 
 		if (Array.isArray(value)) {
+			if (options.arrayFormat === 'single') {
+				return [
+					encode(key, options),
+					'=[',
+					(value.length > 0 ? value.reduce((acc, current, index) =>
+						index ? [acc, ',', encode(current, options)].join('') : [acc, encode(current, options)].join(''), '') : ''),
+					']'
+				].join('');
+			}
+
 			const result = [];
 
 			for (const value2 of value.slice()) {
