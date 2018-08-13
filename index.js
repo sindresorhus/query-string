@@ -27,6 +27,14 @@ function encoderForArrayFormat(options) {
 					encode(value, options)
 				].join('');
 			};
+		case 'key':
+			return (parent, key, value) => {
+				return value === null ? [encode(parent, options), '[' + key + ']'].join('') : [
+					encode(parent, options),
+					'[' + key + ']=',
+					encode(value, options)
+				].join('');
+			};
 		default:
 			return (key, value) => {
 				return value === null ? encode(key, options) : [
@@ -208,6 +216,14 @@ exports.stringify = (obj, options) => {
 			}
 
 			return result.join('&');
+		}
+
+		if (typeof value === 'object') {
+			return Object.entries(value).reduce((acc, [k, v]) => {
+				acc.push(formatter(key, k, v));
+
+				return acc;
+			}, []).join('&');
 		}
 
 		return encode(key, options) + '=' + encode(value, options);
