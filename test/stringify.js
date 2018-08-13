@@ -116,7 +116,7 @@ test('array stringify representation with single parameter array', t => {
 		zaz: ['oh my, ', 'wow']
 	}, {
 		arrayFormat: 'single'
-	}), 'abc=[red,blue%2Cgreen]&bar=[one,two]&foo&zaz=[oh%20my%2C%20,wow]');
+	}), 'abc=red,blue%2Cgreen&bar=one,two&foo&zaz=oh%20my%2C%20,wow');
 });
 
 test('array stringify representation with array brackets and null value', t => {

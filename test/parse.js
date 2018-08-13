@@ -53,7 +53,7 @@ test('handle multiple of the same key', t => {
 	t.deepEqual(m.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
-test('handle multiple values and preserve appearence order', t => {
+test('handle multiple values and preserve appearance order', t => {
 	t.deepEqual(m.parse('a=value&a='), {a: ['value', '']});
 	t.deepEqual(m.parse('a=&a=value'), {a: ['', 'value']});
 });
@@ -150,6 +150,32 @@ test('query strings having ordered index arrays and format option as `index`', t
 	t.deepEqual(m.parse('foo[102]=three&foo[2]=two&foo[100]=one&foo[0]=zero&bat=buz', {
 		arrayFormat: 'index'
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
+});
+
+test('query strings having arrays defined with single param and format option as `single`', t => {
+	t.deepEqual(m.parse('foo=one,two,three,four%2Cfive&bar=something', {
+		arrayFormat: 'single'
+	}), {
+		bar: 'something',
+		foo: ['one', 'two', 'three', 'four,five']
+	});
+});
+
+test('query strings having arrays defined with single param and format option as `single` only read first instance of param', t => {
+	t.deepEqual(m.parse('foo=one,two,three&bar=something&foo=four,five,six&bar=else', {
+		arrayFormat: 'single'
+	}), {
+		bar: 'something',
+		foo: ['one', 'two', 'three']
+	});
+});
+
+test('query strings having arrays defined with single param and format option as `single` only read first instance of param', t => {
+	t.deepEqual(m.parse('foo=a%2Cb,c', {
+		arrayFormat: 'single'
+	}), {
+		foo: ['a,b', 'c']
+	});
 });
 
 test('circuit parse -> stringify', t => {
