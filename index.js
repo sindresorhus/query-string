@@ -76,6 +76,16 @@ function parserForArrayFormat(options) {
 
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
+		case 'single':
+			return (key, value, accumulator) => {
+				if (accumulator[key] === undefined) {
+					if (value.indexOf(',') > -1) {
+						accumulator[key] = value.split(',').map((value) => decode(value, options));
+					} else {
+						accumulator[key] = decode(value, options);
+					}
+				}
+			};
 		default:
 			return (key, value, accumulator) => {
 				if (accumulator[key] === undefined) {
@@ -149,7 +159,7 @@ function parse(input, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : decode(value, options);
+		value = value === undefined ? null : options.arrayFormat === 'single' ? value : decode(value, options);
 
 		formatter(decode(key, options), value, ret);
 	}
@@ -197,6 +207,15 @@ exports.stringify = (obj, options) => {
 		}
 
 		if (Array.isArray(value)) {
+			if (options.arrayFormat === 'single') {
+				return [
+					encode(key, options),
+					'=',
+					(value.length > 0 ? value.reduce((acc, current, index) =>
+						index ? [acc, ',', encode(current, options)].join('') : [acc, encode(current, options)].join(''), '') : '')
+				].join('');
+			}
+
 			const result = [];
 
 			for (const value2 of value.slice()) {

@@ -121,7 +121,7 @@ Default: `true`
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
+Supports indexed, bracket, and single parameter array representations.
 
 - `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
 
@@ -135,6 +135,13 @@ queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
 ```js
 queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
 // => foo[0]=1&foo[1]=2&foo[3]=3
+```
+
+- `single`: stands for representing an array with a single parameter declaration, such as:
+
+```js
+queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'single'});
+// => foo=[1,2,3]
 ```
 
 - `none`: is the __default__ option and removes any bracket representation, such as:
