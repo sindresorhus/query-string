@@ -74,12 +74,12 @@ Decode the keys and values. URI components are decoded with [`decode-uri-compone
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
+Supports both `index` for an indexed array representation or `brackets` for a *bracketed* array representation.
 
-- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+- `brackets`: stands for parsing correctly arrays with brackets representation on the query string, such as:
 
 ```js
-queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
+queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'brackets'});
 //=> foo: [1,2,3]
 ```
 
@@ -90,7 +90,7 @@ queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 //=> foo: [1,2,3]
 ```
 
-- `none`: is the **default** option and removes any bracket representation, such as:
+- `none`: is the **default** option and removes any brackets representation, such as:
 
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
@@ -121,12 +121,12 @@ Default: `true`
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
+Supports both `index` for an indexed array representation or `brackets` for a *bracketed* array representation.
 
-- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+- `brackets`: stands for parsing correctly arrays with brackets representation on the query string, such as:
 
 ```js
-queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
+queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'brackets'});
 // => foo[]=1&foo[]=2&foo[]=3
 ```
 
@@ -137,7 +137,7 @@ queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
 // => foo[0]=1&foo[1]=2&foo[3]=3
 ```
 
-- `none`: is the __default__ option and removes any bracket representation, such as:
+- `none`: is the __default__ option and removes any brackets representation, such as:
 
 ```js
 queryString.stringify({foo: [1,2,3]});
