@@ -144,7 +144,7 @@ function parse(input, options) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
+	for (let param of input.split('&')) {
 		let [key, value] = param.replace(/\+/g, ' ').split('=');
 
 		// Missing `=` should be `null`:
@@ -199,7 +199,7 @@ exports.stringify = (obj, options) => {
 		if (Array.isArray(value)) {
 			const result = [];
 
-			for (const value2 of value.slice()) {
+			for (let value2 of value.slice()) {
 				if (value2 === undefined) {
 					continue;
 				}
