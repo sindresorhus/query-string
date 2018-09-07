@@ -215,10 +215,10 @@ exports.stringify = (obj, options) => {
 };
 
 exports.parseUrl = (input, options) => {
-	const [[domain, hash], querySplits] = input.split('?').map(part => part.split('#'));
+	const [[domain, domainHash], [query, queryHash] = []] = input.split('?').map(part => part.split('#'));
 	return {
 		url: domain,
-		hash: hash || (querySplits && querySplits[1]) || '',
-		query: parse((querySplits && querySplits[0]) || '', options)
+		hash: domainHash || queryHash || '',
+		query: parse(query || '', options)
 	};
 };
