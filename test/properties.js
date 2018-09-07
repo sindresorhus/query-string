@@ -9,20 +9,19 @@ import m from '..';
 // --> any unicode string
 // --> null
 // --> array containing values defined above (at least two items)
-const queryParamsArbitrary = fc.object({
-	key: fc.fullUnicodeString(1, 10),
-	values: [
+const queryParamsArbitrary = fc.dictionary(
+	fc.fullUnicodeString(1, 10),
+	fc.oneof(
 		fc.fullUnicodeString(),
 		fc.constant(null),
-		fc.array(fc.oneof(fc.fullUnicodeString(), fc.constant(null))).filter(a => a.length >= 2)
-	],
-	maxDepth: 0
-});
+		fc.array(fc.oneof(fc.fullUnicodeString(), fc.constant(null)), 2, 10)
+	)
+);
 
 const optionsArbitrary = fc.record({
 	arrayFormat: fc.constantFrom('bracket', 'index', 'none'),
 	strict: fc.boolean(),
-	encode: fc.boolean(),
+	encode: fc.constant(true),
 	sort: fc.constant(false)
 }, {withDeletedKeys: true});
 
