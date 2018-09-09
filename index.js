@@ -179,13 +179,19 @@ exports.stringify = (obj, options) => {
 
 	options = Object.assign(defaults, options);
 
-	if (options.sort === false) {
-		options.sort = () => {};
-	}
-
 	const formatter = encoderForArrayFormat(options);
 
-	return obj ? Object.keys(obj).sort(options.sort).map(key => {
+	if (!obj) {
+		return '';
+	}
+
+	const keys = Object.keys(obj);
+
+	if (options.sort !== false) {
+		keys.sort(options.sort);
+	}
+
+	return keys.map(key => {
 		const value = obj[key];
 
 		if (value === undefined) {
@@ -211,7 +217,7 @@ exports.stringify = (obj, options) => {
 		}
 
 		return encode(key, options) + '=' + encode(value, options);
-	}).filter(x => x.length > 0).join('&') : '';
+	}).filter(x => x.length > 0).join('&');
 };
 
 exports.parseUrl = (input, options) => {
