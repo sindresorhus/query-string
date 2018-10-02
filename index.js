@@ -215,6 +215,10 @@ exports.stringify = (obj, options) => {
 };
 
 exports.parseUrl = (input, options) => {
+	const hashStart = input.indexOf('#');
+	if (hashStart !== -1) {
+		input = input.slice(0, hashStart);
+	}
 	return {
 		url: input.split('?')[0] || '',
 		query: parse(extract(input), options)
