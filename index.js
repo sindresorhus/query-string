@@ -123,6 +123,7 @@ function extract(input) {
 	if (queryStart === -1) {
 		return '';
 	}
+
 	return input.slice(queryStart + 1);
 }
 
@@ -171,20 +172,17 @@ exports.extract = extract;
 exports.parse = parse;
 
 exports.stringify = (obj, options) => {
-	const defaults = {
-		encode: true,
-		strict: true,
-		arrayFormat: 'none'
-	};
-
-	options = Object.assign(defaults, options);
-
-	const formatter = encoderForArrayFormat(options);
-
 	if (!obj) {
 		return '';
 	}
 
+	options = Object.assign({
+		encode: true,
+		strict: true,
+		arrayFormat: 'none'
+	}, options);
+
+	const formatter = encoderForArrayFormat(options);
 	const keys = Object.keys(obj);
 
 	if (options.sort !== false) {
@@ -225,6 +223,7 @@ exports.parseUrl = (input, options) => {
 	if (hashStart !== -1) {
 		input = input.slice(0, hashStart);
 	}
+
 	return {
 		url: input.split('?')[0] || '',
 		query: parse(extract(input), options)
