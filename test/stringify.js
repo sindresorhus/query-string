@@ -139,6 +139,24 @@ test('should sort keys in given order', t => {
 	t.is(m.stringify({a: 'foo', b: 'bar', c: 'baz'}, {sort}), 'c=baz&a=foo&b=bar');
 });
 
+test('should not sort when sort is false', t => {
+	const object = {
+		story: 'a',
+		patch: 'b',
+		deployment: 'c',
+		lat: 10,
+		lng: 20,
+		sb: 'd',
+		sc: 'e',
+		mn: 'f',
+		ln: 'g',
+		nf: 'h',
+		srs: 'i',
+		destination: 'g'
+	};
+	t.is(m.stringify(object, {sort: false}), 'story=a&patch=b&deployment=c&lat=10&lng=20&sb=d&sc=e&mn=f&ln=g&nf=h&srs=i&destination=g');
+});
+
 test('should disable sorting', t => {
 	t.is(m.stringify({
 		c: 'foo',
