@@ -1,6 +1,7 @@
 'use strict';
 const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
+
 let DEFAULT_ARRAY_FORMAT = 'none';
 
 function encoderForArrayFormat(options) {
@@ -231,6 +232,6 @@ exports.parseUrl = (input, options) => {
 	};
 };
 
-exports.setGlobalArrayFormat = (format) => {
+exports.setGlobalArrayFormat = format => {
 	DEFAULT_ARRAY_FORMAT = format;
 };
