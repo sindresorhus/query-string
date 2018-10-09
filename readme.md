@@ -97,6 +97,10 @@ queryString.parse('foo=1&foo=2&foo=3');
 //=> foo: [1,2,3]
 ```
 
+### .setGlobalArrayFormat(*arrayFormat*)
+
+As above, set an arrayFormat as global default setting, convenient for all same setting in one project.
+
 ### .stringify(*object*, *[options]*)
 
 Stringify an object into a query string, sorting the keys.
