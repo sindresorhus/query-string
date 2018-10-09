@@ -2,6 +2,8 @@
 const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
 
+let DEFAULT_ARRAY_FORMAT = 'none';
+
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
@@ -128,7 +130,7 @@ function extract(input) {
 }
 
 function parse(input, options) {
-	options = Object.assign({decode: true, arrayFormat: 'none'}, options);
+	options = Object.assign({decode: true, arrayFormat: DEFAULT_ARRAY_FORMAT}, options);
 
 	const formatter = parserForArrayFormat(options);
 
@@ -179,7 +181,7 @@ exports.stringify = (obj, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: DEFAULT_ARRAY_FORMAT
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
@@ -228,4 +230,8 @@ exports.parseUrl = (input, options) => {
 		url: input.split('?')[0] || '',
 		query: parse(extract(input), options)
 	};
+};
+
+exports.setGlobalArrayFormat = format => {
+	DEFAULT_ARRAY_FORMAT = format;
 };
