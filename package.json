@@ -1,6 +1,6 @@
 {
 	"name": "query-string",
-	"version": "6.2.0",
+	"version": "7.0.0",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
 	"repository": "sindresorhus/query-string",
@@ -12,10 +12,21 @@
 	"engines": {
 		"node": ">=6"
 	},
+	"main": "dist/query-string.js",
+	"umd:main": "dist/query-string.umd.js",
+	"module": "dist/query-string.mjs",
+	"source": "index.js",
 	"scripts": {
+		"build": "microbundle",
 		"test": "xo && ava"
 	},
 	"files": [
+		"dist/query-string.js",
+		"dist/query-string.js.map",
+		"dist/query-string.mjs",
+		"dist/query-string.mjs.map",
+		"dist/query-string.umd.js",
+		"dist/query-string.umd.js.map",
 		"index.js"
 	],
 	"keywords": [
@@ -41,6 +52,7 @@
 		"ava": "^0.25.0",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
+		"microbundle": "^0.6.0",
 		"xo": "^0.23.0"
 	}
 }
