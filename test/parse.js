@@ -1,5 +1,5 @@
 import test from 'ava';
-import m from '..';
+import m from '../dist';
 
 test('query strings starting with a `?`', t => {
 	t.deepEqual(m.parse('?foo=bar'), {foo: 'bar'});

@@ -1,7 +1,7 @@
 import deepEqual from 'deep-equal';
 import * as fc from 'fast-check';
 import test from 'ava';
-import m from '..';
+import m from '../dist';
 
 // Valid query parameters must follow:
 // - key can be any unicode string (not empty)

@@ -1,5 +1,5 @@
 import test from 'ava';
-import m from '..';
+import m from '../dist';
 
 test('stringify', t => {
 	t.is(m.stringify({foo: 'bar'}), 'foo=bar');

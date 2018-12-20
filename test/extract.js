@@ -1,5 +1,5 @@
 import test from 'ava';
-import m from '..';
+import m from '../dist';
 
 test('extracts query string from url', t => {
 	t.is(m.extract('https://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
