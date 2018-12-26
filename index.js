@@ -218,9 +218,9 @@ exports.stringify = (obj, options) => {
 	}).filter(x => x.length > 0).join('&');
 };
 
-exports.parseUrl = (input, options) => {
+exports.parseUrl = (input, options = {}) => {
 	const hashStart = input.indexOf('#');
-	if (hashStart !== -1) {
+	if (hashStart !== -1 && !options.isSupportHashQuery) {
 		input = input.slice(0, hashStart);
 	}
 
