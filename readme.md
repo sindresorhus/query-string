@@ -160,7 +160,7 @@ queryString.stringify({ a: 1, b: 2, c: 3}, {
 
 ```js
 queryString.stringify({ b: 1, c: 2, a: 3}, {sort: false});
-// => 'c=3&a=1&b=2'
+// => 'b=1&c=2&a=3'
 ```
 
 If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in Unicode code point order.
