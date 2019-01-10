@@ -183,3 +183,10 @@ test('decode keys and values', t => {
 test('disable decoding of keys and values', t => {
 	t.deepEqual(m.parse('tags=postal%20office,burger%2C%20fries%20and%20coke', {decode: false}), {tags: 'postal%20office,burger%2C%20fries%20and%20coke'});
 });
+
+test('parse query string, but don\'t sort the keys alphabetically', t => {
+	const parsedUnsorted = m.parse('?a=1&c=2&b=3', {sort: false});
+	const parsedSorted = m.parse('?a=1&c=2&b=3');
+	t.deepEqual(Object.keys(parsedUnsorted), ['a', 'c', 'b']);
+	t.deepEqual(Object.keys(parsedSorted), ['a', 'b', 'c']);
+});

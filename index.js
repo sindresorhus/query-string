@@ -128,7 +128,7 @@ function extract(input) {
 }
 
 function parse(input, options) {
-	options = Object.assign({decode: true, arrayFormat: 'none'}, options);
+	options = Object.assign({decode: true, arrayFormat: 'none', sort: true}, options);
 
 	const formatter = parserForArrayFormat(options);
 
@@ -153,6 +153,10 @@ function parse(input, options) {
 		value = value === undefined ? null : decode(value, options);
 
 		formatter(decode(key, options), value, ret);
+	}
+
+	if (!options.sort) {
+		return ret;
 	}
 
 	return Object.keys(ret).sort().reduce((result, key) => {
