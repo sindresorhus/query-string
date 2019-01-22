@@ -15,8 +15,8 @@
 	"scripts": {
 		"test": "xo && ava",
 		"build": "babel index.js --out-file lib/index.js --presets=@babel/preset-env"
-  },
-  "main": "lib/index.js",
+	},
+	"main": "lib/index.js",
 	"files": [
 		"index.js"
 	],
