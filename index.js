@@ -133,7 +133,7 @@ function parse(input, options) {
 	const formatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
-	const ret = Object.create(null);
+	let ret = Object.create(null);
 
 	if (typeof input !== 'string') {
 		return ret;
