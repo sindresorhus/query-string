@@ -28,6 +28,16 @@ function encoderForArrayFormat(options) {
 				}
 				return [...result, [encode(key, options), '[]=', encode(value, options)].join('')];
 			};
+		case 'comma':
+			return key => (result, value, index) => {
+				if (!value) {
+					return result;
+				}
+				if (index === 0) {
+					return [[encode(key, options), '=', encode(value, options)].join('')];
+				}
+				return [[result, encode(value, options)].join(',')];
+			};
 		default:
 			return key => (result, value) => {
 				if (value === undefined) {
