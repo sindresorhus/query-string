@@ -5,35 +5,38 @@ const decodeComponent = require('decode-uri-component');
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
-			return (key, value, index) => {
-				return value === null ? [
-					encode(key, options),
-					'[',
-					index,
-					']'
-				].join('') : [
-					encode(key, options),
-					'[',
-					encode(index, options),
-					']=',
-					encode(value, options)
-				].join('');
+			return key => (result, value) => {
+				const index = result.length;
+				if (value === undefined) {
+					return result;
+				}
+				if (value === null) {
+					return [...result, [encode(key, options), '[', index, ']'].join('')];
+				}
+				return [
+					...result,
+					[encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join('')
+				];
 			};
 		case 'bracket':
-			return (key, value) => {
-				return value === null ? [encode(key, options), '[]'].join('') : [
-					encode(key, options),
-					'[]=',
-					encode(value, options)
-				].join('');
+			return key => (result, value) => {
+				if (value === undefined) {
+					return result;
+				}
+				if (value === null) {
+					return [...result, [encode(key, options), '[]'].join('')];
+				}
+				return [...result, [encode(key, options), '[]=', encode(value, options)].join('')];
 			};
 		default:
-			return (key, value) => {
-				return value === null ? encode(key, options) : [
-					encode(key, options),
-					'=',
-					encode(value, options)
-				].join('');
+			return key => (result, value) => {
+				if (value === undefined) {
+					return result;
+				}
+				if (value === null) {
+					return [...result, encode(key, options)];
+				}
+				return [...result, [encode(key, options), '=', encode(value, options)].join('')];
 			};
 	}
 }
@@ -201,17 +204,10 @@ exports.stringify = (obj, options) => {
 		}
 
 		if (Array.isArray(value)) {
-			const result = [];
-
-			for (const value2 of value.slice()) {
-				if (value2 === undefined) {
-					continue;
-				}
-
-				result.push(formatter(key, value2, result.length));
-			}
-
-			return result.join('&');
+			return value
+				.slice()
+				.reduce(formatter(key), [])
+				.join('&');
 		}
 
 		return encode(key, options) + '=' + encode(value, options);
