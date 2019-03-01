@@ -90,6 +90,13 @@ queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 //=> foo: [1,2,3]
 ```
 
+- `comma`: stands for parsing separating array elements with comma, such as:
+
+```js
+queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
+//=> foo: [1,2,3]
+```
+
 - `none`: is the **default** option and removes any bracket representation, such as:
 
 ```js
@@ -136,6 +143,14 @@ queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
 queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
 // => foo[0]=1&foo[1]=2&foo[3]=3
 ```
+
+- `comma`: stands for parsing separating array elements with comma, such as:
+
+```js
+queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'comma'});
+// => foo=1,2,3
+```
+
 
 - `none`: is the __default__ option and removes any bracket representation, such as:
 
