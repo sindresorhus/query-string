@@ -19,6 +19,7 @@ function encoderForArrayFormat(options) {
 					encode(value, options)
 				].join('');
 			};
+
 		case 'bracket':
 			return (key, value) => {
 				return value === null ? [encode(key, options), '[]'].join('') : [
@@ -27,6 +28,7 @@ function encoderForArrayFormat(options) {
 					encode(value, options)
 				].join('');
 			};
+
 		default:
 			return (key, value) => {
 				return value === null ? encode(key, options) : [
@@ -59,6 +61,7 @@ function parserForArrayFormat(options) {
 
 				accumulator[key][result[1]] = value;
 			};
+
 		case 'bracket':
 			return (key, value, accumulator) => {
 				result = /(\[\])$/.exec(key);
@@ -76,6 +79,7 @@ function parserForArrayFormat(options) {
 
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
+
 		default:
 			return (key, value, accumulator) => {
 				if (accumulator[key] === undefined) {
