@@ -4,7 +4,7 @@ export interface ParseOptions {
 	 *
 	 * @default true
 	 */
-	decode?: boolean;
+	readonly decode?: boolean;
 
 	/**
 	 * Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
@@ -29,11 +29,11 @@ export interface ParseOptions {
 	 *    queryString.parse('foo=1&foo=2&foo=3');
 	 *    //=> foo: [1,2,3]
 	 */
-	arrayFormat?: 'bracket' | 'index' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'none';
 }
 
 export interface ParsedQuery {
-	[key: string]: string | string[] | undefined;
+	readonly [key: string]: string | string[] | undefined;
 }
 
 /**
@@ -46,8 +46,8 @@ export interface ParsedQuery {
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
 export interface ParsedUrl {
-	url: string;
-	query: ParsedQuery;
+	readonly url: string;
+	readonly query: ParsedQuery;
 }
 
 /**
@@ -68,14 +68,14 @@ export interface StringifyOptions {
 	 *
 	 * @default true
 	 */
-	strict?: boolean;
+	readonly strict?: boolean;
 
 	/**
 	 * [URL encode](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) the keys and values.
 	 *
 	 * @default true
 	 */
-	encode?: boolean;
+	readonly encode?: boolean;
 
 	/**
 	 * Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
@@ -100,7 +100,7 @@ export interface StringifyOptions {
 	 *    queryString.stringify({foo: [1,2,3]});
 	 *    // => foo=1&foo=2&foo=3
 	 */
-	arrayFormat?: 'bracket' | 'index' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'none';
 
 	/**
 	 * Supports both `Function` as a custom sorting function or `false` to disable sorting.
@@ -118,7 +118,7 @@ export interface StringifyOptions {
 	 * queryString.stringify({ b: 1, c: 2, a: 3}, {sort: false});
 	 * // => 'b=1&c=2&a=3'
 	 */
-	sort?: ((itemLeft: string, itemRight: string) => number) | false;
+	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
 }
 
 /**
