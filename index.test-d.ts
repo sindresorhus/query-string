@@ -1,7 +1,7 @@
 import {expectType} from 'tsd-check';
 import * as queryString from '.';
 
-// stringify
+// Stringify
 expectType<string>(
 	queryString.stringify({
 		str: 'bar',
@@ -32,7 +32,7 @@ expectType<string>(
 	)
 );
 
-// parse
+// Parse
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
 
 expectType<queryString.ParsedQuery>(
@@ -48,7 +48,7 @@ expectType<queryString.ParsedQuery>(
 	queryString.parse('?foo=bar', {arrayFormat: 'none'})
 );
 
-// parseUrl
+// Parse URL
 expectType<queryString.ParsedUrl>(queryString.parseUrl('?foo=bar'));
 
 expectType<queryString.ParsedUrl>(
@@ -64,5 +64,5 @@ expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'none'})
 );
 
-// extract
+// Extract
 expectType<string>(queryString.extract('http://foo.bar/?abc=def&hij=klm'));
