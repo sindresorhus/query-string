@@ -10,42 +10,53 @@ function encoderForArrayFormat(options) {
 				if (value === undefined) {
 					return result;
 				}
+
 				if (value === null) {
 					return [...result, [encode(key, options), '[', index, ']'].join('')];
 				}
+
 				return [
 					...result,
 					[encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join('')
 				];
 			};
+
 		case 'bracket':
 			return key => (result, value) => {
 				if (value === undefined) {
 					return result;
 				}
+
 				if (value === null) {
 					return [...result, [encode(key, options), '[]'].join('')];
 				}
+
 				return [...result, [encode(key, options), '[]=', encode(value, options)].join('')];
 			};
+
 		case 'comma':
 			return key => (result, value, index) => {
 				if (!value) {
 					return result;
 				}
+
 				if (index === 0) {
 					return [[encode(key, options), '=', encode(value, options)].join('')];
 				}
+
 				return [[result, encode(value, options)].join(',')];
 			};
+
 		default:
 			return key => (result, value) => {
 				if (value === undefined) {
 					return result;
 				}
+
 				if (value === null) {
 					return [...result, encode(key, options)];
 				}
+
 				return [...result, [encode(key, options), '=', encode(value, options)].join('')];
 			};
 	}
@@ -72,6 +83,7 @@ function parserForArrayFormat(options) {
 
 				accumulator[key][result[1]] = value;
 			};
+
 		case 'bracket':
 			return (key, value, accumulator) => {
 				result = /(\[\])$/.exec(key);
@@ -89,12 +101,14 @@ function parserForArrayFormat(options) {
 
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
+
 		case 'comma':
 			return (key, value, accumulator) => {
 				const isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
 				const newValue = isArray ? value.split(',') : value;
 				accumulator[key] = newValue;
 			};
+
 		default:
 			return (key, value, accumulator) => {
 				if (accumulator[key] === undefined) {
