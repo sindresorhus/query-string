@@ -20,6 +20,7 @@ expectType<string>(
 );
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'index'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'}));
+expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'comma'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {sort: false}));
 const order = ['c', 'a', 'b'];
 expectType<string>(
@@ -47,6 +48,9 @@ expectType<queryString.ParsedQuery>(
 expectType<queryString.ParsedQuery>(
 	queryString.parse('?foo=bar', {arrayFormat: 'none'})
 );
+expectType<queryString.ParsedQuery>(
+	queryString.parse('?foo=bar', {arrayFormat: 'comma'})
+);
 
 // Parse URL
 expectType<queryString.ParsedUrl>(queryString.parseUrl('?foo=bar'));
@@ -62,6 +66,9 @@ expectType<queryString.ParsedUrl>(
 );
 expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'none'})
+);
+expectType<queryString.ParsedUrl>(
+	queryString.parseUrl('?foo=bar', {arrayFormat: 'comma'})
 );
 
 // Extract

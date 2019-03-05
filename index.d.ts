@@ -29,7 +29,7 @@ export interface ParseOptions {
 	 *    queryString.parse('foo=1&foo=2&foo=3');
 	 *    //=> foo: [1,2,3]
 	 */
-	readonly arrayFormat?: 'bracket' | 'index' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 }
 
 export interface ParsedQuery {
@@ -100,7 +100,7 @@ export interface StringifyOptions {
 	 *    queryString.stringify({foo: [1,2,3]});
 	 *    // => foo=1&foo=2&foo=3
 	 */
-	readonly arrayFormat?: 'bracket' | 'index' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 
 	/**
 	 * Supports both `Function` as a custom sorting function or `false` to disable sorting.
