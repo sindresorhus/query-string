@@ -13,6 +13,11 @@ test('handles strings not containing query string', t => {
 	t.deepEqual(m.parseUrl(''), {url: '', query: {}});
 });
 
+test('handles strings with query string that contain =', t => {
+	t.deepEqual(m.parseUrl('https://foo.bar?foo=baz=bar&foo=baz#top'), {url: 'https://foo.bar', query: {foo: ['baz=bar', 'baz']}});
+	t.deepEqual(m.parseUrl('https://foo.bar?foo=bar=&foo=baz='), {url: 'https://foo.bar', query: {foo: ['bar=', 'baz=']}});
+});
+
 test('throws for invalid values', t => {
 	t.throws(() => {
 		m.parseUrl(null);
