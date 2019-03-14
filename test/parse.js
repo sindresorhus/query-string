@@ -107,12 +107,27 @@ test('query strings having brackets arrays and format option as `bracket`', t =>
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having comma separated arrays and format option as `comma`', t => {
+	t.deepEqual(m.parse('foo=bar,baz', {
+		arrayFormat: 'comma'
+	}), {foo: ['bar', 'baz']});
+});
+
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
 	t.deepEqual(m.parse('bar[]&foo[]=a&foo[]&foo[]=', {
 		arrayFormat: 'bracket'
 	}), {
 		foo: ['a', null, ''],
 		bar: [null]
+	});
+});
+
+test('query strings having comma separated arrays with null and format option as `comma`', t => {
+	t.deepEqual(m.parse('bar&foo=a,', {
+		arrayFormat: 'comma'
+	}), {
+		foo: ['a', ''],
+		bar: null
 	});
 });
 

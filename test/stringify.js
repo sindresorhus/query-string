@@ -117,6 +117,24 @@ test('array stringify representation with array brackets and null value', t => {
 	}), 'bar[]&foo[]=a&foo[]&foo[]=');
 });
 
+test('array stringify representation with array commas', t => {
+	t.is(m.stringify({
+		foo: null,
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'comma'
+	}), 'bar=one,two&foo');
+});
+
+test('array stringify representation with array commas and null value', t => {
+	t.is(m.stringify({
+		foo: ['a', null, ''],
+		bar: [null]
+	}, {
+		arrayFormat: 'comma'
+	}), 'foo=a');
+});
+
 test('array stringify representation with a bad array format', t => {
 	t.is(m.stringify({
 		foo: null,
