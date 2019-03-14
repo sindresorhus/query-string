@@ -7,27 +7,31 @@ export interface ParseOptions {
 	readonly decode?: boolean;
 
 	/**
-	 * Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
-	 *
 	 * @default 'none'
 	 *
-	 * - `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+	 * - `bracket`: Parse arrays with bracket representation:
 	 *
 	 *
 	 *    queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-	 *    //=> foo: [1,2,3]
+	 *    //=> foo: [1, 2, 3]
 	 *
-	 * - `index`: stands for parsing taking the index into account, such as:
+	 * - `index`: Parse arrays with index representation:
 	 *
 	 *
 	 *    queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-	 *    //=> foo: [1,2,3]
+	 *    //=> foo: [1, 2, 3]
 	 *
-	 * - `none`: is the **default** option and removes any bracket representation, such as:
+	 * - `comma`: Parse arrays with elements separated by comma:
+	 *
+	 *
+	 *    queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
+	 *    //=> foo: [1, 2, 3]
+	 *
+	 * - `none`: Parse arrays with elements using duplicate keys:
 	 *
 	 *
 	 *    queryString.parse('foo=1&foo=2&foo=3');
-	 *    //=> foo: [1,2,3]
+	 *    //=> foo: [1, 2, 3]
 	 */
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 }
@@ -78,27 +82,31 @@ export interface StringifyOptions {
 	readonly encode?: boolean;
 
 	/**
-	 * Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
-	 *
 	 * @default 'none'
 	 *
-	 * - `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+	 * - `bracket`: Serialize arrays using bracket representation:
 	 *
 	 *
-	 *    queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
-	 *    // => foo[]=1&foo[]=2&foo[]=3
+	 *    queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
+	 *    //=> 'foo[]=1&foo[]=2&foo[]=3'
 	 *
-	 * - `index`: stands for parsing taking the index into account, such as:
-	 *
-	 *
-	 *    queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
-	 *    // => foo[0]=1&foo[1]=2&foo[3]=3
-	 *
-	 * - `none`: is the **default** option and removes any bracket representation, such as:
+	 * - `index`: Serialize arrays using index representation:
 	 *
 	 *
-	 *    queryString.stringify({foo: [1,2,3]});
-	 *    // => foo=1&foo=2&foo=3
+	 *    queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
+	 *    //=> 'foo[0]=1&foo[1]=2&foo[3]=3'
+	 *
+	 * - `comma`: Serialize arrays by separating elements with comma:
+	 *
+	 *
+	 *    queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
+	 *    //=> 'foo=1,2,3'
+	 *
+	 * - `none`: Serialize arrays by using duplicate keys:
+	 *
+	 *
+	 *    queryString.stringify({foo: [1, 2, 3]});
+	 *    //=> 'foo=1&foo=2&foo=3'
 	 */
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 
@@ -110,19 +118,19 @@ export interface StringifyOptions {
 	 * @example
 	 *
 	 * const order = ['c', 'a', 'b'];
-	 * queryString.stringify({ a: 1, b: 2, c: 3}, {
-	 *     sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
+	 * queryString.stringify({a: 1, b: 2, c: 3}, {
+	 * 	sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
 	 * });
 	 * // => 'c=3&a=1&b=2'
 	 *
-	 * queryString.stringify({ b: 1, c: 2, a: 3}, {sort: false});
+	 * queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 	 * // => 'b=1&c=2&a=3'
 	 */
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
 }
 
 /**
- * Stringify an object into a query string, sorting the keys.
+ * Stringify an object into a query string and sorting the keys.
  */
 export function stringify(
 	object: {[key: string]: unknown},

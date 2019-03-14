@@ -161,7 +161,10 @@ function extract(input) {
 }
 
 function parse(input, options) {
-	options = Object.assign({decode: true, arrayFormat: 'none'}, options);
+	options = Object.assign({
+		decode: true,
+		arrayFormat: 'none'
+	}, options);
 
 	const formatter = parserForArrayFormat(options);
 
@@ -204,8 +207,8 @@ function parse(input, options) {
 exports.extract = extract;
 exports.parse = parse;
 
-exports.stringify = (obj, options) => {
-	if (!obj) {
+exports.stringify = (object, options) => {
+	if (!object) {
 		return '';
 	}
 
@@ -216,14 +219,14 @@ exports.stringify = (obj, options) => {
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
-	const keys = Object.keys(obj);
+	const keys = Object.keys(object);
 
 	if (options.sort !== false) {
 		keys.sort(options.sort);
 	}
 
 	return keys.map(key => {
-		const value = obj[key];
+		const value = object[key];
 
 		if (value === undefined) {
 			return '';
@@ -235,7 +238,6 @@ exports.stringify = (obj, options) => {
 
 		if (Array.isArray(value)) {
 			return value
-				.slice()
 				.reduce(formatter(key), [])
 				.join('&');
 		}
