@@ -134,7 +134,7 @@ test('array stringify representation with array indexes and sparse array', t => 
 
 test('should sort keys in given order', t => {
 	const order = ['c', 'a', 'b'];
-	const sort = (key1, key2) => order.indexOf(key1) >= order.indexOf(key2);
+	const sort = (key1, key2) => order.indexOf(key1) - order.indexOf(key2);
 
 	t.is(m.stringify({a: 'foo', b: 'bar', c: 'baz'}, {sort}), 'c=baz&a=foo&b=bar');
 });

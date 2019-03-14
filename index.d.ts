@@ -33,7 +33,7 @@ export interface ParseOptions {
 }
 
 export interface ParsedQuery {
-	readonly [key: string]: string | string[] | undefined;
+	readonly [key: string]: string | string[] | null | undefined;
 }
 
 /**
