@@ -72,28 +72,28 @@ Default: `'none'`
 
 ```js
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-//=> foo: [1, 2, 3]
+//=> foo: ['1', '2', '3']
 ```
 
 - `'index'`: Parse arrays with index representation:
 
 ```js
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-//=> foo: [1, 2, 3]
+//=> foo: ['1', '2', '3']
 ```
 
 - `'comma'`: Parse arrays with elements separated by comma:
 
 ```js
 queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
-//=> foo: [1, 2, 3]
+//=> foo: ['1', '2', '3']
 ```
 
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
-//=> foo: [1, 2, 3]
+//=> foo: ['1', '2', '3']
 ```
 
 ##### sort
@@ -102,6 +102,13 @@ Type: `Function | boolean`<br>
 Default: `true`
 
 Supports both `Function` as a custom sorting function or `false` to disable sorting.
+
+##### parseNumbers
+
+Type: `boolean`<br>
+Default: `false`
+
+Parse the value as a number type instead of string type if it's a number.
 
 ### .stringify(object, [options])
 

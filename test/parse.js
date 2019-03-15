@@ -228,3 +228,18 @@ test('decode keys and values', t => {
 test('disable decoding of keys and values', t => {
 	t.deepEqual(queryString.parse('tags=postal%20office,burger%2C%20fries%20and%20coke', {decode: false}), {tags: 'postal%20office,burger%2C%20fries%20and%20coke'});
 });
+
+test('number value returns as string by default', t => {
+	t.deepEqual(queryString.parse('foo=1'), {foo: '1'});
+});
+
+test('number value returns as number if option is set', t => {
+	t.deepEqual(queryString.parse('foo=1', {parseNumbers: true}), {foo: 1});
+	t.deepEqual(queryString.parse('foo=12.3&bar=123e-1', {parseNumbers: true}), {foo: 12.3, bar: 12.3});
+	t.deepEqual(queryString.parse('foo=0x11&bar=12.00', {parseNumbers: true}), {foo: 17, bar: 12});
+});
+
+test('NaN value returns as string if option is set', t => {
+	t.deepEqual(queryString.parse('foo=null', {parseNumbers: true}), {foo: 'null'});
+	t.deepEqual(queryString.parse('foo=100a&bar=100', {parseNumbers: true}), {foo: '100a', bar: 100});
+});
