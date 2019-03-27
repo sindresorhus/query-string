@@ -137,6 +137,11 @@ test('query strings having indexed arrays and format option as `index`', t => {
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
+	t.deepEqual(m.parse('foo=bar=&foo=ba=z=', {
+	}), {foo: ['bar=', 'ba=z=']});
+});
+
 test('query strings having ordered index arrays and format option as `index`', t => {
 	t.deepEqual(m.parse('foo[1]=bar&foo[0]=baz&foo[3]=one&foo[2]=two', {
 		arrayFormat: 'index'

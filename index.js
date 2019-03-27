@@ -1,6 +1,7 @@
 'use strict';
 const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
+const splitOnFirst = require('split-on-first');
 
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
@@ -182,7 +183,7 @@ function parse(input, options) {
 	}
 
 	for (const param of input.split('&')) {
-		let [key, value] = param.replace(/\+/g, ' ').split('=');
+		let [key, value] = splitOnFirst(param.replace(/\+/g, ' '), '=');
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
