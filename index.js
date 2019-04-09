@@ -37,7 +37,7 @@ function encoderForArrayFormat(options) {
 
 		case 'comma':
 			return key => (result, value, index) => {
-				if (!value) {
+				if (value === null || value === undefined || value.length === 0) {
 					return result;
 				}
 

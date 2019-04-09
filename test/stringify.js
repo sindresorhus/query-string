@@ -135,6 +135,15 @@ test('array stringify representation with array commas and null value', t => {
 	}), 'foo=a');
 });
 
+test('array stringify representation with array commas and 0 value', t => {
+	t.is(queryString.stringify({
+		foo: ['a', null, 0],
+		bar: [null]
+	}, {
+		arrayFormat: 'comma'
+	}), 'foo=a,0');
+});
+
 test('array stringify representation with a bad array format', t => {
 	t.is(queryString.stringify({
 		foo: null,
