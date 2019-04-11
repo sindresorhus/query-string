@@ -152,7 +152,17 @@ function keysSorter(input) {
 	return input;
 }
 
+function removeHash(input) {
+	const hashStart = input.indexOf('#');
+	if (hashStart !== -1) {
+		input = input.slice(0, hashStart);
+	}
+
+	return input;
+}
+
 function extract(input) {
+	input = removeHash(input);
 	const queryStart = input.indexOf('?');
 	if (queryStart === -1) {
 		return '';
@@ -248,13 +258,8 @@ exports.stringify = (object, options) => {
 };
 
 exports.parseUrl = (input, options) => {
-	const hashStart = input.indexOf('#');
-	if (hashStart !== -1) {
-		input = input.slice(0, hashStart);
-	}
-
 	return {
-		url: input.split('?')[0] || '',
+		url: removeHash(input).split('?')[0] || '',
 		query: parse(extract(input), options)
 	};
 };
