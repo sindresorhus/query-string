@@ -11,10 +11,6 @@ $ npm install query-string
 
 This module targets Node.js 6 or later and the latest version of Chrome, Firefox, and Safari. If you want support for older browsers, or, [if your project is using create-react-app v1](https://github.com/sindresorhus/query-string/pull/148#issuecomment-399656020), use version 5: `npm install query-string@5`.
 
-<a href="https://www.patreon.com/sindresorhus">
-	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
-</a>
-
 
 ## Usage
 
@@ -58,7 +54,7 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 #### options
 
-Type: `Object`
+Type: `object`
 
 ##### decode
 
@@ -70,30 +66,30 @@ Decode the keys and values. URL components are decoded with [`decode-uri-compone
 ##### arrayFormat
 
 Type: `string`<br>
-Default: `none`
+Default: `'none'`
 
-- `bracket`: Parse arrays with bracket representation:
+- `'bracket'`: Parse arrays with bracket representation:
 
 ```js
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
 //=> foo: [1, 2, 3]
 ```
 
-- `index`: Parse arrays with index representation:
+- `'index'`: Parse arrays with index representation:
 
 ```js
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 //=> foo: [1, 2, 3]
 ```
 
-- `comma`: Parse arrays with elements separated by comma:
+- `'comma'`: Parse arrays with elements separated by comma:
 
 ```js
 queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 //=> foo: [1, 2, 3]
 ```
 
-- `none`: Parse arrays with elements using duplicate keys:
+- `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
@@ -106,7 +102,7 @@ Stringify an object into a query string and sorting the keys.
 
 #### options
 
-Type: `Object`
+Type: `object`
 
 ##### strict
 
@@ -125,30 +121,30 @@ Default: `true`
 ##### arrayFormat
 
 Type: `string`<br>
-Default: `none`
+Default: `'none'`
 
-- `bracket`: Serialize arrays using bracket representation:
+- `'bracket'`: Serialize arrays using bracket representation:
 
 ```js
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
 //=> 'foo[]=1&foo[]=2&foo[]=3'
 ```
 
-- `index`: Serialize arrays using index representation:
+- `'index'`: Serialize arrays using index representation:
 
 ```js
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
 //=> 'foo[0]=1&foo[1]=2&foo[3]=3'
 ```
 
-- `comma`: Serialize arrays by separating elements with comma:
+- `'comma'`: Serialize arrays by separating elements with comma:
 
 ```js
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 //=> 'foo=1,2,3'
 ```
 
-- `none`: Serialize arrays by using duplicate keys:
+- `'none'`: Serialize arrays by using duplicate keys:
 
 ```js
 queryString.stringify({foo: [1, 2, 3]});
@@ -236,8 +232,3 @@ queryString.stringify({foo: null});
 queryString.stringify({foo: undefined});
 //=> ''
 ```
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)
