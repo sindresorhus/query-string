@@ -96,6 +96,13 @@ queryString.parse('foo=1&foo=2&foo=3');
 //=> foo: [1, 2, 3]
 ```
 
+##### sort
+
+Type: `boolean`<br>
+Default: `true`
+
+Parse the keys and values into an object sorted by key when `true`, or in the order they appear in the query string when `false`.
+
 ### .stringify(object, [options])
 
 Stringify an object into a query string and sorting the keys.
