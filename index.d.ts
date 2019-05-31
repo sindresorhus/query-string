@@ -34,6 +34,14 @@ export interface ParseOptions {
 	 *    //=> foo: [1, 2, 3]
 	 */
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
+
+	/**
+	 * Sort the parsed keys.
+	 *
+	 * @default true
+	 */
+	readonly sort?: boolean;
+
 }
 
 export interface ParsedQuery {
