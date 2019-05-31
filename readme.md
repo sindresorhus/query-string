@@ -98,10 +98,10 @@ queryString.parse('foo=1&foo=2&foo=3');
 
 ##### sort
 
-Type: `boolean`<br>
+Type: `Function | boolean`<br>
 Default: `true`
 
-Parse the keys and values into an object sorted by key when `true`, or in the order they appear in the query string when `false`.
+Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
 ### .stringify(object, [options])
 

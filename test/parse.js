@@ -25,18 +25,28 @@ test('parse multiple query string', t => {
 });
 
 test('parse multiple query string retain order when not sorted', t => {
-	const expectedKeys = ['one', 'two', 'three'];
-	const parsed = queryString.parse('one=foo&two=bar&three=yay', {sort: false});
+	const expectedKeys = ['b', 'a', 'c'];
+	const parsed = queryString.parse('b=foo&a=bar&c=yay', {sort: false});
 	Object.keys(parsed).forEach((key, index) => {
 		t.is(key, expectedKeys[index]);
 	});
 });
 
 test('parse multiple query string sorted keys', t => {
-	const expectedKeys = ['one', 'three', 'two'];
-	const parsed = queryString.parse('one=foo&two=bar&three=yay');
+	const fixture = ['a', 'b', 'c'];
+	const parsed = queryString.parse('a=foo&c=bar&b=yay');
 	Object.keys(parsed).forEach((key, index) => {
-		t.is(key, expectedKeys[index]);
+		t.is(key, fixture[index]);
+	});
+});
+
+test('should sort parsed keys in given order', t => {
+	const fixture = ['c', 'a', 'b'];
+	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);
+
+	const parsed = queryString.parse('a=foo&b=bar&c=yay', {sort});
+	Object.keys(parsed).forEach((key, index) => {
+		t.is(key, fixture[index]);
 	});
 });
 
