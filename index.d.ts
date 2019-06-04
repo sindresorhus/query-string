@@ -132,8 +132,8 @@ export interface StringifyOptions {
 /**
  * Stringify an object into a query string and sorting the keys.
  */
-export function stringify(
-	object: {[key: string]: unknown},
+export function stringify<T = {[key: string]: unknown}>(
+	object: T,
 	options?: StringifyOptions
 ): string;
 
