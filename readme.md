@@ -96,6 +96,13 @@ queryString.parse('foo=1&foo=2&foo=3');
 //=> foo: [1, 2, 3]
 ```
 
+##### sort
+
+Type: `Function | boolean`<br>
+Default: `true`
+
+Supports both `Function` as a custom sorting function or `false` to disable sorting.
+
 ### .stringify(object, [options])
 
 Stringify an object into a query string and sorting the keys.

@@ -24,6 +24,32 @@ test('parse multiple query string', t => {
 	});
 });
 
+test('parse multiple query string retain order when not sorted', t => {
+	const expectedKeys = ['b', 'a', 'c'];
+	const parsed = queryString.parse('b=foo&a=bar&c=yay', {sort: false});
+	Object.keys(parsed).forEach((key, index) => {
+		t.is(key, expectedKeys[index]);
+	});
+});
+
+test('parse multiple query string sorted keys', t => {
+	const fixture = ['a', 'b', 'c'];
+	const parsed = queryString.parse('a=foo&c=bar&b=yay');
+	Object.keys(parsed).forEach((key, index) => {
+		t.is(key, fixture[index]);
+	});
+});
+
+test('should sort parsed keys in given order', t => {
+	const fixture = ['c', 'a', 'b'];
+	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);
+
+	const parsed = queryString.parse('a=foo&b=bar&c=yay', {sort});
+	Object.keys(parsed).forEach((key, index) => {
+		t.is(key, fixture[index]);
+	});
+});
+
 test('parse query string without a value', t => {
 	t.deepEqual(queryString.parse('foo'), {foo: null});
 	t.deepEqual(queryString.parse('foo&key'), {

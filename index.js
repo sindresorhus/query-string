@@ -174,6 +174,7 @@ function extract(input) {
 function parse(input, options) {
 	options = Object.assign({
 		decode: true,
+		sort: true,
 		arrayFormat: 'none'
 	}, options);
 
@@ -202,7 +203,11 @@ function parse(input, options) {
 		formatter(decode(key, options), value, ret);
 	}
 
-	return Object.keys(ret).sort().reduce((result, key) => {
+	if (options.sort === false) {
+		return ret;
+	}
+
+	return (options.sort === true ? Object.keys(ret).sort() : Object.keys(ret).sort(options.sort)).reduce((result, key) => {
 		const value = ret[key];
 		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
 			// Sort object keys, not values
