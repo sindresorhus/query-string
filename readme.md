@@ -108,6 +108,11 @@ Supports both `Function` as a custom sorting function or `false` to disable sort
 Type: `boolean`<br>
 Default: `false`
 
+```js
+queryString.parse('foo[]=1&foo[]=2&foo[]=3', {parseNumbers: true});
+//=> foo: [1, 2, 3]
+```
+
 Parse the value as a number type instead of string type if it's a number.
 
 ### .stringify(object, [options])

@@ -241,5 +241,6 @@ test('number value returns as number if option is set', t => {
 
 test('NaN value returns as string if option is set', t => {
 	t.deepEqual(queryString.parse('foo=null', {parseNumbers: true}), {foo: 'null'});
+	t.deepEqual(queryString.parse('foo=undefined', {parseNumbers: true}), {foo: 'undefined'});
 	t.deepEqual(queryString.parse('foo=100a&bar=100', {parseNumbers: true}), {foo: '100a', bar: 100});
 });

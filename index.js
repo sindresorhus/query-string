@@ -175,7 +175,6 @@ function parse(input, options) {
 	options = Object.assign({
 		decode: true,
 		sort: true,
-		arrayFormat: 'none'
 		arrayFormat: 'none',
 		parseNumbers: false
 	}, options);
