@@ -46,7 +46,7 @@ console.log(location.search);
 
 ## API
 
-### .parse(string, [options])
+### .parse(string, options?)
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
@@ -184,7 +184,7 @@ If omitted, keys are sorted using `Array#sort()`, which means, converting them t
 
 Extract a query string from a URL that can be passed into `.parse()`.
 
-### .parseUrl(string, [options])
+### .parseUrl(string, options?)
 
 Extract the URL and the query string as an object.
 
