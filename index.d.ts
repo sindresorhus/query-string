@@ -36,11 +36,11 @@ export interface ParseOptions {
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 
 	/**
-	 * @default `false`
-	 * 
 	 * Supports both `Function` as a custom sorting function or `false` to disable sorting.
 	 *
 	 * If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in Unicode code point order.
+	 *
+	 * @default true
 	 *
 	 * @example
 	 *
@@ -48,10 +48,10 @@ export interface ParseOptions {
 	 * queryString.parse('?a=one&b=two&c=three', {
 	 * 	sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
 	 * });
-	 * // => {'c': 'three', 'a': 'one', 'b': 'two'}
+	 * // => {c: 'three', a: 'one', b: 'two'}
 	 *
 	 * queryString.parse('?a=one&c=three&b=two', {sort: false});
-	 * // => {'a': 'one', 'c': 'three', 'b': 'two'}
+	 * // => {a: 'one', c: 'three', b: 'two'}
 	 */
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
 
