@@ -13,25 +13,25 @@ export interface ParseOptions {
 	 *
 	 *
 	 *    queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-	 *    //=> foo: [1, 2, 3]
+	 *    //=> foo: ['1', '2', '3']
 	 *
 	 * - `index`: Parse arrays with index representation:
 	 *
 	 *
 	 *    queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-	 *    //=> foo: [1, 2, 3]
+	 *    //=> foo: ['1', '2', '3']
 	 *
 	 * - `comma`: Parse arrays with elements separated by comma:
 	 *
 	 *
 	 *    queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
-	 *    //=> foo: [1, 2, 3]
+	 *    //=> foo: ['1', '2', '3']
 	 *
 	 * - `none`: Parse arrays with elements using duplicate keys:
 	 *
 	 *
 	 *    queryString.parse('foo=1&foo=2&foo=3');
-	 *    //=> foo: [1, 2, 3]
+	 *    //=> foo: ['1', '2', '3']
 	 */
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 
@@ -55,10 +55,21 @@ export interface ParseOptions {
 	 */
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
 
+	/**
+	 * Parse the value as a number type instead of string type if it's a number.
+	 *
+	 * @default false
+	 *
+	 * @example
+	 *
+	 * queryString.parse('foo[]=1&foo[]=2&foo[]=3', {parseNumbers: true});
+	 * //=> foo: [1, 2, 3]
+	 */
+	readonly parseNumbers?: boolean;
 }
 
 export interface ParsedQuery {
-	readonly [key: string]: string | string[] | null | undefined;
+	readonly [key: string]: string | number | Array<string | number> | null | undefined;
 }
 
 /**

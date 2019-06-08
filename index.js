@@ -175,7 +175,8 @@ function parse(input, options) {
 	options = Object.assign({
 		decode: true,
 		sort: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		parseNumbers: false
 	}, options);
 
 	const formatter = parserForArrayFormat(options);
@@ -199,6 +200,10 @@ function parse(input, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : decode(value, options);
+
+		if (options.parseNumbers && !Number.isNaN(Number(value))) {
+			value = Number(value);
+		}
 
 		formatter(decode(key, options), value, ret);
 	}
