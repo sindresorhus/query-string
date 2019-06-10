@@ -37,7 +37,7 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: "bracket" | "index" | "comma" | "none";
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
 
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
