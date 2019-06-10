@@ -109,8 +109,8 @@ Type: `boolean`<br>
 Default: `false`
 
 ```js
-queryString.parse('foo[]=1&foo[]=2&foo[]=3', {parseNumbers: true});
-//=> {'foo[]': [1, 2, 3]}
+queryString.parse('foo=1', {parseNumbers: true});
+//=> {foo: 1}
 ```
 
 Parse the value as a number type instead of string type if it's a number.
