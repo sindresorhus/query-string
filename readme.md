@@ -72,28 +72,28 @@ Default: `'none'`
 
 ```js
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-//=> foo: ['1', '2', '3']
+//=> {foo: ['1', '2', '3']}
 ```
 
 - `'index'`: Parse arrays with index representation:
 
 ```js
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-//=> foo: ['1', '2', '3']
+//=> {foo: ['1', '2', '3']}
 ```
 
 - `'comma'`: Parse arrays with elements separated by comma:
 
 ```js
 queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
-//=> foo: ['1', '2', '3']
+//=> {foo: ['1', '2', '3']}
 ```
 
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
-//=> foo: ['1', '2', '3']
+//=> {foo: ['1', '2', '3']}
 ```
 
 ##### sort
@@ -109,8 +109,8 @@ Type: `boolean`<br>
 Default: `false`
 
 ```js
-queryString.parse('foo[]=1&foo[]=2&foo[]=3', {parseNumbers: true});
-//=> foo: [1, 2, 3]
+queryString.parse('foo=1', {parseNumbers: true});
+//=> {foo: 1}
 ```
 
 Parse the value as a number type instead of string type if it's a number.
@@ -153,7 +153,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
 
 ```js
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
-//=> 'foo[0]=1&foo[1]=2&foo[3]=3'
+//=> 'foo[0]=1&foo[1]=2&foo[2]=3'
 ```
 
 - `'comma'`: Serialize arrays by separating elements with comma:
@@ -233,7 +233,7 @@ queryString.parse('likes=cake&name=bob&likes=icecream');
 //=> {likes: ['cake', 'icecream'], name: 'bob'}
 
 queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
-//=> 'color=chartreuse&color=taupe&id=515'
+//=> 'color=taupe&color=chartreuse&id=515'
 ```
 
 

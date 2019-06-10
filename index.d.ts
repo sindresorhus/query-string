@@ -13,28 +13,28 @@ export interface ParseOptions {
 
 		```
 		queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-		//=> foo: ['1', '2', '3']
+		//=> {foo: ['1', '2', '3']}
 		```
 
 	- `index`: Parse arrays with index representation:
 
 		```
 		queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-		//=> foo: ['1', '2', '3']
+		//=> {foo: ['1', '2', '3']}
 		```
 
 	- `comma`: Parse arrays with elements separated by comma:
 
 		```
 		queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
-		//=> foo: ['1', '2', '3']
+		//=> {foo: ['1', '2', '3']}
 		```
 
 	- `none`: Parse arrays with elements using duplicate keys:
 
 		```
 		queryString.parse('foo=1&foo=2&foo=3');
-		//=> foo: ['1', '2', '3']
+		//=> {foo: ['1', '2', '3']}
 		```
 	*/
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
@@ -68,9 +68,9 @@ export interface ParseOptions {
 	@default false
 
 	@example
-	```
-	queryString.parse('foo[]=1&foo[]=2&foo[]=3', {parseNumbers: true});
-	//=> foo: [1, 2, 3]
+	```js
+	queryString.parse('foo=1', {parseNumbers: true});
+	//=> {foo: 1}
 	```
 	*/
 	readonly parseNumbers?: boolean;
@@ -136,7 +136,7 @@ export interface StringifyOptions {
 
 		```
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
-		//=> 'foo[0]=1&foo[1]=2&foo[3]=3'
+		//=> 'foo[0]=1&foo[1]=2&foo[2]=3'
 		```
 
 	- `comma`: Serialize arrays by separating elements with comma:
