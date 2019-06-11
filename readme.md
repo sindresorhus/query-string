@@ -115,6 +115,18 @@ queryString.parse('foo=1', {parseNumbers: true});
 
 Parse the value as a number type instead of string type if it's a number.
 
+##### parseBooleans
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.parse('foo=true', {parseBooleans: true});
+//=> {foo: true}
+```
+
+Parse the value as a boolean type instead of string type if it's a boolean.
+
 ### .stringify(object, [options])
 
 Stringify an object into a query string and sorting the keys.
