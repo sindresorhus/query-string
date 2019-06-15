@@ -176,7 +176,8 @@ function parse(input, options) {
 		decode: true,
 		sort: true,
 		arrayFormat: 'none',
-		parseNumbers: false
+		parseNumbers: false,
+		parseBooleans: false
 	}, options);
 
 	const formatter = parserForArrayFormat(options);
@@ -203,6 +204,10 @@ function parse(input, options) {
 
 		if (options.parseNumbers && !Number.isNaN(Number(value))) {
 			value = Number(value);
+		}
+
+		if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+			value = value.toLowerCase() === 'true';
 		}
 
 		formatter(decode(key, options), value, ret);
