@@ -76,16 +76,16 @@ export interface ParseOptions {
 	readonly parseNumbers?: boolean;
 
 	/**
-	 Parse the value as a boolean type instead of string type if it's a boolean.
+	Parse the value as a boolean type instead of string type if it's a boolean.
 
-	 @default false
+	@default false
 
-	 @example
-	 ```js
-	 queryString.parse('foo=true', {parseBooleans: true});
-	 //=> {foo: true}
-	 ```
-	 */
+	@example
+	```
+	queryString.parse('foo=true', {parseBooleans: true});
+	//=> {foo: true}
+	```
+	*/
 	readonly parseBooleans?: boolean;
 }
 
