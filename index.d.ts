@@ -90,7 +90,19 @@ export interface ParseOptions {
 }
 
 export interface ParsedQuery {
-	readonly [key: string]: string | number | boolean | Array<string | number | boolean> | null | undefined;
+	[key: string]: string | Array<string> | null | undefined;
+}
+
+export interface ParsedQueryWithBooleans {
+	[key: string]: string | boolean | Array<string | boolean> | null | undefined;
+}
+
+export interface ParsedQueryWithNumbers {
+	[key: string]: string | number | Array<string | number> | null | undefined;
+}
+
+export interface ParsedQueryWithBooleansAndNumbers {
+	[key: string]: string | number | boolean | Array<string | number | boolean> | null | undefined;
 }
 
 /**
@@ -100,6 +112,9 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 @param query - The query string to parse.
 */
+export function parse(query: string, options: { parseBooleans: true, parseNumbers: true } & ParseOptions): ParsedQueryWithBooleansAndNumbers;
+export function parse(query: string, options: { parseBooleans: true } & ParseOptions): ParsedQueryWithBooleans;
+export function parse(query: string, options: { parseNumbers: true } & ParseOptions): ParsedQueryWithNumbers;
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
 export interface ParsedUrl {
