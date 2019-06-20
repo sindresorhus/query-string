@@ -112,9 +112,9 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 @param query - The query string to parse.
 */
-export function parse(query: string, options: { parseBooleans: true, parseNumbers: true } & ParseOptions): ParsedQueryWithBooleansAndNumbers;
-export function parse(query: string, options: { parseBooleans: true } & ParseOptions): ParsedQueryWithBooleans;
-export function parse(query: string, options: { parseNumbers: true } & ParseOptions): ParsedQueryWithNumbers;
+export function parse(query: string, options: {parseBooleans: true, parseNumbers: true} & ParseOptions): ParsedQueryWithBooleansAndNumbers;
+export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQueryWithBooleans;
+export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQueryWithNumbers;
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
 export interface ParsedUrl {
