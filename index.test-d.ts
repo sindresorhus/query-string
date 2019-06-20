@@ -51,11 +51,14 @@ expectType<queryString.ParsedQuery>(
 expectType<queryString.ParsedQuery>(
 	queryString.parse('?foo=bar', {arrayFormat: 'comma'})
 );
-expectType<queryString.ParsedQuery>(
+expectType<queryString.ParsedQuery<string | number>>(
 	queryString.parse('?foo=1', {parseNumbers: true})
 );
-expectType<queryString.ParsedQuery>(
+expectType<queryString.ParsedQuery<string | boolean>>(
 	queryString.parse('?foo=true', {parseBooleans: true})
+);
+expectType<queryString.ParsedQuery<string | boolean | number>>(
+	queryString.parse('?foo=true', {parseBooleans: true, parseNumbers: true})
 );
 
 // Parse URL
