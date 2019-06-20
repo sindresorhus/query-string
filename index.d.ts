@@ -90,7 +90,7 @@ export interface ParseOptions {
 }
 
 export interface ParsedQuery {
-	[key: string]: string | Array<string> | null | undefined;
+	[key: string]: string | string[] | null | undefined;
 }
 
 export interface ParsedQueryWithBooleans {
