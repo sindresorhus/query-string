@@ -204,9 +204,7 @@ function parse(input, options) {
 
 		if (options.parseNumbers && !Number.isNaN(Number(value))) {
 			value = Number(value);
-		}
-
-		if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 			value = value.toLowerCase() === 'true';
 		}
 
