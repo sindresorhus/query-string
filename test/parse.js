@@ -253,3 +253,8 @@ test('boolean value returns as boolean if option is set', t => {
 	t.deepEqual(queryString.parse('foo=true', {parseBooleans: true}), {foo: true});
 	t.deepEqual(queryString.parse('foo=false&bar=true', {parseBooleans: true}), {foo: false, bar: true});
 });
+
+test('boolean value returns as boolean and number value as number if both options are set', t => {
+	t.deepEqual(queryString.parse('foo=true&bar=1.12', {parseNumbers: true, parseBooleans: true}), {foo: true, bar: 1.12});
+	t.deepEqual(queryString.parse('foo=16.32&bar=false', {parseNumbers: true, parseBooleans: true}), {foo: 16.32, bar: false});
+});
