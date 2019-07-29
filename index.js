@@ -245,8 +245,8 @@ exports.stringify = (object, options) => {
 	const formatter = encoderForArrayFormat(options);
 
 	if (options.skipNullAndUndefined) {
-		for (const [key, value] of Object.entries(object)) {
-			if (value === undefined || value === null) {
+		for (const key of Object.keys(object)) {
+			if (object[key] === undefined || object[key] === null) {
 				delete object[key];
 			}
 		}
