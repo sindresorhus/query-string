@@ -100,9 +100,9 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 @param query - The query string to parse.
 */
-export function parse(query: string, options: {parseBooleans: true, parseNumbers: true} & ParseOptions): ParsedQuery<string | boolean | number>;
-export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQuery<string | boolean>;
-export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQuery<string | number>;
+export function parse(query: string, options: { parseBooleans: true, parseNumbers: true } & ParseOptions): ParsedQuery<string | boolean | number>;
+export function parse(query: string, options: { parseBooleans: true } & ParseOptions): ParsedQuery<string | boolean>;
+export function parse(query: string, options: { parseNumbers: true } & ParseOptions): ParsedQuery<string | number>;
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
 export interface ParsedUrl {
@@ -192,13 +192,33 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+
+	/**
+	Takes a boolean which decides whether or not `undefined` and `null` values should be skipped when stringify-ing.
+
+	@default false
+
+	@example
+	```
+	queryString.stringify({ a: 'ja', b: undefined, c: null, d: 'vielsker' }, {
+		skipNullAndUndefined: true,
+	});
+	// => 'a=ja&d=vielsker'
+
+	queryString.stringify({ a: undefined, b: null }, {
+		skipNullAndUndefined: true,
+	});
+	// => ''
+	```
+	*/
+	readonly skipNullAndUndefined?: boolean;
 }
 
 /**
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: {[key: string]: any},
+	object: { [key: string]: any },
 	options?: StringifyOptions
 ): string;
 

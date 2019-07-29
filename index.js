@@ -243,6 +243,15 @@ exports.stringify = (object, options) => {
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
+
+	if (options.skipNullAndUndefined) {
+		for (const [key, value] of Object.entries(object)) {
+			if (value === undefined || value === null) {
+				delete object[key];
+			}
+		}
+	}
+
 	const keys = Object.keys(object);
 
 	if (options.sort !== false) {

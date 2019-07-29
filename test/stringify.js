@@ -193,3 +193,32 @@ test('should disable sorting', t => {
 		sort: false
 	}), 'c=foo&b=bar&a=baz');
 });
+
+test('should ignore null when skipNullAndUndefined is set', t => {
+	t.is(queryString.stringify({
+		a: 'ja',
+		b: null,
+		c: 'vielsker'
+	}, {
+		skipNullAndUndefined: true
+	}), 'a=ja&c=vielsker');
+});
+
+test('should ignore undefined when skipNullAndUndefined is set', t => {
+	t.is(queryString.stringify({
+		a: 'ja',
+		b: undefined,
+		c: 'vielsker'
+	}, {
+		skipNullAndUndefined: true
+	}), 'a=ja&c=vielsker');
+});
+
+test('should ignore both null and undefined when skipNullAndUndefined is set', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: null
+	}, {
+		skipNullAndUndefined: true
+	}), '');
+});
