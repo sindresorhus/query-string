@@ -244,7 +244,7 @@ exports.stringify = (input, options) => {
 
 	const formatter = encoderForArrayFormat(options);
 
-	const	object	=	Object.assign({},	input);
+	const object = Object.assign({}, input);
 
 	if (options.skipNullAndUndefined) {
 		for (const key of Object.keys(object)) {
