@@ -231,8 +231,8 @@ function parse(input, options) {
 exports.extract = extract;
 exports.parse = parse;
 
-exports.stringify = (object, options) => {
-	if (!object) {
+exports.stringify = (input, options) => {
+	if (!input) {
 		return '';
 	}
 
@@ -243,6 +243,8 @@ exports.stringify = (object, options) => {
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
+
+	const	object	=	Object.assign({},	input);
 
 	if (options.skipNullAndUndefined) {
 		for (const key of Object.keys(object)) {
