@@ -195,7 +195,7 @@ function parse(input, options) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
+	for (let param of input.split('&')) {
 		let [key, value] = splitOnFirst(param.replace(/\+/g, ' '), '=');
 
 		// Missing `=` should be `null`:
