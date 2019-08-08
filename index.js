@@ -171,6 +171,16 @@ function extract(input) {
 	return input.slice(queryStart + 1);
 }
 
+function parseValue(value, options) {
+	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		value = Number(value);
+	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		value = value.toLowerCase() === 'true';
+	}
+
+	return value;
+}
+
 function parse(input, options) {
 	options = Object.assign({
 		decode: true,
@@ -201,15 +211,19 @@ function parse(input, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : decode(value, options);
-
-		if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-			value = Number(value);
-		} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-			value = value.toLowerCase() === 'true';
-		}
-
 		formatter(decode(key, options), value, ret);
 	}
+
+	Object.keys(ret).forEach(key => {
+		const value = ret[key];
+		if (Boolean(value) && typeof value === 'object') {
+			Object.keys(value).forEach(k => {
+				value[k] = parseValue(value[k], options);
+			});
+		} else {
+			ret[key] = parseValue(value, options);
+		}
+	});
 
 	if (options.sort === false) {
 		return ret;

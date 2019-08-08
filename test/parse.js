@@ -246,6 +246,13 @@ test('NaN value returns as string if option is set', t => {
 	t.deepEqual(queryString.parse('foo=   &bar=', {parseNumbers: true}), {foo: '   ', bar: ''});
 });
 
+test('parseNumbers works with arrayFormat', t => {
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2&foo[]=3&bar=1', {parseNumbers: true, arrayFormat: 'bracket'}), {foo: [1, 2, 3], bar: 1});
+	t.deepEqual(queryString.parse('foo=1,2,a', {parseNumbers: true, arrayFormat: 'comma'}), {foo: [1, 2, 'a']});
+	t.deepEqual(queryString.parse('foo[0]=1&foo[1]=2&foo[2]', {parseNumbers: true, arrayFormat: 'index'}), {foo: [1, 2, null]});
+	t.deepEqual(queryString.parse('foo=1&foo=2&foo=3', {parseNumbers: true}), {foo: [1, 2, 3]});
+});
+
 test('boolean value returns as string by default', t => {
 	t.deepEqual(queryString.parse('foo=true'), {foo: 'true'});
 });
@@ -255,7 +262,21 @@ test('boolean value returns as boolean if option is set', t => {
 	t.deepEqual(queryString.parse('foo=false&bar=true', {parseBooleans: true}), {foo: false, bar: true});
 });
 
+test('parseBooleans works with arrayFormat', t => {
+	t.deepEqual(queryString.parse('foo[]=true&foo[]=false&foo[]=true&bar=1', {parseBooleans: true, arrayFormat: 'bracket'}), {foo: [true, false, true], bar: '1'});
+	t.deepEqual(queryString.parse('foo=true,false,a', {parseBooleans: true, arrayFormat: 'comma'}), {foo: [true, false, 'a']});
+	t.deepEqual(queryString.parse('foo[0]=true&foo[1]=false&foo[2]', {parseBooleans: true, arrayFormat: 'index'}), {foo: [true, false, null]});
+	t.deepEqual(queryString.parse('foo=true&foo=false&foo=3', {parseBooleans: true}), {foo: [true, false, '3']});
+});
+
 test('boolean value returns as boolean and number value as number if both options are set', t => {
 	t.deepEqual(queryString.parse('foo=true&bar=1.12', {parseNumbers: true, parseBooleans: true}), {foo: true, bar: 1.12});
 	t.deepEqual(queryString.parse('foo=16.32&bar=false', {parseNumbers: true, parseBooleans: true}), {foo: 16.32, bar: false});
+});
+
+test('parseNumbers and parseBooleans can work with arrayFormat at the same time', t => {
+	t.deepEqual(queryString.parse('foo=true&foo=false&bar=1.12&bar=2', {parseNumbers: true, parseBooleans: true}), {foo: [true, false], bar: [1.12, 2]});
+	t.deepEqual(queryString.parse('foo[]=true&foo[]=false&foo[]=true&bar[]=1&bar[]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'bracket'}), {foo: [true, false, true], bar: [1, 2]});
+	t.deepEqual(queryString.parse('foo=true,false&bar=1,2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'comma'}), {foo: [true, false], bar: [1, 2]});
+	t.deepEqual(queryString.parse('foo[0]=true&foo[1]=false&bar[0]=1&bar[1]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'index'}), {foo: [true, false], bar: [1, 2]});
 });
