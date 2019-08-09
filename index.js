@@ -216,7 +216,7 @@ function parse(input, options) {
 
 	Object.keys(ret).forEach(key => {
 		const value = ret[key];
-		if (Boolean(value) && typeof value === 'object') {
+		if (typeof value === 'object' && value !== null) {
 			Object.keys(value).forEach(k => {
 				value[k] = parseValue(value[k], options);
 			});
