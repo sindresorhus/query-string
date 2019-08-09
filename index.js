@@ -214,16 +214,16 @@ function parse(input, options) {
 		formatter(decode(key, options), value, ret);
 	}
 
-	Object.keys(ret).forEach(key => {
+	for (const key of Object.keys(ret)) {
 		const value = ret[key];
 		if (typeof value === 'object' && value !== null) {
-			Object.keys(value).forEach(k => {
+			for (const k of Object.keys(value)) {
 				value[k] = parseValue(value[k], options);
-			});
+			}
 		} else {
 			ret[key] = parseValue(value, options);
 		}
-	});
+	}
 
 	if (options.sort === false) {
 		return ret;
