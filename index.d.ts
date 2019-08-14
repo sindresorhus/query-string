@@ -200,15 +200,15 @@ export interface StringifyOptions {
 
 	@example
 	```
-	queryString.stringify({ a: 'ja', b: undefined, c: null, d: 'vielsker' }, {
+	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
 		skipNullAndUndefined: true,
 	});
-	// => 'a=ja&d=vielsker'
+	//=> 'a=1&d=4'
 
-	queryString.stringify({ a: undefined, b: null }, {
+	queryString.stringify({a: undefined, b: null}, {
 		skipNullAndUndefined: true,
 	});
-	// => ''
+	//=> ''
 	```
 	*/
 	readonly skipNullAndUndefined?: boolean;
