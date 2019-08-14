@@ -202,25 +202,26 @@ queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 //=> 'b=1&c=2&a=3'
 ```
 
+If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in Unicode code point order.
+
 ##### skipNullAndUndefined
 
-Type: `boolean`
+Type: `boolean`<br>
+Default: `false`
 
 ```js
-queryString.stringify({ a: 'ja', b: undefined, c: null, d: 'vielsker' }, {
+queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
 	skipNullAndUndefined: true,
 });
-// => 'a=ja&d=vielsker'
+//=> 'a=1&d=4'
 ```
 
 ```js
-queryString.stringify({ a: undefined, b: null }, {
+queryString.stringify({a: undefined, b: null}, {
 	skipNullAndUndefined: true,
 });
-// => ''
+//=> ''
 ```
-
-If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in Unicode code point order.
 
 ### .extract(string)
 
@@ -269,8 +270,6 @@ queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
 
 ## Falsy values
 
-This behaviour can be altered by using the `skipNullAndUndefined` setting in the options variable. With this set to `true`, `null` and `undefined` will return in no key being generated in the output.
-
 Sometimes you want to unset a key, or maybe just make it present without assigning a value to it. Here is how falsy values are stringified:
 
 ```js
@@ -283,6 +282,8 @@ queryString.stringify({foo: null});
 queryString.stringify({foo: undefined});
 //=> ''
 ```
+
+Note: This behaviour can be changed with the `skipNullAndUndefined` option.
 
 
 ---
