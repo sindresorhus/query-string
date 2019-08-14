@@ -53,11 +53,11 @@ export interface ParseOptions {
 	queryString.parse('?a=one&b=two&c=three', {
 		sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
 	});
-	// => {c: 'three', a: 'one', b: 'two'}
+	//=> {c: 'three', a: 'one', b: 'two'}
 	```
 
 	queryString.parse('?a=one&c=three&b=two', {sort: false});
-	// => {a: 'one', c: 'three', b: 'two'}
+	//=> {a: 'one', c: 'three', b: 'two'}
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
@@ -185,10 +185,10 @@ export interface StringifyOptions {
 	queryString.stringify({a: 1, b: 2, c: 3}, {
 		sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
 	});
-	// => 'c=3&a=1&b=2'
+	//=> 'c=3&a=1&b=2'
 
 	queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
-	// => 'b=1&c=2&a=3'
+	//=> 'b=1&c=2&a=3'
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
