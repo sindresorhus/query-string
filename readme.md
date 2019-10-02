@@ -204,6 +204,60 @@ queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 
 If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in Unicode code point order.
 
+#### skipUndefined
+
+Type: `boolean`<br>
+Default: `true`
+
+```js
+queryString.stringify({a: undefined, b: null, c: 'one'}, {skipUndefined=true});
+//=> 'b&c=one'
+```
+
+Takes a boolean which decides if 'undefined' values should be skipped during stringify.
+
+#### skipNulls
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.stringify({a: null, b: 'one'}, {skipNulls=true});
+//=>  'b=one'
+```
+
+Takes a boolean which decides if 'null' values should be skipped during stringify.
+
+#### skipNullAndUndefined
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.stringify({a: undefined, b: null, c: 'one'}, {skipNullAndUndefined=true});
+//=> 'c=one'
+
+queryString.stringify({a: undefined, b: null}, {skipNullAndUndefined=true});
+//=> ''
+```
+
+Takes a boolean which decides if 'undefined' and 'null' values should be skipped during stringify.
+
+#### skipEmptyStrings
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.stringify({a: null, b: '', c: 'one'}, {skipEmptyStrings=true});
+//=> a&c=one
+
+queryString.stringify({a: '', b: ['one', '', 'three']}, {skipEmptyStrings=true});
+//=> 'b=one&b=three'
+```
+
+Takes a boolean which decides if empty string values should be skipped during stringify.
+
 ### .extract(string)
 
 Extract a query string from a URL that can be passed into `.parse()`.

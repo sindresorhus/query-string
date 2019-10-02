@@ -9,11 +9,23 @@ function encoderForArrayFormat(options) {
 			return key => (result, value) => {
 				const index = result.length;
 				if (value === undefined) {
-					return result;
+					if (options.skipNullAndUndefined || options.skipUndefined) {
+						return result;
+					}
+
+					return [...result, [encode(key, options), '[', index, ']'].join('')];
 				}
 
 				if (value === null) {
+					if (options.skipNullAndUndefined || options.skipNulls) {
+						return result;
+					}
+
 					return [...result, [encode(key, options), '[', index, ']'].join('')];
+				}
+
+				if (value === '' && options.skipEmptyStrings) {
+					return result;
 				}
 
 				return [
@@ -25,11 +37,23 @@ function encoderForArrayFormat(options) {
 		case 'bracket':
 			return key => (result, value) => {
 				if (value === undefined) {
-					return result;
+					if (options.skipNullAndUndefined || options.skipUndefined) {
+						return result;
+					}
+
+					return [...result, [encode(key, options), '[]'].join('')];
 				}
 
 				if (value === null) {
+					if (options.skipNullAndUndefined || options.skipNulls) {
+						return result;
+					}
+
 					return [...result, [encode(key, options), '[]'].join('')];
+				}
+
+				if (value === '' && options.skipEmptyStrings) {
+					return result;
 				}
 
 				return [...result, [encode(key, options), '[]=', encode(value, options)].join('')];
@@ -51,11 +75,23 @@ function encoderForArrayFormat(options) {
 		default:
 			return key => (result, value) => {
 				if (value === undefined) {
-					return result;
+					if (options.skipNullAndUndefined || options.skipUndefined) {
+						return result;
+					}
+
+					return [...result, encode(key, options)];
 				}
 
 				if (value === null) {
+					if (options.skipNullAndUndefined || options.skipNulls) {
+						return result;
+					}
+
 					return [...result, encode(key, options)];
+				}
+
+				if (value === '' && options.skipEmptyStrings) {
+					return result;
 				}
 
 				return [...result, [encode(key, options), '=', encode(value, options)].join('')];
@@ -253,7 +289,8 @@ exports.stringify = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		skipUndefined: true
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
@@ -267,11 +304,25 @@ exports.stringify = (object, options) => {
 		const value = object[key];
 
 		if (value === undefined) {
-			return '';
+			if (options.skipNullAndUndefined || options.skipUndefined) {
+				return '';
+			}
+
+			return encode(key, options);
 		}
 
 		if (value === null) {
+			if (options.skipNullAndUndefined || options.skipNulls) {
+				return '';
+			}
+
 			return encode(key, options);
+		}
+
+		if (value === '') {
+			if (options.skipEmptyStrings) {
+				return '';
+			}
 		}
 
 		if (Array.isArray(value)) {

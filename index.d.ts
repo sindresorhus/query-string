@@ -192,6 +192,64 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+
+	/**
+	Takes a boolean which decides if 'undefined' values should be skipped during stringify
+
+	@default true
+
+	@example
+	```
+	queryString.stringify({a: undefined, b: null, c: 'one'}, {skipUndefined=true});
+	//=> 'b&c=one'
+	```
+	*/
+	readonly skipUndefined?: boolean
+
+	/**
+	Takes a boolean which decides if 'null' values should be skipped during stringify
+
+	@default false
+
+	@example
+	```
+	queryString.stringify({a: null, b: 'one'}, {skipNulls=true});
+	//=>  'b=one'
+	```
+	*/
+	readonly skipNulls?: boolean
+
+	/**
+	Takes a boolean which decides if 'undefined' and 'null' values should be skipped during stringify
+
+	@default false
+
+	@example
+	```
+	queryString.stringify({a: undefined, b: null, c: 'one'}, {skipNullAndUndefined=true});
+	//=> 'c=one'
+
+	queryString.stringify({a: undefined, b: null}, {skipNullAndUndefined=true});
+	//=> ''
+	```
+	*/
+	readonly skipNullAndUndefined?: boolean
+
+	/**
+	Takes a boolean which decides if empty string values should be skipped during stringify
+
+	@default false
+
+	@example
+	```
+	queryString.stringify({a: null, b: '', c: 'one'}, {skipEmptyStrings=true});
+	//=> a&c=one
+
+	queryString.stringify({a: '', b: ['one', '', 'three']}, {skipEmptyStrings=true});
+	//=> 'b=one&b=three'
+	```
+	*/
+	readonly skipEmptyStrings?: boolean
 }
 
 /**

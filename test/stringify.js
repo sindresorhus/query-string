@@ -193,3 +193,87 @@ test('should disable sorting', t => {
 		sort: false
 	}), 'c=foo&b=bar&a=baz');
 });
+
+test('should remove null and undefined', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: null,
+		c: 'foo',
+		d: ['bar', null, 'baz', undefined]
+	}, {
+		skipNullAndUndefined: true
+	}), 'c=foo&d=bar&d=baz');
+});
+
+test('should remove nulls', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: null,
+		c: 'foo'
+	}, {
+		skipUndefined: false,
+		skipNulls: true
+	}), 'a&c=foo');
+});
+
+test('should remove undefined', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: null,
+		c: 'foo'
+	}, {
+		skipUndefined: true
+	}), 'b&c=foo');
+});
+
+test('should remove empty strings', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: '',
+		c: 'foo'
+	}, {
+		skipEmptyStrings: true
+	}), 'c=foo');
+});
+
+test('should remove empty strings array', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: '',
+		c: 'foo',
+		d: ['', 'foo', null, '', 'baz']
+	}, {
+		skipEmptyStrings: true
+	}), 'c=foo&d=foo&d&d=baz');
+});
+
+test('array stringify representation with array brackets skipping nulls and not skipping undefined', t => {
+	t.is(queryString.stringify({
+		foo: ['a', null, '', undefined],
+		bar: [null]
+	}, {
+		arrayFormat: 'bracket',
+		skipNulls: true,
+		skipUndefined: false
+	}), 'foo[]=a&foo[]=&foo[]');
+});
+
+test('array stringify representation with array brackets not skipping undefined', t => {
+	t.is(queryString.stringify({
+		foo: ['a', null, '', undefined],
+		bar: [null]
+	}, {
+		arrayFormat: 'bracket',
+		skipUndefined: false
+	}), 'bar[]&foo[]=a&foo[]&foo[]=&foo[]');
+});
+
+test('array stringify representation with array brackets skipping undefined and nulls', t => {
+	t.is(queryString.stringify({
+		foo: ['a', null, '', undefined],
+		bar: [null]
+	}, {
+		arrayFormat: 'bracket',
+		skipNullAndUndefined: true
+	}), 'foo[]=a&foo[]=');
+});
