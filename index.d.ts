@@ -192,6 +192,23 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+
+	/**
+	Skip the key in stringify result if value is `null` or `undefined`.
+	@default false
+	@example
+	```
+	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
+		skipNullAndUndefined: true,
+	});
+	//=> 'a=1&d=4'
+	queryString.stringify({a: undefined, b: null}, {
+		skipNullAndUndefined: true,
+	});
+	//=> ''
+	```
+	*/
+	readonly skipNullAndUndefined?: boolean;
 }
 
 /**

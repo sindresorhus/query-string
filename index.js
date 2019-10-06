@@ -8,7 +8,7 @@ function encoderForArrayFormat(options) {
 		case 'index':
 			return key => (result, value) => {
 				const index = result.length;
-				if (value === undefined) {
+				if (value === undefined || (options.skipNullAndUndefined && value === null)) {
 					return result;
 				}
 
@@ -24,7 +24,7 @@ function encoderForArrayFormat(options) {
 
 		case 'bracket':
 			return key => (result, value) => {
-				if (value === undefined) {
+				if (value === undefined || (options.skipNullAndUndefined && value === null)) {
 					return result;
 				}
 
@@ -36,12 +36,12 @@ function encoderForArrayFormat(options) {
 			};
 
 		case 'comma':
-			return key => (result, value, index) => {
+			return key => (result, value) => {
 				if (value === null || value === undefined || value.length === 0) {
 					return result;
 				}
 
-				if (index === 0) {
+				if (result.length === 0) {
 					return [[encode(key, options), '=', encode(value, options)].join('')];
 				}
 
@@ -50,7 +50,7 @@ function encoderForArrayFormat(options) {
 
 		default:
 			return key => (result, value) => {
-				if (value === undefined) {
+				if (value === undefined || (options.skipNullAndUndefined && value === null)) {
 					return result;
 				}
 
@@ -257,7 +257,17 @@ exports.stringify = (object, options) => {
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
-	const keys = Object.keys(object);
+
+	const objectCpy = Object.assign({}, object);
+	if (options.skipNullAndUndefined) {
+		for (const key of Object.keys(objectCpy)) {
+			if (objectCpy[key] === undefined || objectCpy[key] === null) {
+				delete objectCpy[key];
+			}
+		}
+	}
+
+	const keys = Object.keys(objectCpy);
 
 	if (options.sort !== false) {
 		keys.sort(options.sort);

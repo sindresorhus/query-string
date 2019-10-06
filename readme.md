@@ -204,9 +204,32 @@ queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 
 If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in Unicode code point order.
 
+##### skipNullAndUndefined
+
+Skip the key in stringify result if value is `null` or `undefined`.
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
+	skipNullAndUndefined: true,
+});
+//=> 'a=1&d=4'
+```
+
+```js
+queryString.stringify({a: undefined, b: null}, {
+	skipNullAndUndefined: true,
+});
+//=> ''
+```
+
 ### .extract(string)
 
 Extract a query string from a URL that can be passed into `.parse()`.
+
+Note: This behaviour can be changed with the `skipNullAndUndefined` option.
 
 ### .parseUrl(string, options?)
 
