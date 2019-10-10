@@ -2,6 +2,7 @@ import test from 'ava';
 import queryString from '..';
 
 test('stringify url not containing query string', t => {
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/'}), 'https://foo.bar/');
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}}), 'https://foo.bar/');
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/#top', query: {}}), 'https://foo.bar/#top');
 	t.deepEqual(queryString.stringifyUrl({url: '', query: {}}), '');
