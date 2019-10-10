@@ -161,6 +161,16 @@ function removeHash(input) {
 	return input;
 }
 
+function getHash(url) {
+	let hash = '';
+	const hashStart = url.indexOf('#');
+	if (hashStart !== -1) {
+		hash = url.slice(hashStart);
+	}
+
+	return hash;
+}
+
 function extract(input) {
 	input = removeHash(input);
 	const queryStart = input.indexOf('?');
@@ -289,4 +299,17 @@ exports.parseUrl = (input, options) => {
 		url: removeHash(input).split('?')[0] || '',
 		query: parse(extract(input), options)
 	};
+};
+
+exports.stringifyUrl = (input, options) => {
+	const url = removeHash(input.url).split('?')[0] || '';
+	const queryFromUrl = this.extract(input.url);
+	const hash = getHash(input.url);
+	const stringifyQuery = this.stringify(input.query, options);
+	let queryString = [queryFromUrl, stringifyQuery].filter(str => str).join('&');
+	if (queryString) {
+		queryString = `?${queryString}`;
+	}
+
+	return `${url}${queryString}${hash}`;
 };
