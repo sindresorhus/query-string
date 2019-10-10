@@ -206,3 +206,13 @@ export function stringify(
 Extract a query string from a URL that can be passed into `.parse()`.
 */
 export function extract(url: string): string;
+
+
+
+/**
+Stringify an object of URL and the query into a URL.
+*/
+export function stringifyUrl(
+	input: ParsedUrl,
+	options?: StringifyOptions
+): string;
