@@ -221,6 +221,21 @@ queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
 
+### .stringifyUrl(object, options?)
+
+The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
+
+The `object` are the same as result of `.parseUrl`
+
+The `options` are the same as for `.stringify()`.
+
+Returns a URL with query string.
+
+```js
+queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
+// => 'https://foo.bar?foo=bar'
+```
+
 
 ## Nesting
 
