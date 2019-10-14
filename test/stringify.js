@@ -231,6 +231,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 	}, {
 		skipNullAndUndefined: true
 	}), 'a=1&a=2&c=1');
+
 	t.is(queryString.stringify({
 		a: [undefined, null, 1, undefined, 2, null],
 		b: null,
@@ -239,6 +240,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 		skipNullAndUndefined: true,
 		arrayFormat: 'bracket'
 	}), 'a[]=1&a[]=2&c=1');
+
 	t.is(queryString.stringify({
 		a: [undefined, null, 1, undefined, 2, null],
 		b: null,
@@ -247,6 +249,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 		skipNullAndUndefined: true,
 		arrayFormat: 'comma'
 	}), 'a=1,2&c=1');
+
 	t.is(queryString.stringify({
 		a: [undefined, null, 1, undefined, 2, null],
 		b: null,
