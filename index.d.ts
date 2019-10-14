@@ -201,17 +201,17 @@ export interface StringifyOptions {
 	@example
 	```
 	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
-		skipNullAndUndefined: true,
+		skipNull: true,
 	});
 	//=> 'a=1&d=4'
 
 	queryString.stringify({a: undefined, b: null}, {
-		skipNullAndUndefined: true,
+		skipNull: true,
 	});
 	//=> ''
 	```
 	*/
-	readonly skipNullAndUndefined?: boolean;
+	readonly skipNull?: boolean;
 }
 
 /**
@@ -225,6 +225,6 @@ export function stringify(
 /**
 Extract a query string from a URL that can be passed into `.parse()`.
 
-Note: This behaviour can be changed with the `skipNullAndUndefined` option.
+Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;

@@ -194,42 +194,42 @@ test('should disable sorting', t => {
 	}), 'c=foo&b=bar&a=baz');
 });
 
-test('should ignore null when skipNullAndUndefined is set', t => {
+test('should ignore null when skipNull is set', t => {
 	t.is(queryString.stringify({
 		a: 1,
 		b: null,
 		c: 3
 	}, {
-		skipNullAndUndefined: true
+		skipNull: true
 	}), 'a=1&c=3');
 });
 
-test('should ignore undefined when skipNullAndUndefined is set', t => {
+test('should ignore undefined when skipNull is set', t => {
 	t.is(queryString.stringify({
 		a: 1,
 		b: undefined,
 		c: 3
 	}, {
-		skipNullAndUndefined: true
+		skipNull: true
 	}), 'a=1&c=3');
 });
 
-test('should ignore both null and undefined when skipNullAndUndefined is set', t => {
+test('should ignore both null and undefined when skipNull is set', t => {
 	t.is(queryString.stringify({
 		a: undefined,
 		b: null
 	}, {
-		skipNullAndUndefined: true
+		skipNull: true
 	}), '');
 });
 
-test('should ignore both null and undefined when skipNullAndUndefined is set for arrayFormat', t => {
+test('should ignore both null and undefined when skipNull is set for arrayFormat', t => {
 	t.is(queryString.stringify({
 		a: [undefined, null, 1, undefined, 2, null],
 		b: null,
 		c: 1
 	}, {
-		skipNullAndUndefined: true
+		skipNull: true
 	}), 'a=1&a=2&c=1');
 
 	t.is(queryString.stringify({
@@ -237,7 +237,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 		b: null,
 		c: 1
 	}, {
-		skipNullAndUndefined: true,
+		skipNull: true,
 		arrayFormat: 'bracket'
 	}), 'a[]=1&a[]=2&c=1');
 
@@ -246,7 +246,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 		b: null,
 		c: 1
 	}, {
-		skipNullAndUndefined: true,
+		skipNull: true,
 		arrayFormat: 'comma'
 	}), 'a=1,2&c=1');
 
@@ -255,7 +255,7 @@ test('should ignore both null and undefined when skipNullAndUndefined is set for
 		b: null,
 		c: 1
 	}, {
-		skipNullAndUndefined: true,
+		skipNull: true,
 		arrayFormat: 'index'
 	}), 'a[0]=1&a[1]=2&c=1');
 });
