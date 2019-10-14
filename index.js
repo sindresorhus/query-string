@@ -258,7 +258,7 @@ exports.stringify = (object, options) => {
 
 	const formatter = encoderForArrayFormat(options);
 
-	const objectCpy = Object.assign({}, object);
+	const objectCopy = Object.assign({}, object);
 	if (options.skipNullAndUndefined) {
 		for (const key of Object.keys(objectCpy)) {
 			if (objectCpy[key] === undefined || objectCpy[key] === null) {
