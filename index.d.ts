@@ -224,5 +224,7 @@ export function stringify(
 
 /**
 Extract a query string from a URL that can be passed into `.parse()`.
+
+Note: This behaviour can be changed with the `skipNullAndUndefined` option.
 */
 export function extract(url: string): string;

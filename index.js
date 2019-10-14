@@ -260,14 +260,14 @@ exports.stringify = (object, options) => {
 
 	const objectCopy = Object.assign({}, object);
 	if (options.skipNullAndUndefined) {
-		for (const key of Object.keys(objectCpy)) {
-			if (objectCpy[key] === undefined || objectCpy[key] === null) {
-				delete objectCpy[key];
+		for (const key of Object.keys(objectCopy)) {
+			if (objectCopy[key] === undefined || objectCopy[key] === null) {
+				delete objectCopy[key];
 			}
 		}
 	}
 
-	const keys = Object.keys(objectCpy);
+	const keys = Object.keys(objectCopy);
 
 	if (options.sort !== false) {
 		keys.sort(options.sort);
