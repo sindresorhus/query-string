@@ -206,7 +206,7 @@ If omitted, keys are sorted using `Array#sort()`, which means, converting them t
 
 ##### skipNullAndUndefined
 
-Skip the key in stringify result if value is `null` or `undefined`.
+Skip the element in the stringify result if the value is `null` or `undefined`.
 
 Type: `boolean`<br>
 Default: `false`
