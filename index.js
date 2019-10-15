@@ -306,7 +306,7 @@ exports.stringifyUrl = (input, options) => {
 	const queryFromUrl = this.extract(input.url);
 	const hash = getHash(input.url);
 	const stringifyQuery = this.stringify(input.query, options);
-	let queryString = [queryFromUrl, stringifyQuery].filter(str => str).join('&');
+	let queryString = [queryFromUrl, stringifyQuery].filter(string => string).join('&');
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
