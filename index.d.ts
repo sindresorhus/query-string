@@ -207,10 +207,14 @@ Extract a query string from a URL that can be passed into `.parse()`.
 */
 export function extract(url: string): string;
 
-
-
 /**
 Stringify an object of URL and the query into a URL.
+
+@example
+```
+queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
+// => 'https://foo.bar?foo=bar'
+```
 */
 export function stringifyUrl(
 	input: ParsedUrl,
