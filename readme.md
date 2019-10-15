@@ -223,13 +223,27 @@ queryString.parseUrl('https://foo.bar?foo=bar');
 
 ### .stringifyUrl(object, options?)
 
-The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
+Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
 
-The `object` are the same as result of `.parseUrl`
+#### object
+
+Type: `object`
+
+##### url
+
+Type: `string`
+
+A URL that will be merge with query object
+
+##### query
+
+Type: `object`
+
+A query object that will be merge with URL
 
 The `options` are the same as for `.stringify()`.
 
-Returns a URL with query string.
+Returns a URL with a query string.
 
 ```js
 queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
