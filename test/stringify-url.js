@@ -18,3 +18,18 @@ test('stringify URL with query string', t => {
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar?', query: {foo: ['bar', 'baz']}}), 'https://foo.bar?foo=bar&foo=baz');
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}}), 'https://foo.bar?foo=baz&foo=bar');
 });
+
+test('stringify URL from result of parseUrl without query string', t => {
+	const parsedUrl = queryString.parseUrl('https://foo.bar#top');
+	t.deepEqual(queryString.stringifyUrl(parsedUrl), 'https://foo.bar');
+});
+
+test('stringify URL from result of parseUrl with query string', t => {
+	const parsedUrl = queryString.parseUrl('https://foo.bar?foo=bar&foo=baz#top');
+	t.deepEqual(queryString.stringifyUrl(parsedUrl), 'https://foo.bar?foo=bar&foo=baz');
+});
+
+test('stringify URL from result of parseUrl with query string that contain =', t => {
+	const parsedUrl = queryString.parseUrl('https://foo.bar?foo=bar=&foo=baz=');
+	t.deepEqual(queryString.stringifyUrl(parsedUrl, {encode: false}), 'https://foo.bar?foo=bar=&foo=baz=');
+});
