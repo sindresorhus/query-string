@@ -265,14 +265,8 @@ queryString.stringify({foo: undefined});
 ```
 
 
----
+## query-string for enterprise
 
-<div align="center">
-	<b>
-		<a href="https://tidelift.com/subscription/pkg/npm-query-string?utm_source=npm-query-string&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
-	</b>
-	<br>
-	<sub>
-		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
-	</sub>
-</div>
+Available as part of the Tidelift Subscription.
+
+The maintainers of query-string and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-query-string?utm_source=npm-query-string&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
