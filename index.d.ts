@@ -12,6 +12,8 @@ export interface ParseOptions {
 	- `bracket`: Parse arrays with bracket representation:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
 		//=> {foo: ['1', '2', '3']}
 		```
@@ -19,6 +21,8 @@ export interface ParseOptions {
 	- `index`: Parse arrays with index representation:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 		//=> {foo: ['1', '2', '3']}
 		```
@@ -26,6 +30,8 @@ export interface ParseOptions {
 	- `comma`: Parse arrays with elements separated by comma:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 		//=> {foo: ['1', '2', '3']}
 		```
@@ -33,6 +39,8 @@ export interface ParseOptions {
 	- `none`: Parse arrays with elements using duplicate keys:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.parse('foo=1&foo=2&foo=3');
 		//=> {foo: ['1', '2', '3']}
 		```
@@ -48,6 +56,8 @@ export interface ParseOptions {
 
 	@example
 	```
+	import queryString = require('query-string');
+
 	const order = ['c', 'a', 'b'];
 
 	queryString.parse('?a=one&b=two&c=three', {
@@ -55,6 +65,10 @@ export interface ParseOptions {
 	});
 	//=> {c: 'three', a: 'one', b: 'two'}
 	```
+
+	@example
+	```
+	import queryString = require('query-string');
 
 	queryString.parse('?a=one&c=three&b=two', {sort: false});
 	//=> {a: 'one', c: 'three', b: 'two'}
@@ -68,7 +82,9 @@ export interface ParseOptions {
 	@default false
 
 	@example
-	```js
+	```
+	import queryString = require('query-string');
+
 	queryString.parse('foo=1', {parseNumbers: true});
 	//=> {foo: 1}
 	```
@@ -82,6 +98,8 @@ export interface ParseOptions {
 
 	@example
 	```
+	import queryString = require('query-string');
+
 	queryString.parse('foo=true', {parseBooleans: true});
 	//=> {foo: true}
 	```
@@ -117,6 +135,8 @@ Extract the URL and the query string as an object.
 
 @example
 ```
+import queryString = require('query-string');
+
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
@@ -144,6 +164,8 @@ export interface StringifyOptions {
 	- `bracket`: Serialize arrays using bracket representation:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
 		//=> 'foo[]=1&foo[]=2&foo[]=3'
 		```
@@ -151,6 +173,8 @@ export interface StringifyOptions {
 	- `index`: Serialize arrays using index representation:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
 		//=> 'foo[0]=1&foo[1]=2&foo[2]=3'
 		```
@@ -158,6 +182,8 @@ export interface StringifyOptions {
 	- `comma`: Serialize arrays by separating elements with comma:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 		//=> 'foo=1,2,3'
 		```
@@ -165,6 +191,8 @@ export interface StringifyOptions {
 	- `none`: Serialize arrays by using duplicate keys:
 
 		```
+		import queryString = require('query-string');
+
 		queryString.stringify({foo: [1, 2, 3]});
 		//=> 'foo=1&foo=2&foo=3'
 		```
@@ -180,12 +208,19 @@ export interface StringifyOptions {
 
 	@example
 	```
+	import queryString = require('query-string');
+
 	const order = ['c', 'a', 'b'];
 
 	queryString.stringify({a: 1, b: 2, c: 3}, {
 		sort: (itemLeft, itemRight) => order.indexOf(itemLeft) - order.indexOf(itemRight)
 	});
 	//=> 'c=3&a=1&b=2'
+	```
+
+	@example
+	```
+	import queryString = require('query-string');
 
 	queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 	//=> 'b=1&c=2&a=3'
@@ -195,13 +230,15 @@ export interface StringifyOptions {
 
 	/**
 	Skip keys with `null` as the value.
-	
+
 	Note that keys with `undefined` as the value are always skipped.
 
 	@default false
 
 	@example
 	```
+	import queryString = require('query-string');
+
 	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
 		skipNull: true
 	});
