@@ -203,7 +203,7 @@ export interface StringifyOptions {
 	@example
 	```
 	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
-		skipNull: true,
+		skipNull: true
 	});
 	//=> 'a=1&d=4'
 
