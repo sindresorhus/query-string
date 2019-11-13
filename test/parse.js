@@ -75,6 +75,10 @@ test('handle `+` correctly', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 });
 
+test('handle `+` correctly when not decoding', t => {
+	t.deepEqual(queryString.parse('foo+faz=bar+baz++', {decode: false}), {'foo+faz': 'bar+baz++'});
+});
+
 test('handle multiple of the same key', t => {
 	t.deepEqual(queryString.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });

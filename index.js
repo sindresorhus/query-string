@@ -206,7 +206,7 @@ function parse(input, options) {
 	}
 
 	for (const param of input.split('&')) {
-		let [key, value] = splitOnFirst(param.replace(/\+/g, ' '), '=');
+		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
