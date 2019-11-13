@@ -194,7 +194,9 @@ export interface StringifyOptions {
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
 
 	/**
-	Skip the key in stringify result if value is `null` or `undefined`.
+	Skip keys with `null` as the value.
+	
+	Note that keys with `undefined` as the value are always skipped.
 
 	@default false
 
@@ -206,7 +208,7 @@ export interface StringifyOptions {
 	//=> 'a=1&d=4'
 
 	queryString.stringify({a: undefined, b: null}, {
-		skipNull: true,
+		skipNull: true
 	});
 	//=> ''
 	```
