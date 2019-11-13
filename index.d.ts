@@ -192,6 +192,28 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+
+	/**
+	Skip keys with `null` as the value.
+	
+	Note that keys with `undefined` as the value are always skipped.
+
+	@default false
+
+	@example
+	```
+	queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
+		skipNull: true
+	});
+	//=> 'a=1&d=4'
+
+	queryString.stringify({a: undefined, b: null}, {
+		skipNull: true
+	});
+	//=> ''
+	```
+	*/
+	readonly skipNull?: boolean;
 }
 
 /**
@@ -204,5 +226,7 @@ export function stringify(
 
 /**
 Extract a query string from a URL that can be passed into `.parse()`.
+
+Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;

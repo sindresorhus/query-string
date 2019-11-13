@@ -128,7 +128,7 @@ test('array stringify representation with array commas', t => {
 
 test('array stringify representation with array commas and null value', t => {
 	t.is(queryString.stringify({
-		foo: ['a', null, ''],
+		foo: [null, 'a', null, ''],
 		bar: [null]
 	}, {
 		arrayFormat: 'comma'
@@ -192,4 +192,70 @@ test('should disable sorting', t => {
 	}, {
 		sort: false
 	}), 'c=foo&b=bar&a=baz');
+});
+
+test('should ignore null when skipNull is set', t => {
+	t.is(queryString.stringify({
+		a: 1,
+		b: null,
+		c: 3
+	}, {
+		skipNull: true
+	}), 'a=1&c=3');
+});
+
+test('should ignore undefined when skipNull is set', t => {
+	t.is(queryString.stringify({
+		a: 1,
+		b: undefined,
+		c: 3
+	}, {
+		skipNull: true
+	}), 'a=1&c=3');
+});
+
+test('should ignore both null and undefined when skipNull is set', t => {
+	t.is(queryString.stringify({
+		a: undefined,
+		b: null
+	}, {
+		skipNull: true
+	}), '');
+});
+
+test('should ignore both null and undefined when skipNull is set for arrayFormat', t => {
+	t.is(queryString.stringify({
+		a: [undefined, null, 1, undefined, 2, null],
+		b: null,
+		c: 1
+	}, {
+		skipNull: true
+	}), 'a=1&a=2&c=1');
+
+	t.is(queryString.stringify({
+		a: [undefined, null, 1, undefined, 2, null],
+		b: null,
+		c: 1
+	}, {
+		skipNull: true,
+		arrayFormat: 'bracket'
+	}), 'a[]=1&a[]=2&c=1');
+
+	t.is(queryString.stringify({
+		a: [undefined, null, 1, undefined, 2, null],
+		b: null,
+		c: 1
+	}, {
+		skipNull: true,
+		arrayFormat: 'comma'
+	}), 'a=1,2&c=1');
+
+	t.is(queryString.stringify({
+		a: [undefined, null, 1, undefined, 2, null],
+		b: null,
+		c: 1
+	}, {
+		skipNull: true,
+		arrayFormat: 'index'
+	}), 'a[0]=1&a[1]=2&c=1');
 });
