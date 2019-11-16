@@ -338,10 +338,14 @@ exports.stringify = (object, options) => {
 };
 
 exports.parseUrl = (input, options) => {
-	return {
-		url: removeHash(input).split('?')[0] || '',
-		query: parse(extract(input), options)
-	};
+	const [url, hash] = splitOnFirst(input, '#');
+	return Object.assign(
+		{
+			url: url.split('?')[0] || '',
+			query: parse(extract(input), options)
+		},
+		options && options.parseFragment && hash ? {fragment: hash} : {}
+	);
 };
 
 exports.stringifyUrl = (input, options) => {

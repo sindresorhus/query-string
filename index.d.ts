@@ -121,6 +121,21 @@ export interface ParseOptions {
 	```
 	*/
 	readonly parseBooleans?: boolean;
+	
+	/**
+	Parse the fragment identifier from the URL.
+
+	@default false
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.parseUrl('https://foo.bar?foo=bar#xyz');
+	//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragment: 'xyz'}
+	```
+	*/
+	readonly parseFragment?: boolean;
 }
 
 export interface ParsedQuery<T = string> {
@@ -142,6 +157,7 @@ export function parse(query: string, options?: ParseOptions): ParsedQuery;
 export interface ParsedUrl {
 	readonly url: string;
 	readonly query: ParsedQuery;
+	readonly fragment?: string;
 }
 
 /**
