@@ -131,11 +131,11 @@ export interface ParseOptions {
 	```
 	import queryString = require('query-string');
 
-	queryString.parseUrl('https://foo.bar?foo=bar#xyz');
-	//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragment: 'xyz'}
+	queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+	//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 	```
 	*/
-	readonly parseFragment?: boolean;
+	readonly parseFragmentIdentifier?: boolean;
 }
 
 export interface ParsedQuery<T = string> {
@@ -157,7 +157,7 @@ export function parse(query: string, options?: ParseOptions): ParsedQuery;
 export interface ParsedUrl {
 	readonly url: string;
 	readonly query: ParsedQuery;
-	readonly fragment?: string;
+	readonly fragmentIdentifier?: string;
 }
 
 /**

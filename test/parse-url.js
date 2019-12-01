@@ -19,9 +19,9 @@ test('handles strings with query string that contain =', t => {
 });
 
 test('handles strings with fragment identifier', t => {
-	t.deepEqual(queryString.parseUrl('https://foo.bar?top=foo#bar', {parseFragment: true}), {url: 'https://foo.bar', query: {top: 'foo'}, fragment: 'bar'});
-	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar&foo=baz#top', {parseFragment: true}), {url: 'https://foo.bar', query: {foo: ['bar', 'baz']}, fragment: 'top'});
-	t.deepEqual(queryString.parseUrl('https://foo.bar/#top', {parseFragment: true}), {url: 'https://foo.bar/', query: {}, fragment: 'top'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar?top=foo#bar', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {top: 'foo'}, fragmentIdentifier: 'bar'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar&foo=baz#top', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {foo: ['bar', 'baz']}, fragmentIdentifier: 'top'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar/#top', {parseFragmentIdentifier: true}), {url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'top'});
 });
 
 test('throws for invalid values', t => {

@@ -344,7 +344,7 @@ exports.parseUrl = (input, options) => {
 			url: url.split('?')[0] || '',
 			query: parse(extract(input), options)
 		},
-		options && options.parseFragment && hash ? {fragment: hash} : {}
+		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: hash} : {}
 	);
 };
 

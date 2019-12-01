@@ -88,7 +88,7 @@ expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=true', {parseBooleans: true})
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=true#bar', {parseFragment: true})
+	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true})
 );
 
 // Extract
