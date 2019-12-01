@@ -383,6 +383,19 @@ The URL to stringify.
 Type: `object`
 
 Query items to add to the URL.
+#### parseFragmentIdentifier
+
+Extracts the fragment identifier from url
+
+Type: `boolean`\
+Default: `false`
+
+```js
+import queryString = require('query-string');
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
+```
 
 ## Nesting
 
