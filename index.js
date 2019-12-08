@@ -304,9 +304,10 @@ exports.parseUrl = (input, options) => {
 exports.stringifyUrl = (input, options) => {
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = this.extract(input.url);
+	const paredQueryFromUrl = this.parse(queryFromUrl);
 	const hash = getHash(input.url);
-	const stringifyQuery = this.stringify(input.query, options);
-	let queryString = [queryFromUrl, stringifyQuery].filter(string => string).join('&');
+	const query = Object.assign(paredQueryFromUrl, input.query);
+	let queryString = this.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
