@@ -250,6 +250,12 @@ queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 // => 'https://foo.bar?foo=bar'
 ```
 
+Adding another query item with the same name as a query string in the URL will replace instead.
+
+```js
+queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
+// => 'https://foo.bar?foo=bar'
+```
 
 ## Nesting
 
