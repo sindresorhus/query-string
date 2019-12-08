@@ -217,6 +217,6 @@ queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 ```
 */
 export function stringifyUrl(
-	input: ParsedUrl,
+	object: ParsedUrl,
 	options?: StringifyOptions
 ): string;
