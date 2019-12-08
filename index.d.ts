@@ -208,7 +208,7 @@ Extract a query string from a URL that can be passed into `.parse()`.
 export function extract(url: string): string;
 
 /**
-Stringify an object into a URL with a query string and sorting the keys.
+Stringify an object into a URL with a query string and sorting the keys. The inverse of `.parseUrl()`.
 
 @example
 ```
