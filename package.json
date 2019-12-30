@@ -1,14 +1,10 @@
 {
-	"name": "query-string",
-	"version": "6.9.0",
+	"name": "bms-query-string",
+	"version": "1.0.0",
+	"main": "dist/index.js",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
-	"repository": "sindresorhus/query-string",
-	"author": {
-		"name": "Sindre Sorhus",
-		"email": "sindresorhus@gmail.com",
-		"url": "sindresorhus.com"
-	},
+	"repository": "reznord/query-string",
 	"engines": {
 		"node": ">=6"
 	},
