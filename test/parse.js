@@ -143,6 +143,13 @@ test('query strings having comma separated arrays and format option as `comma`',
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having pipe separated arrays and format option as `separator`', t => {
+	t.deepEqual(queryString.parse('foo=bar|baz', {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: '|'
+	}), {foo: ['bar', 'baz']});
+});
+
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
 	t.deepEqual(queryString.parse('bar[]&foo[]=a&foo[]&foo[]=', {
 		arrayFormat: 'bracket'
@@ -253,6 +260,7 @@ test('NaN value returns as string if option is set', t => {
 test('parseNumbers works with arrayFormat', t => {
 	t.deepEqual(queryString.parse('foo[]=1&foo[]=2&foo[]=3&bar=1', {parseNumbers: true, arrayFormat: 'bracket'}), {foo: [1, 2, 3], bar: 1});
 	t.deepEqual(queryString.parse('foo=1,2,a', {parseNumbers: true, arrayFormat: 'comma'}), {foo: [1, 2, 'a']});
+	t.deepEqual(queryString.parse('foo=1|2|a', {parseNumbers: true, arrayFormat: 'separator', arrayFormatSeparator: '|'}), {foo: [1, 2, 'a']});
 	t.deepEqual(queryString.parse('foo[0]=1&foo[1]=2&foo[2]', {parseNumbers: true, arrayFormat: 'index'}), {foo: [1, 2, null]});
 	t.deepEqual(queryString.parse('foo=1&foo=2&foo=3', {parseNumbers: true}), {foo: [1, 2, 3]});
 });

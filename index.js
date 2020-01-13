@@ -36,6 +36,7 @@ function encoderForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return key => (result, value) => {
 				if (value === null || value === undefined || value.length === 0) {
 					return result;
@@ -45,7 +46,7 @@ function encoderForArrayFormat(options) {
 					return [[encode(key, options), '=', encode(value, options)].join('')];
 				}
 
-				return [[result, encode(value, options)].join(',')];
+				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
 			};
 
 		default:
@@ -104,9 +105,10 @@ function parserForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return (key, value, accumulator) => {
-				const isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
-				const newValue = isArray ? value.split(',') : value;
+				const isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
+				const newValue = isArray ? value.split(options.arrayFormatSeparator) : value;
 				accumulator[key] = newValue;
 			};
 
@@ -186,6 +188,7 @@ function parse(input, options) {
 		decode: true,
 		sort: true,
 		arrayFormat: 'none',
+		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false
 	}, options);
@@ -253,7 +256,8 @@ exports.stringify = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		arrayFormatSeparator: ','
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
