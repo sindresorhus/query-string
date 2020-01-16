@@ -123,7 +123,7 @@ queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 //=> {foo: ['1', '2', '3']}
 ```
 
-- `'separator'`: Parse arrays with elements separated by custom character:
+- `'separator'`: Parse arrays with elements separated by a custom character:
 
 ```js
 const queryString = require('query-string');
@@ -251,7 +251,7 @@ queryString.stringify({foo: [1, 2, 3]});
 Type: `string`\
 Default: `','`
 
-Character for arrayFormat when `separator` behavior chosen.
+The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 ##### sort
 
