@@ -124,6 +124,12 @@ function parserForArrayFormat(options) {
 	}
 }
 
+function validateArrayFormatSeparator(value) {
+	if (typeof value !== 'string' || value.length !== 1) {
+		throw new TypeError('arrayFormatSeparator must be single character string');
+	}
+}
+
 function encode(value, options) {
 	if (options.encode) {
 		return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
@@ -193,6 +199,8 @@ function parse(input, options) {
 		parseBooleans: false
 	}, options);
 
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
+
 	const formatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
@@ -259,6 +267,8 @@ exports.stringify = (object, options) => {
 		arrayFormat: 'none',
 		arrayFormatSeparator: ','
 	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
 	const formatter = encoderForArrayFormat(options);
 

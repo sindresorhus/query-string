@@ -292,3 +292,12 @@ test('parseNumbers and parseBooleans can work with arrayFormat at the same time'
 	t.deepEqual(queryString.parse('foo=true,false&bar=1,2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'comma'}), {foo: [true, false], bar: [1, 2]});
 	t.deepEqual(queryString.parse('foo[0]=true&foo[1]=false&bar[0]=1&bar[1]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'index'}), {foo: [true, false], bar: [1, 2]});
 });
+
+test('parse throws TypeError for invalid arrayFormatSeparator', t => {
+	t.throws(_ => queryString.parse('', {arrayFormatSeparator: ',,'}), {
+		instanceOf: TypeError
+	});
+	t.throws(_ => queryString.parse('', {arrayFormatSeparator: []}), {
+		instanceOf: TypeError
+	});
+});
