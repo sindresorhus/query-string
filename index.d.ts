@@ -60,7 +60,6 @@ export interface ParseOptions {
 	Character for arrayFormat when `separator` behavior chosen.
 
 	@default ,
-
 	*/
 	readonly arrayFormatSeparator?: 'string';
 
@@ -229,7 +228,6 @@ export interface StringifyOptions {
 	Character for arrayFormat when `separator` behavior chosen.
 
 	@default ,
-
 	*/
 	readonly arrayFormatSeparator?: 'string';
 
