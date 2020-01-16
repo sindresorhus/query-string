@@ -237,7 +237,6 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 //=> 'foo=1,2,3'
 ```
 
-
 - `'none'`: Serialize arrays by using duplicate keys:
 
 ```js
