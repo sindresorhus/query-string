@@ -267,3 +267,22 @@ Extract a query string from a URL that can be passed into `.parse()`.
 Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
+
+/**
+Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
+
+Query items in the `query` property overrides queries in the `url` property.
+
+@example
+```
+queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+```
+*/
+export function stringifyUrl(
+	object: ParsedUrl,
+	options?: StringifyOptions
+): string;

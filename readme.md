@@ -304,6 +304,39 @@ queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
 
+### .stringifyUrl(object, options?)
+
+Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
+
+The `options` are the same as for `.stringify()`.
+
+Returns a string with the URL and a query string.
+
+Query items in the `query` property overrides queries in the `url` property.
+
+```js
+queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+```
+
+#### object
+
+Type: `object`
+
+##### url
+
+Type: `string`
+
+The URL to stringify.
+
+##### query
+
+Type: `object`
+
+Query items to add to the URL.
 
 ## Nesting
 
