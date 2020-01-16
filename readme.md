@@ -146,7 +146,7 @@ queryString.parse('foo=1&foo=2&foo=3');
 Type: `string`\
 Default: `','`
 
-Character for arrayFormat when `separator` behavior chosen.
+The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 ##### sort
 
