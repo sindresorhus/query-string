@@ -313,11 +313,11 @@ exports.parseUrl = (input, options) => {
 
 exports.stringifyUrl = (input, options) => {
 	const url = removeHash(input.url).split('?')[0] || '';
-	const queryFromUrl = this.extract(input.url);
-	const parsedQueryFromUrl = this.parse(queryFromUrl);
+	const queryFromUrl = exports.extract(input.url);
+	const parsedQueryFromUrl = exports.parse(queryFromUrl);
 	const hash = getHash(input.url);
 	const query = Object.assign(parsedQueryFromUrl, input.query);
-	let queryString = this.stringify(query, options);
+	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
