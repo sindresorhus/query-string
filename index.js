@@ -106,7 +106,7 @@ function parserForArrayFormat(options) {
 		case 'comma':
 			return (key, value, accumulator) => {
 				const isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
-				const newValue = isArray ? value.split(',') : value;
+				const newValue = isArray ? value.split(',').map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
 			};
 
@@ -220,7 +220,7 @@ function parse(input, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : decode(value, options);
+		value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
 		formatter(decode(key, options), value, ret);
 	}
 

@@ -284,3 +284,12 @@ test('parseNumbers and parseBooleans can work with arrayFormat at the same time'
 	t.deepEqual(queryString.parse('foo=true,false&bar=1,2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'comma'}), {foo: [true, false], bar: [1, 2]});
 	t.deepEqual(queryString.parse('foo[0]=true&foo[1]=false&bar[0]=1&bar[1]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'index'}), {foo: [true, false], bar: [1, 2]});
 });
+
+test('query strings having comma encoded and format option as `comma`', t => {
+	t.deepEqual(queryString.parse('foo=zero%2Cone,two%2Cthree', {arrayFormat: 'comma'}), {
+		foo: [
+			'zero,one',
+			'two,three'
+		]
+	});
+});
