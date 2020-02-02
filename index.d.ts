@@ -56,8 +56,8 @@ export interface ParseOptions {
 	*/
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
 
-	/** 
-  The character used to separate array elements when using `{arrayFormat: 'separator'}`.
+	/**
+	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 	@default ,
 	*/
@@ -224,7 +224,7 @@ export interface StringifyOptions {
 	*/
 	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
 
-	/** 
+	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 	@default ,
