@@ -96,7 +96,12 @@ function parserForArrayFormat(options) {
 				}
 
 				if (accumulator[key] === undefined) {
-					accumulator[key] = [value];
+					if (options.allowEmptyArrays) {
+						accumulator[key] = [];
+					} else {
+						accumulator[key] = [value];
+					}
+
 					return;
 				}
 
@@ -197,7 +202,8 @@ function parse(input, options) {
 		sort: true,
 		arrayFormat: 'none',
 		parseNumbers: false,
-		parseBooleans: false
+		parseBooleans: false,
+		allowEmptyArrays: false
 	}, options);
 
 	const formatter = parserForArrayFormat(options);
@@ -263,7 +269,8 @@ exports.stringify = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		allowEmptyArrays: false
 	}, options);
 
 	const formatter = encoderForArrayFormat(options);
@@ -295,6 +302,10 @@ exports.stringify = (object, options) => {
 		}
 
 		if (Array.isArray(value)) {
+			if (options.allowEmptyArrays && value.length === 0) {
+				return key + '[]=';
+			}
+
 			return value
 				.reduce(formatter(key), [])
 				.join('&');

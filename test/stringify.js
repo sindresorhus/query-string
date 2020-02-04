@@ -259,3 +259,7 @@ test('should ignore both null and undefined when skipNull is set for arrayFormat
 		arrayFormat: 'index'
 	}), 'a[0]=1&a[1]=2&c=1');
 });
+
+test('should encode empty arrays when allowEmptyArrays is set', t => {
+	t.is(queryString.stringify({a: []}, {allowEmptyArrays: true, arrayFormat: 'bracket'}), 'a[]=');
+});

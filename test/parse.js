@@ -293,3 +293,9 @@ test('query strings having comma encoded and format option as `comma`', t => {
 		]
 	});
 });
+
+test('should decode empty arrays when allowEmptyArrays is set', t => {
+	t.deepEqual(queryString.parse('a[]=', {allowEmptyArrays: true, arrayFormat: 'bracket'}), {
+		a: []
+	});
+});
