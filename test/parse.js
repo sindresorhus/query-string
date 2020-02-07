@@ -299,5 +299,14 @@ test('parse throws TypeError for invalid arrayFormatSeparator', t => {
 	});
 	t.throws(_ => queryString.parse('', {arrayFormatSeparator: []}), {
 		instanceOf: TypeError
+ 	});
+});
+
+test('query strings having comma encoded and format option as `comma`', t => {
+	t.deepEqual(queryString.parse('foo=zero%2Cone,two%2Cthree', {arrayFormat: 'comma'}), {
+		foo: [
+			'zero,one',
+			'two,three'
+		]
 	});
 });

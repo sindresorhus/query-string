@@ -108,7 +108,7 @@ function parserForArrayFormat(options) {
 		case 'separator':
 			return (key, value, accumulator) => {
 				const isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
-				const newValue = isArray ? value.split(options.arrayFormatSeparator) : value;
+				const newValue = isArray ? value.split(',').map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
 			};
 
@@ -169,6 +169,16 @@ function removeHash(input) {
 	return input;
 }
 
+function getHash(url) {
+	let hash = '';
+	const hashStart = url.indexOf('#');
+	if (hashStart !== -1) {
+		hash = url.slice(hashStart);
+	}
+
+	return hash;
+}
+
 function extract(input) {
 	input = removeHash(input);
 	const queryStart = input.indexOf('?');
@@ -221,7 +231,7 @@ function parse(input, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : decode(value, options);
+		value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
 		formatter(decode(key, options), value, ret);
 	}
 
@@ -313,4 +323,18 @@ exports.parseUrl = (input, options) => {
 		url: removeHash(input).split('?')[0] || '',
 		query: parse(extract(input), options)
 	};
+};
+
+exports.stringifyUrl = (input, options) => {
+	const url = removeHash(input.url).split('?')[0] || '';
+	const queryFromUrl = exports.extract(input.url);
+	const parsedQueryFromUrl = exports.parse(queryFromUrl);
+	const hash = getHash(input.url);
+	const query = Object.assign(parsedQueryFromUrl, input.query);
+	let queryString = exports.stringify(query, options);
+	if (queryString) {
+		queryString = `?${queryString}`;
+	}
+
+	return `${url}${queryString}${hash}`;
 };

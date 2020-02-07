@@ -39,7 +39,6 @@ $ npm install query-string
 
 This module targets Node.js 6 or later and the latest version of Chrome, Firefox, and Safari. If you want support for older browsers, or, if your project is using create-react-app v1, use version 5: `npm install query-string@5`.
 
-
 ## Usage
 
 ```js
@@ -70,7 +69,6 @@ location.search = stringified;
 console.log(location.search);
 //=> '?foo=unicorn&ilike=pizza'
 ```
-
 
 ## API
 
@@ -327,6 +325,39 @@ queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
 
+### .stringifyUrl(object, options?)
+
+Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
+
+The `options` are the same as for `.stringify()`.
+
+Returns a string with the URL and a query string.
+
+Query items in the `query` property overrides queries in the `url` property.
+
+```js
+queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
+//=> 'https://foo.bar?foo=bar'
+```
+
+#### object
+
+Type: `object`
+
+##### url
+
+Type: `string`
+
+The URL to stringify.
+
+##### query
+
+Type: `object`
+
+Query items to add to the URL.
 
 ## Nesting
 
@@ -358,7 +389,6 @@ queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
 //=> 'color=taupe&color=chartreuse&id=515'
 ```
 
-
 ## Falsy values
 
 Sometimes you want to unset a key, or maybe just make it present without assigning a value to it. Here is how falsy values are stringified:
@@ -375,7 +405,6 @@ queryString.stringify({foo: null});
 queryString.stringify({foo: undefined});
 //=> ''
 ```
-
 
 ## query-string for enterprise
 
