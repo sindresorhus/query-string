@@ -108,7 +108,7 @@ function parserForArrayFormat(options) {
 		case 'separator':
 			return (key, value, accumulator) => {
 				const isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
-				const newValue = isArray ? value.split(',').map(item => decode(item, options)) : value === null ? value : decode(value, options);
+				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
 			};
 
