@@ -143,6 +143,13 @@ test('query strings having comma separated arrays and format option as `comma`',
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having pipe separated arrays and format option as `separator`', t => {
+	t.deepEqual(queryString.parse('foo=bar|baz', {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: '|'
+	}), {foo: ['bar', 'baz']});
+});
+
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
 	t.deepEqual(queryString.parse('bar[]&foo[]=a&foo[]&foo[]=', {
 		arrayFormat: 'bracket'
@@ -253,6 +260,7 @@ test('NaN value returns as string if option is set', t => {
 test('parseNumbers works with arrayFormat', t => {
 	t.deepEqual(queryString.parse('foo[]=1&foo[]=2&foo[]=3&bar=1', {parseNumbers: true, arrayFormat: 'bracket'}), {foo: [1, 2, 3], bar: 1});
 	t.deepEqual(queryString.parse('foo=1,2,a', {parseNumbers: true, arrayFormat: 'comma'}), {foo: [1, 2, 'a']});
+	t.deepEqual(queryString.parse('foo=1|2|a', {parseNumbers: true, arrayFormat: 'separator', arrayFormatSeparator: '|'}), {foo: [1, 2, 'a']});
 	t.deepEqual(queryString.parse('foo[0]=1&foo[1]=2&foo[2]', {parseNumbers: true, arrayFormat: 'index'}), {foo: [1, 2, null]});
 	t.deepEqual(queryString.parse('foo=1&foo=2&foo=3', {parseNumbers: true}), {foo: [1, 2, 3]});
 });
@@ -283,6 +291,15 @@ test('parseNumbers and parseBooleans can work with arrayFormat at the same time'
 	t.deepEqual(queryString.parse('foo[]=true&foo[]=false&foo[]=true&bar[]=1&bar[]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'bracket'}), {foo: [true, false, true], bar: [1, 2]});
 	t.deepEqual(queryString.parse('foo=true,false&bar=1,2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'comma'}), {foo: [true, false], bar: [1, 2]});
 	t.deepEqual(queryString.parse('foo[0]=true&foo[1]=false&bar[0]=1&bar[1]=2', {parseNumbers: true, parseBooleans: true, arrayFormat: 'index'}), {foo: [true, false], bar: [1, 2]});
+});
+
+test('parse throws TypeError for invalid arrayFormatSeparator', t => {
+	t.throws(_ => queryString.parse('', {arrayFormatSeparator: ',,'}), {
+		instanceOf: TypeError
+	});
+	t.throws(_ => queryString.parse('', {arrayFormatSeparator: []}), {
+		instanceOf: TypeError
+	});
 });
 
 test('query strings having comma encoded and format option as `comma`', t => {

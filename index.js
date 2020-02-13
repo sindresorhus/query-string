@@ -36,6 +36,7 @@ function encoderForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return key => (result, value) => {
 				if (value === null || value === undefined || value.length === 0) {
 					return result;
@@ -45,7 +46,7 @@ function encoderForArrayFormat(options) {
 					return [[encode(key, options), '=', encode(value, options)].join('')];
 				}
 
-				return [[result, encode(value, options)].join(',')];
+				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
 			};
 
 		default:
@@ -104,9 +105,10 @@ function parserForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return (key, value, accumulator) => {
-				const isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
-				const newValue = isArray ? value.split(',').map(item => decode(item, options)) : value === null ? value : decode(value, options);
+				const isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
+				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
 			};
 
@@ -119,6 +121,12 @@ function parserForArrayFormat(options) {
 
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
+	}
+}
+
+function validateArrayFormatSeparator(value) {
+	if (typeof value !== 'string' || value.length !== 1) {
+		throw new TypeError('arrayFormatSeparator must be single character string');
 	}
 }
 
@@ -196,9 +204,12 @@ function parse(input, options) {
 		decode: true,
 		sort: true,
 		arrayFormat: 'none',
+		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false
 	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
 	const formatter = parserForArrayFormat(options);
 
@@ -263,8 +274,11 @@ exports.stringify = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		arrayFormatSeparator: ','
 	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
 	const formatter = encoderForArrayFormat(options);
 

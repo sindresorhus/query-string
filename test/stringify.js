@@ -259,3 +259,12 @@ test('should ignore both null and undefined when skipNull is set for arrayFormat
 		arrayFormat: 'index'
 	}), 'a[0]=1&a[1]=2&c=1');
 });
+
+test('stringify throws TypeError for invalid arrayFormatSeparator', t => {
+	t.throws(_ => queryString.stringify({}, {arrayFormatSeparator: ',,'}), {
+		instanceOf: TypeError
+	});
+	t.throws(_ => queryString.stringify({}, {arrayFormatSeparator: []}), {
+		instanceOf: TypeError
+	});
+});
