@@ -190,10 +190,15 @@ function extract(input) {
 }
 
 function parseValue(value, options) {
+	const initialValue = value;
 	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
 		value = Number(value);
 	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 		value = value.toLowerCase() === 'true';
+	}
+
+	if (initialValue.toString() !== value.toString()) {
+		return initialValue;
 	}
 
 	return value;
