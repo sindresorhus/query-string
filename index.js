@@ -231,7 +231,7 @@ function parse(input, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
+		value = value === undefined ? null : ['comma', 'separator'].indexOf(options.arrayFormat) > -1 ? value : decode(value, options);
 		formatter(decode(key, options), value, ret);
 	}
 

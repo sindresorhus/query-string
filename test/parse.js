@@ -310,3 +310,9 @@ test('query strings having comma encoded and format option as `comma`', t => {
 		]
 	});
 });
+
+test('value shoud not be decoded twice with arrayFormat set as `separator`', t => {
+	t.deepEqual(queryString.parse('foo=2020-01-01T00:00:00%2B03:00', {arrayFormat: 'separator'}), {
+		foo: '2020-01-01T00:00:00+03:00'
+	});
+});
