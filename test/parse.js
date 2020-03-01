@@ -64,18 +64,18 @@ test('parse query string without a value', t => {
 	t.deepEqual(queryString.parse('a=&a'), {a: ['', null]});
 });
 
-test('return empty object if no qss can be found', t => {
+test('return empty object if no query string search can be found', t => {
 	t.deepEqual(queryString.parse('?'), {});
 	t.deepEqual(queryString.parse('&'), {});
 	t.deepEqual(queryString.parse('#'), {});
 	t.deepEqual(queryString.parse(' '), {});
 });
 
-test('handle `+` correctly', t => {
+test('handle `+` as a space replacer when decoding', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 });
 
-test('handle `+` correctly when not decoding', t => {
+test('handle `+` as a plus when not decoding', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++', {decode: false}), {'foo+faz': 'bar+baz++'});
 });
 
@@ -83,7 +83,7 @@ test('handle multiple of the same key', t => {
 	t.deepEqual(queryString.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
-test('handle multiple values and preserve appearence order', t => {
+test('handle multiple values and preserve appearance order', t => {
 	t.deepEqual(queryString.parse('a=value&a='), {a: ['value', '']});
 	t.deepEqual(queryString.parse('a=&a=value'), {a: ['', 'value']});
 });
@@ -93,7 +93,7 @@ test('handle multiple values and preserve appearance order with brackets', t => 
 	t.deepEqual(queryString.parse('a[]=&a[]=value', {arrayFormat: 'bracket'}), {a: ['', 'value']});
 });
 
-test('handle multiple values and preserve appearance order with indexes', t => {
+test('handle multiple values and preserve appearance order with indices', t => {
 	t.deepEqual(queryString.parse('a[0]=value&a[1]=', {arrayFormat: 'index'}), {a: ['value', '']});
 	t.deepEqual(queryString.parse('a[1]=&a[0]=value', {arrayFormat: 'index'}), {a: ['value', '']});
 });
@@ -174,7 +174,7 @@ test('query strings having indexed arrays and format option as `index`', t => {
 	}), {foo: ['bar', 'baz']});
 });
 
-test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
+test('query strings having `=` within parameters (i.e. GraphQL IDs)', t => {
 	t.deepEqual(queryString.parse('foo=bar=&foo=ba=z='), {foo: ['bar=', 'ba=z=']});
 });
 
@@ -222,7 +222,7 @@ test('circuit parse -> stringify', t => {
 });
 
 test('circuit original -> parse - > stringify -> sorted original', t => {
-	const original = 'foo[21474836471]=foo&foo[21474836470]&foo[1]=one&foo[0]=&bat=buz';
+	const original = 'foo[471]=foo&foo[470]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const options = {
 		arrayFormat: 'index'
@@ -253,6 +253,7 @@ test('number value returns as number if option is set', t => {
 test('NaN value returns as string if option is set', t => {
 	t.deepEqual(queryString.parse('foo=null', {parseNumbers: true}), {foo: 'null'});
 	t.deepEqual(queryString.parse('foo=undefined', {parseNumbers: true}), {foo: 'undefined'});
+	t.deepEqual(queryString.parse('foo=NaN', {parseNumbers: true}), {foo: 'NaN'});
 	t.deepEqual(queryString.parse('foo=100a&bar=100', {parseNumbers: true}), {foo: '100a', bar: 100});
 	t.deepEqual(queryString.parse('foo=   &bar=', {parseNumbers: true}), {foo: '   ', bar: ''});
 });
