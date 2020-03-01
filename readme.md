@@ -144,7 +144,17 @@ queryString.parse('foo=1&foo=2&foo=3');
 Type: `string`\
 Default: `','`
 
-The character used to separate array elements when using `{arrayFormat: 'separator'}`.
+The **single** character used to separate array elements when using `{arrayFormat: 'separator'}`.
+
+```js
+const queryString = require('query-string');
+
+queryString.parse('foo=bar|baz', {
+    arrayFormat: 'separator',
+    arrayFormatSeparator: '|'
+});
+//=> {foo: ['bar', 'baz']}
+```
 
 ##### sort
 
@@ -249,7 +259,17 @@ queryString.stringify({foo: [1, 2, 3]});
 Type: `string`\
 Default: `','`
 
-The character used to separate array elements when using `{arrayFormat: 'separator'}`.
+The **single** character used to separate array elements when using `{arrayFormat: 'separator'}`.
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: ['bar', 'baz']}, {
+    arrayFormat: 'separator',
+    arrayFormatSeparator: '|'
+});
+//=> 'foo=bar|baz'
+```
 
 ##### sort
 
