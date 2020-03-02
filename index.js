@@ -240,7 +240,7 @@ function parse(input, options) {
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
-	const arrayFormatter = parserForArrayFormat(options);
+	const formatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
 	const ret = Object.create(null);
@@ -261,7 +261,7 @@ function parse(input, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
-		arrayFormatter(decode(key, options), value, ret);
+		formatter(decode(key, options), value, ret);
 	}
 
 	for (const key of Object.keys(ret)) {
