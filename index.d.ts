@@ -1,3 +1,5 @@
+export type CustomValueParser = (value: string) => any;
+
 export interface ParseOptions {
 	/**
 	Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
@@ -121,6 +123,23 @@ export interface ParseOptions {
 	```
 	*/
 	readonly parseBooleans?: boolean;
+
+	/**
+	Parse the value as a boolean type instead of string type if it's a boolean.
+
+	@default false
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.parse('foo=true', {parseBooleans: true});
+	//=> {foo: true}
+	```
+	*/
+	readonly types?: {
+		[key: string]: 'string' | 'number' | CustomValueParser;
+	};
 }
 
 export interface ParsedQuery<T = string> {

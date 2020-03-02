@@ -64,18 +64,41 @@ function encoderForArrayFormat(options) {
 	}
 }
 
+function createCustomValueFormatter(typedSchemaFormatter) {
+	if (typedSchemaFormatter === 'string') {
+		return String;
+	}
+
+	if (typedSchemaFormatter === 'number') {
+		return Number;
+	}
+
+	if (typeof typedSchemaFormatter === 'function') {
+		return typedSchemaFormatter;
+	}
+
+	return val => val;
+}
+
+function getPreparedValue(typesSchema, key, value) {
+	const customValueFormatter = createCustomValueFormatter(typesSchema[key]);
+	return customValueFormatter(value);
+}
+
 function parserForArrayFormat(options) {
 	let result;
 
 	switch (options.arrayFormat) {
 		case 'index':
 			return (key, value, accumulator) => {
+				const preparedValue = getPreparedValue(options.types, key, value);
+
 				result = /\[(\d*)\]$/.exec(key);
 
 				key = key.replace(/\[\d*\]$/, '');
 
 				if (!result) {
-					accumulator[key] = value;
+					accumulator[key] = preparedValue;
 					return;
 				}
 
@@ -83,25 +106,27 @@ function parserForArrayFormat(options) {
 					accumulator[key] = {};
 				}
 
-				accumulator[key][result[1]] = value;
+				accumulator[key][result[1]] = preparedValue;
 			};
 
 		case 'bracket':
 			return (key, value, accumulator) => {
+				const preparedValue = getPreparedValue(options.types, key, value);
+
 				result = /(\[\])$/.exec(key);
 				key = key.replace(/\[\]$/, '');
 
 				if (!result) {
-					accumulator[key] = value;
+					accumulator[key] = preparedValue;
 					return;
 				}
 
 				if (accumulator[key] === undefined) {
-					accumulator[key] = [value];
+					accumulator[key] = [preparedValue];
 					return;
 				}
 
-				accumulator[key] = [].concat(accumulator[key], value);
+				accumulator[key] = [].concat(accumulator[key], preparedValue);
 			};
 
 		case 'comma':
@@ -109,17 +134,20 @@ function parserForArrayFormat(options) {
 			return (key, value, accumulator) => {
 				const isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
 				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
-				accumulator[key] = newValue;
+				const preparedValue = getPreparedValue(options.types, key, newValue);
+				accumulator[key] = preparedValue;
 			};
 
 		default:
 			return (key, value, accumulator) => {
+				const preparedValue = getPreparedValue(options.types, key, value);
+
 				if (accumulator[key] === undefined) {
-					accumulator[key] = value;
+					accumulator[key] = preparedValue;
 					return;
 				}
 
-				accumulator[key] = [].concat(accumulator[key], value);
+				accumulator[key] = [].concat(accumulator[key], preparedValue);
 			};
 	}
 }
@@ -206,12 +234,13 @@ function parse(input, options) {
 		arrayFormat: 'none',
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
-		parseBooleans: false
+		parseBooleans: false,
+		types: Object.create(null)
 	}, options);
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
-	const formatter = parserForArrayFormat(options);
+	const arrayFormatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
 	const ret = Object.create(null);
@@ -232,7 +261,7 @@ function parse(input, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
-		formatter(decode(key, options), value, ret);
+		arrayFormatter(decode(key, options), value, ret);
 	}
 
 	for (const key of Object.keys(ret)) {
@@ -250,7 +279,9 @@ function parse(input, options) {
 		return ret;
 	}
 
-	return (options.sort === true ? Object.keys(ret).sort() : Object.keys(ret).sort(options.sort)).reduce((result, key) => {
+	const retKeys = options.sort === true ? Object.keys(ret).sort() : Object.keys(ret).sort(options.sort);
+
+	return retKeys.reduce((result, key) => {
 		const value = ret[key];
 		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
 			// Sort object keys, not values
