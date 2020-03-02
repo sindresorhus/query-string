@@ -316,7 +316,7 @@ test('custom parameters parsing', t => {
 		types: {
 			foo: 'string',
 			bar: 'number',
-			baz: val => parseFloat(val) * 2
+			baz: value => Number.parseFloat(value) * 2
 		}
 	});
 	const expected = {
