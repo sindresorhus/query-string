@@ -133,8 +133,7 @@ Parse a query string into an object. Leading `?` or `#` are ignored, so you can 
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
 @param query - The query string to parse.
-@param options - The options describing how to parse the query string.
- */
+*/
 export function parse(query: string, options: {parseBooleans: true, parseNumbers: true} & ParseOptions): ParsedQuery<string | boolean | number>;
 export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQuery<string | boolean>;
 export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQuery<string | number>;
