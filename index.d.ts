@@ -125,16 +125,23 @@ export interface ParseOptions {
 	readonly parseBooleans?: boolean;
 
 	/**
-	Parse the value as a boolean type instead of string type if it's a boolean.
+	Types schema for custom parsing.
+	Use flags like "string" or "number" or pass your own parsing function for some of the parameters.
 
-	@default false
+	@default {}
 
 	@example
 	```
 	import queryString = require('query-string');
 
-	queryString.parse('foo=true', {parseBooleans: true});
-	//=> {foo: true}
+	queryString.parse('foo=1&bar=1&baz=1.5', {
+		types: {
+			foo: 'string',
+			bar: 'number',
+			baz: val => parseFloat(val) * 2
+		}
+	});
+	//=> {foo: '1', bar: 1, baz: 3}
 	```
 	*/
 	readonly types?: {
