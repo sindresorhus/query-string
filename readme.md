@@ -265,8 +265,8 @@ The character used to separate array elements when using `{arrayFormat: 'separat
 const queryString = require('query-string');
 
 queryString.stringify({foo: ['bar', 'baz']}, {
-    arrayFormat: 'separator',
-    arrayFormatSeparator: '|'
+	arrayFormat: 'separator',
+	arrayFormatSeparator: '|'
 });
 //=> 'foo=bar|baz'
 ```
