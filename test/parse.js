@@ -64,7 +64,7 @@ test('parse query string without a value', t => {
 	t.deepEqual(queryString.parse('a=&a'), {a: ['', null]});
 });
 
-test('return empty object if no query string search can be found', t => {
+test('return empty object if no query string can be found', t => {
 	t.deepEqual(queryString.parse('?'), {});
 	t.deepEqual(queryString.parse('&'), {});
 	t.deepEqual(queryString.parse('#'), {});
