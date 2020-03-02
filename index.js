@@ -64,7 +64,7 @@ function encoderForArrayFormat(options) {
 	}
 }
 
-function createCustomValueFormatter(typedSchemaFormatter) {
+function createCustomValueParser(typedSchemaFormatter) {
 	if (typedSchemaFormatter === 'string') {
 		return String;
 	}
@@ -81,8 +81,8 @@ function createCustomValueFormatter(typedSchemaFormatter) {
 }
 
 function getPreparedValue(typesSchema, key, value) {
-	const customValueFormatter = createCustomValueFormatter(typesSchema[key]);
-	return customValueFormatter(value);
+	const customValueParser = createCustomValueParser(typesSchema[key]);
+	return customValueParser(value);
 }
 
 function parserForArrayFormat(options) {
