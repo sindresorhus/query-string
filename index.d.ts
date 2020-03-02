@@ -229,7 +229,7 @@ export interface StringifyOptions {
 
 	@default ,
 	*/
-	readonly arrayFormatSeparator?: 'string';
+	readonly arrayFormatSeparator?: string;
 
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
