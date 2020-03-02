@@ -310,3 +310,19 @@ test('query strings having comma encoded and format option as `comma`', t => {
 		]
 	});
 });
+
+test('custom parameters parsing', t => {
+	const actual = queryString.parse('foo=1&bar=1&baz=1.5', {
+		types: {
+			foo: 'string',
+			bar: 'number',
+			baz: val => parseFloat(val) * 2
+		}
+	});
+	const expected = {
+		foo: '1',
+		bar: 1,
+		baz: 3
+	};
+	t.deepEqual(actual, expected);
+});
