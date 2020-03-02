@@ -1,4 +1,4 @@
-export type CustomValueParser = (value: string) => any;
+export type CustomValueParser = (value: string) => unknown;
 
 export interface ParseOptions {
 	/**
