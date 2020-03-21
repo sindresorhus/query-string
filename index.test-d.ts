@@ -23,6 +23,7 @@ expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'comma'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {sort: false}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {skipNull: true}));
+expectType<string>(queryString.stringify({foo: 'bar'}, {skipEmptyString: true}));
 const order = ['c', 'a', 'b'];
 expectType<string>(
 	queryString.stringify(
