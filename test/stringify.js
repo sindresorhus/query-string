@@ -305,6 +305,13 @@ test('should ignore empty string when skipEmptyString is set for arrayFormat', t
 		skipEmptyString: true,
 		arrayFormat: 'index'
 	}), 'a[0]=1&a[1]=2&c=1');
+
+	t.is(queryString.stringify({
+		a: ['', '', '', ''],
+		c: 1
+	}, {
+		skipEmptyString: true
+	}), 'c=1');
 });
 
 test('stringify throws TypeError for invalid arrayFormatSeparator', t => {
