@@ -8,7 +8,9 @@ function encoderForArrayFormat(options) {
 		case 'index':
 			return key => (result, value) => {
 				const index = result.length;
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')) {
 					return result;
 				}
 
@@ -24,7 +26,9 @@ function encoderForArrayFormat(options) {
 
 		case 'bracket':
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')) {
 					return result;
 				}
 
@@ -51,7 +55,9 @@ function encoderForArrayFormat(options) {
 
 		default:
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')) {
 					return result;
 				}
 
@@ -263,6 +269,14 @@ function parse(input, options) {
 	}, Object.create(null));
 }
 
+function isEmptyString(value) {
+	return value === '';
+}
+
+function isNullOrUndefined(value) {
+	return value === null || value === undefined;
+}
+
 exports.extract = extract;
 exports.parse = parse;
 
@@ -282,14 +296,18 @@ exports.stringify = (object, options) => {
 
 	const formatter = encoderForArrayFormat(options);
 
-	const objectCopy = Object.assign({}, object);
-	if (options.skipNull) {
-		for (const key of Object.keys(objectCopy)) {
-			if (objectCopy[key] === undefined || objectCopy[key] === null) {
-				delete objectCopy[key];
+	const objectCopy = Object
+		.keys(object)
+		.reduce((objectCopy, key) => {
+			if ((options.skipNull && isNullOrUndefined(object[key])) ||
+				(options.skipEmptyString && isEmptyString(object[key]))) {
+				return objectCopy;
 			}
-		}
-	}
+
+			objectCopy[key] = object[key];
+
+			return objectCopy;
+		}, Object.create(null));
 
 	const keys = Object.keys(objectCopy);
 
