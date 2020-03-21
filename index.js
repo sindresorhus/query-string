@@ -269,10 +269,6 @@ function parse(input, options) {
 	}, Object.create(null));
 }
 
-function isEmptyString(value) {
-	return value === '';
-}
-
 function isNullOrUndefined(value) {
 	return value === null || value === undefined;
 }
@@ -300,7 +296,7 @@ exports.stringify = (object, options) => {
 		.keys(object)
 		.reduce((objectCopy, key) => {
 			if ((options.skipNull && isNullOrUndefined(object[key])) ||
-				(options.skipEmptyString && isEmptyString(object[key]))) {
+				(options.skipEmptyString && object[key] === '')) {
 				return objectCopy;
 			}
 
