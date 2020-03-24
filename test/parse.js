@@ -316,3 +316,8 @@ test('value shoud not be decoded twice with arrayFormat set as `separator`', t =
 		foo: '2020-01-01T00:00:00+03:00'
 	});
 });
+
+// See https://github.com/sindresorhus/query-string/pull/243#issuecomment-591179715
+test.failing('value separated by encoded comma will not be parsed as array with arrayFormat set as `comma`', t => {
+	t.fail();
+});
