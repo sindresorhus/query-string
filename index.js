@@ -3,14 +3,19 @@ const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
 const splitOnFirst = require('split-on-first');
 
+const isNullOrUndefined = value => value === null || value === undefined;
+
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
 			return key => (result, value) => {
 				const index = result.length;
-				if (value === undefined ||
+
+				if (
+					value === undefined ||
 					(options.skipNull && value === null) ||
-					(options.skipEmptyString && value === '')) {
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -26,9 +31,11 @@ function encoderForArrayFormat(options) {
 
 		case 'bracket':
 			return key => (result, value) => {
-				if (value === undefined ||
+				if (
+					value === undefined ||
 					(options.skipNull && value === null) ||
-					(options.skipEmptyString && value === '')) {
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -55,9 +62,11 @@ function encoderForArrayFormat(options) {
 
 		default:
 			return key => (result, value) => {
-				if (value === undefined ||
+				if (
+					value === undefined ||
 					(options.skipNull && value === null) ||
-					(options.skipEmptyString && value === '')) {
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -267,10 +276,6 @@ function parse(input, options) {
 
 		return result;
 	}, Object.create(null));
-}
-
-function isNullOrUndefined(value) {
-	return value === null || value === undefined;
 }
 
 exports.extract = extract;
