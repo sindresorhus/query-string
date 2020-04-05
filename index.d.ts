@@ -298,8 +298,9 @@ export interface StringifyOptions {
 	});
 	//=> 'a=1&d=4'
 	```
-
-	```js
+	
+	@example
+	```
 	const queryString = require('query-string');
 
 	queryString.stringify({a: '', b: ''}, {
@@ -308,7 +309,6 @@ export interface StringifyOptions {
 	//=> ''
 	```
 	*/
-
 	readonly skipEmptyString?: boolean;
 }
 
