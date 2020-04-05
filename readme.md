@@ -306,7 +306,7 @@ queryString.stringify({a: undefined, b: null}, {
 
 ##### skipEmptyString
 
-Skip keys with empty strings as the value.
+Skip keys with an empty string as the value.
 
 Type: `boolean`\
 Default: `false`
