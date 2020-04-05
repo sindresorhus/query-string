@@ -290,20 +290,20 @@ exports.stringify = (object, options) => {
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
+	const shouldFilter = key => (
+		(options.skipNull && isNullOrUndefined(object[key])) ||
+		(options.skipEmptyString && object[key] === '')
+	);
+
 	const formatter = encoderForArrayFormat(options);
 
-	const objectCopy = Object
-		.keys(object)
-		.reduce((objectCopy, key) => {
-			if ((options.skipNull && isNullOrUndefined(object[key])) ||
-				(options.skipEmptyString && object[key] === '')) {
-				return objectCopy;
-			}
+	const objectCopy = {};
 
+	for (const key of Object.keys(object)) {
+		if (!shouldFilter(key)) {
 			objectCopy[key] = object[key];
-
-			return objectCopy;
-		}, Object.create(null));
+		}
+	}
 
 	const keys = Object.keys(objectCopy);
 
