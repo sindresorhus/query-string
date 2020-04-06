@@ -285,13 +285,13 @@ export interface StringifyOptions {
 	readonly skipNull?: boolean;
 
 	/**
-	Skip keys with empty strings as the value.
+	Skip keys with an empty string as the value.
 
 	@default false
 
 	@example
 	```
-	const queryString = require('query-string');
+	import queryString = require('query-string');
 
 	queryString.stringify({a: 1, b: '', c: '', d: 4}, {
 		skipEmptyString: true
@@ -301,7 +301,7 @@ export interface StringifyOptions {
 	
 	@example
 	```
-	const queryString = require('query-string');
+	import queryString = require('query-string');
 
 	queryString.stringify({a: '', b: ''}, {
 		skipEmptyString: true
