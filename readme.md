@@ -350,6 +350,20 @@ queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
 
+##### parseFragmentIdentifier
+
+Parse the fragment identifier from the URL.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+const queryString = require('query-string');
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
+```
+
 ### .stringifyUrl(object, options?)
 
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
@@ -383,20 +397,6 @@ The URL to stringify.
 Type: `object`
 
 Query items to add to the URL.
-
-##### parseFragmentIdentifier
-
-Parse the fragment identifier from the URL.
-
-Type: `boolean`\
-Default: `false`
-
-```js
-const queryString = require('query-string');
-
-queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
-//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
-```
 
 ## Nesting
 
