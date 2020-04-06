@@ -352,11 +352,15 @@ exports.stringifyUrl = (input, options) => {
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
-	const hash = getHash(input.url);
+	let hash = getHash(input.url);
 	const query = Object.assign(parsedQueryFromUrl, input.query);
 	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
+	}
+
+	if (options && options.parseFragmentIdentifier && input.fragmentIdentifier) {
+		hash = `#${input.fragmentIdentifier}`;
 	}
 
 	return `${url}${queryString}${hash}`;
