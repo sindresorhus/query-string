@@ -19,6 +19,13 @@ test('stringify URL with a query string', t => {
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}}), 'https://foo.bar?foo=bar');
 });
 
+test('skipEmptyString:: stringify URL with a query string', t => {
+	const config = {skipEmptyString: true};
+
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar', baz: ''}}, config), 'https://foo.bar?foo=bar');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar', baz: ['', 'qux']}}, config), 'https://foo.bar?baz=qux&foo=bar');
+});
+
 test('stringify URL from the result of `parseUrl` without query string', t => {
 	const url = 'https://foo.bar';
 	const parsedUrl = queryString.parseUrl(url);

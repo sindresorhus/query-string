@@ -3,12 +3,19 @@ const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
 const splitOnFirst = require('split-on-first');
 
+const isNullOrUndefined = value => value === null || value === undefined;
+
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
 			return key => (result, value) => {
 				const index = result.length;
-				if (value === undefined || (options.skipNull && value === null)) {
+
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -24,7 +31,11 @@ function encoderForArrayFormat(options) {
 
 		case 'bracket':
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -51,7 +62,11 @@ function encoderForArrayFormat(options) {
 
 		default:
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -280,14 +295,18 @@ exports.stringify = (object, options) => {
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
+	const shouldFilter = key => (
+		(options.skipNull && isNullOrUndefined(object[key])) ||
+		(options.skipEmptyString && object[key] === '')
+	);
+
 	const formatter = encoderForArrayFormat(options);
 
-	const objectCopy = Object.assign({}, object);
-	if (options.skipNull) {
-		for (const key of Object.keys(objectCopy)) {
-			if (objectCopy[key] === undefined || objectCopy[key] === null) {
-				delete objectCopy[key];
-			}
+	const objectCopy = {};
+
+	for (const key of Object.keys(object)) {
+		if (!shouldFilter(key)) {
+			objectCopy[key] = object[key];
 		}
 	}
 

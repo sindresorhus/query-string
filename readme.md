@@ -304,6 +304,31 @@ queryString.stringify({a: undefined, b: null}, {
 //=> ''
 ```
 
+##### skipEmptyString
+
+Skip keys with an empty string as the value.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({a: 1, b: '', c: '', d: 4}, {
+	skipEmptyString: true
+});
+//=> 'a=1&d=4'
+```
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({a: '', b: ''}, {
+	skipEmptyString: true
+});
+//=> ''
+```
+
 ### .extract(string)
 
 Extract a query string from a URL that can be passed into `.parse()`.
