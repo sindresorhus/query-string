@@ -383,7 +383,8 @@ The URL to stringify.
 Type: `object`
 
 Query items to add to the URL.
-#### parseFragmentIdentifier
+
+##### parseFragmentIdentifier
 
 Parse the fragment identifier from the URL.
 
