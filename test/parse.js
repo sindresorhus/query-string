@@ -310,3 +310,16 @@ test('query strings having comma encoded and format option as `comma`', t => {
 		]
 	});
 });
+
+test('value should not be decoded twice with `arrayFormat` option set as `separator`', t => {
+	t.deepEqual(queryString.parse('foo=2020-01-01T00:00:00%2B03:00', {arrayFormat: 'separator'}), {
+		foo: '2020-01-01T00:00:00+03:00'
+	});
+});
+
+// See https://github.com/sindresorhus/query-string/issues/242
+test.failing('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
+	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
+		id: [1, 2, 3]
+	});
+});
