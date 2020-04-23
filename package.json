@@ -21,6 +21,7 @@
 	],
 	"scripts": {
 		"size": "size-limit",
+		"benchmark": "node ./test/benchmark.js",
 		"test": "xo && ava && tsd"
 	},
 	"files": [
@@ -50,6 +51,7 @@
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "^4.4.5",
 		"ava": "^1.4.1",
+		"benchmark": "^2.1.4",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
 		"size-limit": "^4.4.5",
