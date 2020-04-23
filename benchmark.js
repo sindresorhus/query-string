@@ -1,5 +1,5 @@
 const Benchmark = require('benchmark');
-const queryString = require('..');
+const queryString = require('.');
 
 const {stringify, stringifyUrl} = queryString;
 const suite = new Benchmark.Suite();

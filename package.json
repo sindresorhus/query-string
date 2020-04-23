@@ -21,7 +21,7 @@
 	],
 	"scripts": {
 		"size": "size-limit",
-		"benchmark": "node ./test/benchmark.js",
+		"benchmark": "node ./benchmark.js",
 		"test": "xo && ava && tsd"
 	},
 	"files": [
