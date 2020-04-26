@@ -13,14 +13,7 @@
 	"engines": {
 		"node": ">=6"
 	},
-	"size-limit": [
-		{
-			"path": "index.js",
-			"limit": "2 KB"
-		}
-	],
 	"scripts": {
-		"size": "size-limit",
 		"benchmark": "node benchmark.js",
 		"test": "xo && ava && tsd"
 	},
@@ -49,12 +42,10 @@
 		"strict-uri-encode": "^2.0.0"
 	},
 	"devDependencies": {
-		"@size-limit/preset-small-lib": "^4.4.5",
 		"ava": "^1.4.1",
 		"benchmark": "^2.1.4",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
-		"size-limit": "^4.4.5",
 		"tsd": "^0.7.3",
 		"xo": "^0.24.0"
 	}
