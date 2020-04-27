@@ -1,3 +1,4 @@
+'use strict';
 const Benchmark = require('benchmark');
 const queryString = require('.');
 
@@ -21,7 +22,7 @@ const TEST_INDEX_STRING = stringify(TEST_OBJECT, {arrayFormat: 'index'});
 const TEST_COMMA_STRING = stringify(TEST_OBJECT, {arrayFormat: 'comma'});
 const TEST_URL = stringifyUrl({url: TEST_HOST, query: TEST_OBJECT});
 
-// Creates test case and adds it to the suite
+// Creates a test case and adds it to the suite
 const defineTestCase = (methodName, input, options) => {
 	const fn = queryString[methodName];
 	const label = options ? ` (${stringify(options)})` : '';
@@ -30,7 +31,8 @@ const defineTestCase = (methodName, input, options) => {
 };
 
 // Define all test cases
-// parse
+
+// Parse
 defineTestCase('parse', TEST_STRING);
 defineTestCase('parse', TEST_STRING, {parseNumbers: true});
 defineTestCase('parse', TEST_STRING, {parseBooleans: true});
@@ -39,6 +41,7 @@ defineTestCase('parse', TEST_STRING, {decode: false});
 defineTestCase('parse', TEST_BRACKETS_STRING, {arrayFormat: 'bracket'});
 defineTestCase('parse', TEST_INDEX_STRING, {arrayFormat: 'index'});
 defineTestCase('parse', TEST_COMMA_STRING, {arrayFormat: 'comma'});
+
 // Stringify
 defineTestCase('stringify', TEST_OBJECT);
 defineTestCase('stringify', TEST_OBJECT, {strict: false});
@@ -48,10 +51,13 @@ defineTestCase('stringify', TEST_OBJECT, {skipEmptyString: true});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket'});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'index'});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'comma'});
+
 // Extract
 defineTestCase('extract', TEST_URL);
+
 // ParseUrl
 defineTestCase('parseUrl', TEST_URL);
+
 // StringifyUrl
 defineTestCase('stringifyUrl', {url: TEST_HOST, query: TEST_OBJECT});
 
@@ -63,5 +69,4 @@ suite.on('cycle', event => {
 	console.log(name.padEnd(36, '_') + opsPerSec.padStart(12, '_') + ' ops/s');
 });
 
-// Run benchmark
 suite.run();
