@@ -157,6 +157,9 @@ export function parse(query: string, options?: ParseOptions): ParsedQuery;
 export interface ParsedUrl {
 	readonly url: string;
 	readonly query: ParsedQuery;
+	/**
+	The fragment identifier of the URL.
+	*/
 	readonly fragmentIdentifier?: string;
 }
 
@@ -326,6 +329,27 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly skipEmptyString?: boolean;
+
+	/**
+	Adds the fragment identifier to the URL.
+
+	@default false
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.stringifyUrl({
+		url: 'https://foo.bar',
+		query: {top: 'foo'},
+		fragmentIdentifier: 'bar'
+	}, {
+		parseFragmentIdentifier: true
+	});
+	//=> 'https://foo.bar?top=foo#bar'
+	```
+	*/
+	readonly parseFragmentIdentifier?: boolean;
 }
 
 /**

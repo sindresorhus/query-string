@@ -339,8 +339,6 @@ Note: This behaviour can be changed with the `skipNull` option.
 
 Extract the URL and the query string as an object.
 
-The `options` are the same as for `.parse()`.
-
 Returns an object with a `url` and `query` property.
 
 ```js
@@ -349,6 +347,14 @@ const queryString = require('query-string');
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
 ```
+
+#### options
+
+Type: `object`
+
+The `options` are the same as for `.parse()`.
+
+Extra options are as below
 
 ##### parseFragmentIdentifier
 
@@ -382,7 +388,7 @@ queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
 ```
 
-#### object
+#### options
 
 Type: `object`
 
@@ -397,6 +403,24 @@ The URL to stringify.
 Type: `object`
 
 Query items to add to the URL.
+
+##### parseFragmentIdentifier
+
+Adds the fragment identifier to the URL.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {top: 'foo'},
+	fragmentIdentifier: 'bar'
+}, {
+	parseFragmentIdentifier: true
+});
+//=> 'https://foo.bar?top=foo#bar'
+```
 
 ## Nesting
 
