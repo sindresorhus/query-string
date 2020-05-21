@@ -384,6 +384,32 @@ Type: `object`
 
 Query items to add to the URL.
 
+### .pick(input, keysToPick)
+
+Returns a string with the `input` property without the keys you *did not enter* in the `keysToPick` property
+
+#### input
+
+Type: `string`
+
+#### keysToPick
+
+Type: `string[]`
+
+
+### .exclude(input, keysToExclude)
+
+Returns a string with the `input` property without the keys you *entered* in the `keysToExclude` property
+
+#### input
+
+Type: `string`
+
+#### keysToExclude
+
+Type: `string[]`
+
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).

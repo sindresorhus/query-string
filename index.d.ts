@@ -327,6 +327,34 @@ Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
 
+
+/**
+	Parses a query string and only picks the passed keysToPicks
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.pick('http://example.com/?foo=1&bar=2', ['bar'])
+	//=> 'http://example.com/?bar=2'
+	```
+*/
+export function pick(url: string, keysToPick: string[]): string;
+
+/**
+	Parses a query string and excludes the passed keysToExclude
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.exclude('http://example.com/?foo=1&bar=2', ['bar'])
+	//=> 'http://example.com/?foo=1'
+	```
+*/
+export function exclude(url: string, keysToExclude: string[]): string;
+
+
 /**
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
 

@@ -281,6 +281,38 @@ function parse(input, options) {
 exports.extract = extract;
 exports.parse = parse;
 
+function pick(input, keysToPick) {
+	const {url, query} = parseUrl(input);
+	const filteredQuery = Object.keys(query).reduce((accumulator, currentKey) => {
+		const shouldPickCurrentKey = keysToPick.includes(currentKey);
+		if (shouldPickCurrentKey) {
+			return Object.assign({[currentKey]: query[currentKey]}, accumulator);
+		}
+
+		return accumulator;
+	}, {});
+
+	return stringifyUrl({url, query: filteredQuery});
+}
+
+exports.pick = pick;
+
+function exclude(input, keysToExclude) {
+	const {url, query} = parseUrl(input);
+	const filteredQuery = Object.keys(query).reduce((accumulator, currentKey) => {
+		const shouldExcludeCurrentKey = keysToExclude.includes(currentKey);
+		if (shouldExcludeCurrentKey) {
+			return accumulator;
+		}
+
+		return Object.assign({[currentKey]: query[currentKey]}, accumulator);
+	}, {});
+
+	return stringifyUrl({url, query: filteredQuery});
+}
+
+exports.exclude = exclude;
+
 exports.stringify = (object, options) => {
 	if (!object) {
 		return '';
@@ -337,14 +369,16 @@ exports.stringify = (object, options) => {
 	}).filter(x => x.length > 0).join('&');
 };
 
-exports.parseUrl = (input, options) => {
+function parseUrl(input, options) {
 	return {
 		url: removeHash(input).split('?')[0] || '',
 		query: parse(extract(input), options)
 	};
-};
+}
 
-exports.stringifyUrl = (input, options) => {
+exports.parseUrl = parseUrl;
+
+function stringifyUrl(input, options) {
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
@@ -356,4 +390,6 @@ exports.stringifyUrl = (input, options) => {
 	}
 
 	return `${url}${queryString}${hash}`;
-};
+}
+
+exports.stringifyUrl = stringifyUrl;
