@@ -283,32 +283,26 @@ exports.parse = parse;
 
 function pick(input, keysToPick) {
 	const {url, query} = parseUrl(input);
-	const filteredQuery = Object.keys(query).reduce((accumulator, currentKey) => {
-		const shouldPickCurrentKey = keysToPick.includes(currentKey);
-		if (shouldPickCurrentKey) {
-			return Object.assign({[currentKey]: query[currentKey]}, accumulator);
-		}
-
-		return accumulator;
-	}, {});
-
-	return stringifyUrl({url, query: filteredQuery});
+	const search = extract(input);
+	const getParameterOrder = key => search.indexOf(`${key}=`) === 0 ? search.indexOf(`${key}=`) : search.indexOf(`&${key}=`) === -1 ? -1 : search.indexOf(`&${key}=`);
+	const sortedKeys = Object.keys(query).sort((keyA, keyB) => getParameterOrder(keyA) - getParameterOrder(keyB));
+	const filteredParameters = sortedKeys.filter(key => keysToPick.includes(key)).map(key => `${key}=${query[key]}`);
+	const queryString = search && filteredParameters.length > 0 ? `?${filteredParameters.join('&')}` : '';
+	const hash = getHash(input);
+	return `${url}${queryString}${hash}`;
 }
 
 exports.pick = pick;
 
 function exclude(input, keysToExclude) {
 	const {url, query} = parseUrl(input);
-	const filteredQuery = Object.keys(query).reduce((accumulator, currentKey) => {
-		const shouldExcludeCurrentKey = keysToExclude.includes(currentKey);
-		if (shouldExcludeCurrentKey) {
-			return accumulator;
-		}
-
-		return Object.assign({[currentKey]: query[currentKey]}, accumulator);
-	}, {});
-
-	return stringifyUrl({url, query: filteredQuery});
+	const search = extract(input);
+	const getParameterOrder = key => search.indexOf(`${key}=`) === 0 ? search.indexOf(`${key}=`) : search.indexOf(`&${key}=`) === -1 ? -1 : search.indexOf(`&${key}=`);
+	const sortedKeys = Object.keys(query).sort((keyA, keyB) => getParameterOrder(keyA) - getParameterOrder(keyB));
+	const filteredParameters = sortedKeys.filter(key => !keysToExclude.includes(key)).map(key => `${key}=${query[key]}`);
+	const queryString = search && filteredParameters.length > 0 ? `?${filteredParameters.join('&')}` : '';
+	const hash = getHash(input);
+	return `${url}${queryString}${hash}`;
 }
 
 exports.exclude = exclude;
