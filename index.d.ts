@@ -157,6 +157,7 @@ export function parse(query: string, options?: ParseOptions): ParsedQuery;
 export interface ParsedUrl {
 	readonly url: string;
 	readonly query: ParsedQuery;
+
 	/**
 	The fragment identifier of the URL.
 	*/
