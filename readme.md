@@ -354,7 +354,7 @@ Type: `object`
 
 The `options` are the same as for `.parse()`.
 
-Extra options are as below
+Extra options are as below.
 
 ##### parseFragmentIdentifier
 
@@ -386,6 +386,13 @@ queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 
 queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {top: 'foo'},
+	fragmentIdentifier: 'bar'
+});
+//=> 'https://foo.bar?top=foo#bar'
 ```
 
 #### options
@@ -403,24 +410,6 @@ The URL to stringify.
 Type: `object`
 
 Query items to add to the URL.
-
-##### parseFragmentIdentifier
-
-Adds the fragment identifier to the URL.
-
-Type: `boolean`\
-Default: `false`
-
-```js
-queryString.stringifyUrl({
-	url: 'https://foo.bar',
-	query: {top: 'foo'},
-	fragmentIdentifier: 'bar'
-}, {
-	parseFragmentIdentifier: true
-});
-//=> 'https://foo.bar?top=foo#bar'
-```
 
 ## Nesting
 

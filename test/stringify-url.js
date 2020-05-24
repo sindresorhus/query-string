@@ -20,12 +20,12 @@ test('stringify URL with a query string', t => {
 });
 
 test('stringify URL with fragment identifier', t => {
-	const config = {parseFragmentIdentifier: true};
-	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {top: 'foo'}, fragmentIdentifier: 'bar'}, config), 'https://foo.bar?top=foo#bar');
-	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: ['bar', 'baz']}, fragmentIdentifier: 'top'}, config), 'https://foo.bar?foo=bar&foo=baz#top');
-	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'top'}, config), 'https://foo.bar/#top');
-	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/#abc', query: {}, fragmentIdentifier: 'top'}, config), 'https://foo.bar/#top');
-	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {}}, config), 'https://foo.bar');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {top: 'foo'}, fragmentIdentifier: 'bar'}), 'https://foo.bar?top=foo#bar');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: ['bar', 'baz']}, fragmentIdentifier: 'top'}), 'https://foo.bar?foo=bar&foo=baz#top');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'top'}), 'https://foo.bar/#top');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/#abc', query: {}, fragmentIdentifier: 'top'}), 'https://foo.bar/#top');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {}}), 'https://foo.bar');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {}, fragmentIdentifier: 'foo bar'}), 'https://foo.bar#foo%20bar');
 });
 
 test('skipEmptyString:: stringify URL with a query string', t => {

@@ -123,7 +123,7 @@ export interface ParseOptions {
 	readonly parseBooleans?: boolean;
 	
 	/**
-	Parse the fragment identifier from the URL.
+	Parse the fragment identifier from the URL and add it to result object.
 
 	@default false
 
@@ -330,27 +330,6 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly skipEmptyString?: boolean;
-
-	/**
-	Adds the fragment identifier to the URL.
-
-	@default false
-
-	@example
-	```
-	import queryString = require('query-string');
-
-	queryString.stringifyUrl({
-		url: 'https://foo.bar',
-		query: {top: 'foo'},
-		fragmentIdentifier: 'bar'
-	}, {
-		parseFragmentIdentifier: true
-	});
-	//=> 'https://foo.bar?top=foo#bar'
-	```
-	*/
-	readonly parseFragmentIdentifier?: boolean;
 }
 
 /**
@@ -380,6 +359,13 @@ queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 
 queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {top: 'foo'},
+	fragmentIdentifier: 'bar'
+});
+//=> 'https://foo.bar?top=foo#bar'
 ```
 */
 export function stringifyUrl(

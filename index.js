@@ -338,17 +338,24 @@ exports.stringify = (object, options) => {
 };
 
 exports.parseUrl = (input, options) => {
+	options = Object.assign({
+		decode: true
+	}, options);
 	const [url, hash] = splitOnFirst(input, '#');
 	return Object.assign(
 		{
 			url: url.split('?')[0] || '',
 			query: parse(extract(input), options)
 		},
-		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: hash} : {}
+		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
 	);
 };
 
 exports.stringifyUrl = (input, options) => {
+	options = Object.assign({
+		encode: true,
+		strict: true
+	}, options);
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
@@ -359,8 +366,8 @@ exports.stringifyUrl = (input, options) => {
 		queryString = `?${queryString}`;
 	}
 
-	if (options && options.parseFragmentIdentifier && input.fragmentIdentifier) {
-		hash = `#${input.fragmentIdentifier}`;
+	if (input.fragmentIdentifier) {
+		hash = `#${encode(input.fragmentIdentifier, options)}`;
 	}
 
 	return `${url}${queryString}${hash}`;
