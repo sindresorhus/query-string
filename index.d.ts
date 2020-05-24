@@ -166,6 +166,7 @@ export interface ParsedUrl {
 
 /**
 Extract the URL and the query string as an object.
+Optionally object contains `fragmentIdentifier` if `parseFragmentIdentifier` is `true` in options.
 
 @param url - The URL to parse.
 
@@ -175,6 +176,9 @@ import queryString = require('query-string');
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 */
 export function parseUrl(url: string, options?: ParseOptions): ParsedUrl;
@@ -351,6 +355,8 @@ export function extract(url: string): string;
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
 
 Query items in the `query` property overrides queries in the `url` property.
+
+Fragment identifier in the `fragmentIdentifier` property overrides fragment identifier in the `url` property
 
 @example
 ```

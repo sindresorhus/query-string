@@ -340,12 +340,16 @@ Note: This behaviour can be changed with the `skipNull` option.
 Extract the URL and the query string as an object.
 
 Returns an object with a `url` and `query` property.
+Optionally object contains `fragmentIdentifier` if `parseFragmentIdentifier` is `true` in options.
 
 ```js
 const queryString = require('query-string');
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 
 #### options
@@ -379,6 +383,8 @@ The `options` are the same as for `.stringify()`.
 Returns a string with the URL and a query string.
 
 Query items in the `query` property overrides queries in the `url` property.
+
+Fragment identifier in the `fragmentIdentifier` property overrides fragment identifier in the `url` property
 
 ```js
 queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
