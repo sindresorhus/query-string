@@ -356,7 +356,7 @@ Stringify an object into a URL with a query string and sorting the keys. The inv
 
 Query items in the `query` property overrides queries in the `url` property.
 
-Fragment identifier in the `fragmentIdentifier` property overrides fragment identifier in the `url` property
+The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
 
 @example
 ```
