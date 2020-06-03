@@ -159,7 +159,7 @@ export interface ParsedUrl {
 	readonly query: ParsedQuery;
 
 	/**
-	The fragment identifier of the URL.
+	If the `parseFragmentIdentifier` is `true`, the object will also contain a `fragmentIdentifier` property.
 	*/
 	readonly fragmentIdentifier?: string;
 }
