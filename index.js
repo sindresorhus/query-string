@@ -341,7 +341,9 @@ exports.parseUrl = (input, options) => {
 	options = Object.assign({
 		decode: true
 	}, options);
+
 	const [url, hash] = splitOnFirst(input, '#');
+
 	return Object.assign(
 		{
 			url: url.split('?')[0] || '',
@@ -356,6 +358,7 @@ exports.stringifyUrl = (input, options) => {
 		encode: true,
 		strict: true
 	}, options);
+
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
