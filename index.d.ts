@@ -371,7 +371,9 @@ queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 
 queryString.stringifyUrl({
 	url: 'https://foo.bar',
-	query: {top: 'foo'},
+	query: {
+		top: 'foo'
+	},
 	fragmentIdentifier: 'bar'
 });
 //=> 'https://foo.bar?top=foo#bar'
