@@ -362,13 +362,14 @@ exports.stringifyUrl = (input, options) => {
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
-	let hash = getHash(input.url);
+
 	const query = Object.assign(parsedQueryFromUrl, input.query);
 	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
 
+	let hash = getHash(input.url);
 	if (input.fragmentIdentifier) {
 		hash = `#${encode(input.fragmentIdentifier, options)}`;
 	}
