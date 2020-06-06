@@ -357,7 +357,7 @@ queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: tr
 
 Type: `object`
 
-The `options` are the same as for `.parse()`.
+The options are the same as for `.parse()`.
 
 Extra options are as below.
 
@@ -396,7 +396,9 @@ queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 
 queryString.stringifyUrl({
 	url: 'https://foo.bar',
-	query: {top: 'foo'},
+	query: {
+		top: 'foo'
+	},
 	fragmentIdentifier: 'bar'
 });
 //=> 'https://foo.bar?top=foo#bar'
