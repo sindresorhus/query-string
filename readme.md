@@ -402,7 +402,7 @@ queryString.stringifyUrl({
 //=> 'https://foo.bar?top=foo#bar'
 ```
 
-#### options
+#### object
 
 Type: `object`
 
