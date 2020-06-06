@@ -334,15 +334,40 @@ Note: This behaviour can be changed with the `skipNull` option.
 
 Extract the URL and the query string as an object.
 
-The `options` are the same as for `.parse()`.
-
 Returns an object with a `url` and `query` property.
+
+If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 ```js
 const queryString = require('query-string');
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
+```
+
+#### options
+
+Type: `object`
+
+The options are the same as for `.parse()`.
+
+Extra options are as below.
+
+##### parseFragmentIdentifier
+
+Parse the fragment identifier from the URL.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+const queryString = require('query-string');
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 
 ### .stringifyUrl(object, options?)
@@ -355,12 +380,23 @@ Returns a string with the URL and a query string.
 
 Query items in the `query` property overrides queries in the `url` property.
 
+The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
+
 ```js
 queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
 
 queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {
+		top: 'foo'
+	},
+	fragmentIdentifier: 'bar'
+});
+//=> 'https://foo.bar?top=foo#bar'
 ```
 
 #### object
