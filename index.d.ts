@@ -160,7 +160,8 @@ export interface ParsedUrl {
 
 	/**
 	The fragment identifier of the URL.
-	Present when `parseFragmentIdentifier` is `true`.
+
+	Present when the `parseFragmentIdentifier` option is `true`.
 	*/
 	readonly fragmentIdentifier?: string;
 }
