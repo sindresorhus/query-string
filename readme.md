@@ -340,7 +340,8 @@ Note: This behaviour can be changed with the `skipNull` option.
 Extract the URL and the query string as an object.
 
 Returns an object with a `url` and `query` property.
-If the `parseFragmentIdentifier` is `true`, the object will also contain a `fragmentIdentifier` property.
+
+If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 ```js
 const queryString = require('query-string');
