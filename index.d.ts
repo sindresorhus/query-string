@@ -168,7 +168,8 @@ export interface ParsedUrl {
 
 /**
 Extract the URL and the query string as an object.
-If the `parseFragmentIdentifier` is `true`, the object will also contain a `fragmentIdentifier` property.
+
+If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 @param url - The URL to parse.
 
