@@ -52,3 +52,8 @@ test('stringify URL from the result of `parseUrl` with query string that contain
 	const parsedUrl = queryString.parseUrl(url);
 	t.deepEqual(queryString.stringifyUrl(parsedUrl, {encode: false}), url);
 });
+
+test('stringify URL without sorting existing query params', t => {
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar?C=3&A=1', query: {D: 4, B: 2}}, {sort: false}), 'https://foo.bar?C=3&A=1&D=4&B=2');
+});
+
