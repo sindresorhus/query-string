@@ -361,7 +361,7 @@ exports.stringifyUrl = (input, options) => {
 
 	const url = removeHash(input.url).split('?')[0] || '';
 	const queryFromUrl = exports.extract(input.url);
-	const parsedQueryFromUrl = exports.parse(queryFromUrl);
+	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
 
 	const query = Object.assign(parsedQueryFromUrl, input.query);
 	let queryString = exports.stringify(query, options);
