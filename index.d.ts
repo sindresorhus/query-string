@@ -329,31 +329,30 @@ export function extract(url: string): string;
 
 
 /**
-	Parses a query string and only picks the passed keysToPicks
+Parses a query string and only picks the passed keysToPicks
 
-	@example
-	```
-	import queryString = require('query-string');
+@example
+```
+import queryString = require('query-string');
 
-	queryString.pick('http://example.com/?foo=1&bar=2', ['bar'])
-	//=> 'http://example.com/?bar=2'
-	```
+queryString.pick('http://example.com/?foo=1&bar=2', ['bar'])
+//=> 'http://example.com/?bar=2'
+```
 */
-export function pick(url: string, keysToPick: string[]): string;
+export function pick(url: string, keysToPick: readonly string[]): string;
 
 /**
-	Parses a query string and excludes the passed keysToExclude
+Parses a query string and excludes the passed keysToExclude
 
-	@example
-	```
-	import queryString = require('query-string');
+@example
+```
+import queryString = require('query-string');
 
-	queryString.exclude('http://example.com/?foo=1&bar=2', ['bar'])
-	//=> 'http://example.com/?foo=1'
-	```
+queryString.exclude('http://example.com/?foo=1&bar=2', ['bar'])
+//=> 'http://example.com/?foo=1'
+```
 */
-export function exclude(url: string, keysToExclude: string[]): string;
-
+export function exclude(url: string, keysToExclude: readonly string[]): string;
 
 /**
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
