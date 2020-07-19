@@ -396,7 +396,6 @@ Type: `string`
 
 Type: `string[]`
 
-
 ### .exclude(input, keysToExclude)
 
 Returns a string with the `input` property without the keys you *entered* in the `keysToExclude` property
@@ -408,7 +407,6 @@ Type: `string`
 #### keysToExclude
 
 Type: `string[]`
-
 
 ## Nesting
 
