@@ -327,9 +327,8 @@ Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
 
-
 /**
-Parses a query string and only picks the passed keysToPicks
+Parses a query string and only picks the passed keysToPicks.
 
 @example
 ```
@@ -342,7 +341,7 @@ queryString.pick('http://example.com/?foo=1&bar=2', ['bar'])
 export function pick(url: string, keysToPick: readonly string[]): string;
 
 /**
-Parses a query string and excludes the passed keysToExclude
+Parses a query string and excludes the passed keysToExclude.
 
 @example
 ```
