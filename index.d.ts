@@ -121,7 +121,7 @@ export interface ParseOptions {
 	```
 	*/
 	readonly parseBooleans?: boolean;
-	
+
 	/**
 	Parse the fragment identifier from the URL and add it to result object.
 
@@ -139,7 +139,7 @@ export interface ParseOptions {
 }
 
 export interface ParsedQuery<T = string> {
-	[key: string]: T | T[] | null | undefined;
+	[key: string]: T | T[] | null;
 }
 
 /**
