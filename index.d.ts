@@ -343,7 +343,7 @@ export interface StringifyOptions {
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: {[key: string]: any},
+	object?: {[key: string]: any},
 	options?: StringifyOptions
 ): string;
 
