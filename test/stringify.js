@@ -177,6 +177,24 @@ test('array stringify representation with brackets and separators with multiple 
 	}), 'bar[]=one,two,three&foo');
 });
 
+test('array stringify representation with brackets and separators with a single empty string', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=&foo');
+});
+
+test('array stringify representation with brackets and separators with a multiple empty string', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['', 'two', '']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=,two,&foo');
+});
+
 test('should sort keys in given order', t => {
 	const fixture = ['c', 'a', 'b'];
 	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);

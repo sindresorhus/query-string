@@ -48,9 +48,25 @@ function encoderForArrayFormat(options) {
 
 		case 'comma':
 		case 'separator':
-		case 'bracket-separator':
 			return key => (result, value) => {
 				if (value === null || value === undefined || value.length === 0) {
+					return result;
+				}
+
+				const keyValueSep = options.arrayFormat === 'bracket-separator' ?
+					'[]=' :
+					'=';
+
+				if (result.length === 0) {
+					return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
+				}
+
+				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
+			};
+
+		case 'bracket-separator':
+			return key => (result, value) => {
+				if (value === null || value === undefined) { // Explicitly allow empty strings
 					return result;
 				}
 
