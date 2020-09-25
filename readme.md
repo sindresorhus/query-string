@@ -125,6 +125,19 @@ queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: 
 //=> {foo: ['1', '2', '3']}
 ```
 
+- `'bracket-separator'`: Parse explicitly bracket-postfixed arrays with elements separated by a custom character:
+
+```js
+const queryString = require('query-string');
+
+//Can handle arrays on a single value to product explicit array
+queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1']}
+
+queryString.parse('foo[]=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '2', '3']}
+```
+
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
@@ -228,6 +241,24 @@ const queryString = require('query-string');
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 //=> 'foo=1,2,3'
+```
+
+- `'separator'`: Serialize arrays by separating elements with a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+//=> 'foo=1|2|3'
+```
+
+- `'bracket-separator'`: Serialize arrays by explicitly postfixing arrays with brackets and separating elements with a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1|2|3'
 ```
 
 - `'none'`: Serialize arrays by using duplicate keys:

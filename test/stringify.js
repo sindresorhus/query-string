@@ -159,6 +159,24 @@ test('array stringify representation with array indexes and sparse array', t => 
 	t.is(queryString.stringify({bar: fixture}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
 });
 
+test('array stringify representation with brackets and separators with single value', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=one&foo');
+});
+
+test('array stringify representation with brackets and separators with multiple values', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', 'two', 'three']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=one,two,three&foo');
+});
+
 test('should sort keys in given order', t => {
 	const fixture = ['c', 'a', 'b'];
 	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);

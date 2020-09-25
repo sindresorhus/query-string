@@ -174,6 +174,36 @@ test('query strings having indexed arrays and format option as `index`', t => {
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having brackets+separator arrays and format option as `bracket-separator` with 1 value', t => {
+	t.deepEqual(queryString.parse('foo[]=bar', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar']});
+});
+
+test('query strings having brackets+separator arrays and format option as `bracket-separator` with multiple values', t => {
+	t.deepEqual(queryString.parse('foo[]=bar,baz,,,biz', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar', 'baz', '', '', 'biz']});
+});
+
+test('query strings with multiple brackets+separator arrays and format option as `bracket-separator` using same key name', t => {
+	t.deepEqual(queryString.parse('foo[]=bar,baz&foo[]=biz,boz', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar', 'baz', 'biz', 'boz']});
+});
+
+test('query strings having an empty brackets+separator array and format option as `bracket-separator`', t => {
+	t.deepEqual(queryString.parse('foo[]', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: []});
+});
+
+test('query strings having a brackets+separator array and format option as `bracket-separator` with a single empty string', t => {
+	t.deepEqual(queryString.parse('foo[]=', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['']});
+});
+
 test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
 	t.deepEqual(queryString.parse('foo=bar=&foo=ba=z='), {foo: ['bar=', 'ba=z=']});
 });

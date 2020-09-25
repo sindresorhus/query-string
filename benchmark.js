@@ -20,6 +20,7 @@ const TEST_STRING = stringify(TEST_OBJECT);
 const TEST_BRACKETS_STRING = stringify(TEST_OBJECT, {arrayFormat: 'bracket'});
 const TEST_INDEX_STRING = stringify(TEST_OBJECT, {arrayFormat: 'index'});
 const TEST_COMMA_STRING = stringify(TEST_OBJECT, {arrayFormat: 'comma'});
+const TEST_BRACKET_SEPARATOR_STRING = stringify(TEST_OBJECT, {arrayFormat: 'bracket-separator'});
 const TEST_URL = stringifyUrl({url: TEST_HOST, query: TEST_OBJECT});
 
 // Creates a test case and adds it to the suite
@@ -41,6 +42,7 @@ defineTestCase('parse', TEST_STRING, {decode: false});
 defineTestCase('parse', TEST_BRACKETS_STRING, {arrayFormat: 'bracket'});
 defineTestCase('parse', TEST_INDEX_STRING, {arrayFormat: 'index'});
 defineTestCase('parse', TEST_COMMA_STRING, {arrayFormat: 'comma'});
+defineTestCase('parse', TEST_BRACKET_SEPARATOR_STRING, {arrayFormat: 'bracket-separator'});
 
 // Stringify
 defineTestCase('stringify', TEST_OBJECT);
@@ -51,6 +53,7 @@ defineTestCase('stringify', TEST_OBJECT, {skipEmptyString: true});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket'});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'index'});
 defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'comma'});
+defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket-separator'});
 
 // Extract
 defineTestCase('extract', TEST_URL);
@@ -66,7 +69,7 @@ suite.on('cycle', event => {
 	const {name, hz} = event.target;
 	const opsPerSec = Math.round(hz).toLocaleString();
 
-	console.log(name.padEnd(36, '_') + opsPerSec.padStart(12, '_') + ' ops/s');
+	console.log(name.padEnd(46, '_') + opsPerSec.padStart(3, '_') + ' ops/s');
 });
 
 suite.run();
