@@ -93,3 +93,5 @@ expectType<queryString.ParsedUrl>(
 
 // Extract
 expectType<string>(queryString.extract('http://foo.bar/?abc=def&hij=klm'));
+
+expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: {foo: undefined}}));

@@ -354,6 +354,20 @@ Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
 
+export interface UrlObject {
+	readonly url: string;
+
+	/**
+	Qverrides queries in the `url` property.
+	*/
+	readonly query: Record<string, string | undefined | null>;
+
+	/**
+	Overrides the fragment identifier in the `url` property.
+	*/
+	readonly fragmentIdentifier?: string;
+}
+
 /**
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
 
@@ -380,6 +394,6 @@ queryString.stringifyUrl({
 ```
 */
 export function stringifyUrl(
-	object: ParsedUrl,
+	object: UrlObject,
 	options?: StringifyOptions
 ): string;
