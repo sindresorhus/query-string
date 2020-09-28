@@ -339,11 +339,18 @@ export interface StringifyOptions {
 	readonly skipEmptyString?: boolean;
 }
 
+export type Stringifiable = string | boolean | number;
+
+export type StringifiableRecord = Record<
+	string,
+	Stringifiable | Stringifiable[] | null | undefined
+>;
+
 /**
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: {[key: string]: any},
+	object: StringifiableRecord,
 	options?: StringifyOptions
 ): string;
 
@@ -358,9 +365,9 @@ export interface UrlObject {
 	readonly url: string;
 
 	/**
-	Qverrides queries in the `url` property.
+	Overrides queries in the `url` property.
 	*/
-	readonly query: Record<string, string | undefined | null>;
+	readonly query: StringifiableRecord;
 
 	/**
 	Overrides the fragment identifier in the `url` property.
