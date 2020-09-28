@@ -340,9 +340,10 @@ export interface StringifyOptions {
 }
 
 export type Stringifiable = string | boolean | number;
+
 export type StringifiableRecord = Record<
-  string,
-  Stringifiable | Stringifiable[] | null | undefined
+	string,
+	Stringifiable | Stringifiable[] | null | undefined
 >;
 
 /**
