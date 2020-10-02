@@ -111,7 +111,7 @@ expectType<string>(
 			fooNull: null,
 			fooUndefined: undefined,
 			fooString: "hi",
-			fooMixedArray: ["a", "b", "", null, 1, true]
+			fooMixedArray: ["a", "b", "", null, 1, true, undefined]
 		}
 	})
 );
