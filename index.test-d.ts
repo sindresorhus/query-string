@@ -98,9 +98,12 @@ expectType<string>(
 	queryString.stringifyUrl({
 		url: 'https://sindresorhus.com',
 		query: {
-			fooArray: [
+			fooMixedArray: [
 				'a',
-				'b'
+				1,
+				true,
+				null,
+				undefined
 			],
 			fooNumber: 1,
 			fooBoolean: true,

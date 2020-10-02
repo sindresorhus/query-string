@@ -339,11 +339,11 @@ export interface StringifyOptions {
 	readonly skipEmptyString?: boolean;
 }
 
-export type Stringifiable = string | boolean | number;
+export type Stringifiable = string | boolean | number | null | undefined;
 
 export type StringifiableRecord = Record<
 	string,
-	Stringifiable | Stringifiable[] | null | undefined
+	Stringifiable | Stringifiable[]
 >;
 
 /**
