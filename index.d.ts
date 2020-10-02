@@ -54,7 +54,7 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: "bracket" | "index" | "comma" | "separator" | "none";
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -149,18 +149,9 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 @param query - The query string to parse.
 */
-export function parse(
-	query: string,
-	options: { parseBooleans: true; parseNumbers: true } & ParseOptions
-): ParsedQuery<string | boolean | number>;
-export function parse(
-	query: string,
-	options: { parseBooleans: true } & ParseOptions
-): ParsedQuery<string | boolean>;
-export function parse(
-	query: string,
-	options: { parseNumbers: true } & ParseOptions
-): ParsedQuery<string | number>;
+export function parse(query: string, options: {parseBooleans: true, parseNumbers: true} & ParseOptions): ParsedQuery<string | boolean | number>;
+export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQuery<string | boolean>;
+export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQuery<string | number>;
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
 export interface ParsedUrl {
@@ -258,7 +249,7 @@ export interface StringifyOptions {
 		//=> 'foo=1&foo=2&foo=3'
 		```
 	*/
-	readonly arrayFormat?: "bracket" | "index" | "comma" | "separator" | "none";
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -349,6 +340,7 @@ export interface StringifyOptions {
 }
 
 export type Stringifiable = string | boolean | number | null | undefined;
+
 export type StringifiableRecord = Record<
 	string,
 	Stringifiable | Stringifiable[]
