@@ -75,6 +75,11 @@ test('handle `+` correctly', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 });
 
+test('handle number pasring correctly with math operators', t => {
+	t.deepEqual(queryString.parse('192e11=bar'), {'192e11': 'bar'});
+	t.deepEqual(queryString.parse('bar=192e11'), {bar: '192e11'});
+});
+
 test('handle `+` correctly when not decoding', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++', {decode: false}), {'foo+faz': 'bar+baz++'});
 });
