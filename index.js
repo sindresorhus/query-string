@@ -342,11 +342,11 @@ exports.parseUrl = (url, options) => {
 		decode: true
 	}, options);
 
-	const [url, hash] = splitOnFirst(url, '#');
+	const [url_, hash] = splitOnFirst(url, '#');
 
 	return Object.assign(
 		{
-			url: url.split('?')[0] || '',
+			url: url_.split('?')[0] || '',
 			query: parse(extract(url), options)
 		},
 		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
