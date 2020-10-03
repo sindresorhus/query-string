@@ -379,10 +379,11 @@ exports.stringifyUrl = (input, options) => {
 };
 
 exports.filterElements = (input, filter, options) => {
-	const {url, query, fragmentIdentifier} = exports.parseUrl(input, {
-		...options,
+	options = Object.assign({
 		parseFragmentIdentifier: true
-	});
+	}, options);
+
+	const {url, query, fragmentIdentifier} = exports.parseUrl(input, options);
 	return exports.stringifyUrl({
 		url,
 		query: filterObject(query, filter),
