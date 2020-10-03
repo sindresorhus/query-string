@@ -214,7 +214,7 @@ function parseValue(value, options) {
 	return value;
 }
 
-function parse(input, options) {
+function parse(query, options) {
 	options = Object.assign({
 		decode: true,
 		sort: true,
@@ -231,17 +231,17 @@ function parse(input, options) {
 	// Create an object with no prototype
 	const ret = Object.create(null);
 
-	if (typeof input !== 'string') {
+	if (typeof query !== 'string') {
 		return ret;
 	}
 
-	input = input.trim().replace(/^[?#&]/, '');
+	query = query.trim().replace(/^[?#&]/, '');
 
-	if (!input) {
+	if (!query) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
+	for (const param of query.split('&')) {
 		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
 
 		// Missing `=` should be `null`:
@@ -337,41 +337,41 @@ exports.stringify = (object, options) => {
 	}).filter(x => x.length > 0).join('&');
 };
 
-exports.parseUrl = (input, options) => {
+exports.parseUrl = (url, options) => {
 	options = Object.assign({
 		decode: true
 	}, options);
 
-	const [url, hash] = splitOnFirst(input, '#');
+	const [url_, hash] = splitOnFirst(url, '#');
 
 	return Object.assign(
 		{
-			url: url.split('?')[0] || '',
-			query: parse(extract(input), options)
+			url: url_.split('?')[0] || '',
+			query: parse(extract(url), options)
 		},
 		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
 	);
 };
 
-exports.stringifyUrl = (input, options) => {
+exports.stringifyUrl = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true
 	}, options);
 
-	const url = removeHash(input.url).split('?')[0] || '';
-	const queryFromUrl = exports.extract(input.url);
+	const url = removeHash(object.url).split('?')[0] || '';
+	const queryFromUrl = exports.extract(object.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
 
-	const query = Object.assign(parsedQueryFromUrl, input.query);
+	const query = Object.assign(parsedQueryFromUrl, object.query);
 	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
 
-	let hash = getHash(input.url);
-	if (input.fragmentIdentifier) {
-		hash = `#${encode(input.fragmentIdentifier, options)}`;
+	let hash = getHash(object.url);
+	if (object.fragmentIdentifier) {
+		hash = `#${encode(object.fragmentIdentifier, options)}`;
 	}
 
 	return `${url}${queryString}${hash}`;
