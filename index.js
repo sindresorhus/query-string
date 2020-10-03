@@ -179,14 +179,14 @@ function getHash(url) {
 	return hash;
 }
 
-function extract(input) {
-	input = removeHash(input);
-	const queryStart = input.indexOf('?');
+function extract(url) {
+	url = removeHash(url);
+	const queryStart = url.indexOf('?');
 	if (queryStart === -1) {
 		return '';
 	}
 
-	return input.slice(queryStart + 1);
+	return url.slice(queryStart + 1);
 }
 
 function parseValue(value, options) {
@@ -199,7 +199,7 @@ function parseValue(value, options) {
 	return value;
 }
 
-function parse(input, options) {
+function parse(query, options) {
 	options = Object.assign({
 		decode: true,
 		sort: true,
@@ -216,17 +216,17 @@ function parse(input, options) {
 	// Create an object with no prototype
 	const ret = Object.create(null);
 
-	if (typeof input !== 'string') {
+	if (typeof query !== 'string') {
 		return ret;
 	}
 
-	input = input.trim().replace(/^[?#&]/, '');
+	query = query.trim().replace(/^[?#&]/, '');
 
-	if (!input) {
+	if (!query) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
+	for (const param of query.split('&')) {
 		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
 
 		// Missing `=` should be `null`:
@@ -318,19 +318,19 @@ exports.stringify = (object, options) => {
 	}).filter(x => x.length > 0).join('&');
 };
 
-exports.parseUrl = (input, options) => {
+exports.parseUrl = (url, options) => {
 	return {
-		url: removeHash(input).split('?')[0] || '',
-		query: parse(extract(input), options)
+		url: removeHash(url).split('?')[0] || '',
+		query: parse(extract(url), options)
 	};
 };
 
-exports.stringifyUrl = (input, options) => {
-	const url = removeHash(input.url).split('?')[0] || '';
-	const queryFromUrl = exports.extract(input.url);
+exports.stringifyUrl = (object, options) => {
+	const url = removeHash(object.url).split('?')[0] || '';
+	const queryFromUrl = exports.extract(object.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl);
-	const hash = getHash(input.url);
-	const query = Object.assign(parsedQueryFromUrl, input.query);
+	const hash = getHash(object.url);
+	const query = Object.assign(parsedQueryFromUrl, object.query);
 	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
