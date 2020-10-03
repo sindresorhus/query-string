@@ -359,6 +359,43 @@ Type: `object`
 
 Query items to add to the URL.
 
+### .filterElements(url, includeParams, options?)
+### .filterElements(url, filter, options?)
+
+Filter query parameters from a url.
+
+```js
+queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?foo=1#hello'
+
+queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?bar=2#hello'
+```
+
+#### url
+
+Type: `string`
+
+The url containing the query parameters to filter.
+
+#### includeParams
+
+Type: `string[]`
+
+The names of the query parameters to retain. All other query parameters will be removed from the url.
+
+#### filter
+
+Type: `(name, value) => boolean`
+
+A filter predicate that will be provided the name of each query parameter and its value. The predicate will be provided with the `name` of the query parameter and its `value`. The `parseNumbers` and `parseBooleans` options affect `value`.
+
+#### options
+
+Type: `object`
+
+[Parse options](#options) and [stringify options](#options-1).
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).

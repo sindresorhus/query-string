@@ -2,6 +2,7 @@
 const strictUriEncode = require('strict-uri-encode');
 const decodeComponent = require('decode-uri-component');
 const splitOnFirst = require('split-on-first');
+const filterObject = require('filter-obj');
 
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
@@ -337,4 +338,16 @@ exports.stringifyUrl = (input, options) => {
 	}
 
 	return `${url}${queryString}${hash}`;
+};
+
+exports.filterElements = (input, filter, options) => {
+	const {url, query, fragmentIdentifier} = exports.parseUrl(input, {
+		...options,
+		parseFragmentIdentifier: true
+	});
+	return exports.stringifyUrl({
+		url,
+		query: filterObject(query, filter),
+		fragmentIdentifier
+	}, options);
 };

@@ -33,11 +33,13 @@
 		"stringify",
 		"encode",
 		"decode",
-		"searchparams"
+		"searchparams",
+		"filter"
 	],
 	"dependencies": {
-		"split-on-first": "^1.0.0",
 		"decode-uri-component": "^0.2.0",
+		"filter-obj": "^2.0.1",
+		"split-on-first": "^1.0.0",
 		"strict-uri-encode": "^2.0.0"
 	},
 	"devDependencies": {

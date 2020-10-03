@@ -318,3 +318,40 @@ export function stringifyUrl(
 	object: ParsedUrl,
 	options?: StringifyOptions
 ): string;
+
+/**
+Filter query parameters from a url.
+
+@param url The url containing the query parameters to filter.
+@param includeParams The names of the query parameters to retain. All other query parameters will be removed from the url.
+@param filter A filter predicate that will be provided the name of each query parameter and its value.
+
+@example
+```
+queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?foo=1#hello'
+
+queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?bar=2#hello'
+```
+*/
+export function filterElements(
+	url: string,
+	includeParams: ReadonlyArray<string>,
+	options?: ParseOptions & StringifyOptions
+): string
+export function filterElements(
+	url: string,
+	filter: (name: string, value: string | boolean | number) => boolean,
+	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+export function filterElements(
+	url: string,
+	filter: (name: string, value: string | boolean) => boolean,
+	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+): string
+export function filterElements(
+	url: string,
+	filter: (name: string, value: string | number) => boolean,
+	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string
