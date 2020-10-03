@@ -1,4 +1,4 @@
-# query-string [![Build Status](https://travis-ci.org/sindresorhus/query-string.svg?branch=master)](https://travis-ci.org/sindresorhus/query-string)
+# query-string [![Build Status](https://travis-ci.com/sindresorhus/query-string.svg?branch=master)](https://travis-ci.com/github/sindresorhus/query-string) [![](https://badgen.net/bundlephobia/minzip/query-string)](https://bundlephobia.com/result?p=query-string)
 
 > Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
 
@@ -16,14 +16,9 @@
 		<sup>Special thanks to:</sup>
 		<br>
 		<br>
-		<a href="https://github.com/botpress/botpress">
-			<img src="https://sindresorhus.com/assets/thanks/botpress-logo.svg" width="260" alt="Botpress">
+		<a href="https://standardresume.co">
+			<img src="https://sindresorhus.com/assets/thanks/standard-resume-logo.svg" width="200"/>
 		</a>
-		<br>
-		<sub><b>Botpress is an open-source conversational assistant creation platform.</b></sub>
-		<br>
-		<sub>They <a href="https://github.com/botpress/botpress/blob/master/.github/CONTRIBUTING.md">welcome contributions</a> from anyone, whether you're into machine learning,<br>want to get started in open-source, or just have an improvement idea.</sub>
-		<br>
 	</p>
 </div>
 
@@ -304,6 +299,31 @@ queryString.stringify({a: undefined, b: null}, {
 //=> ''
 ```
 
+##### skipEmptyString
+
+Skip keys with an empty string as the value.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({a: 1, b: '', c: '', d: 4}, {
+	skipEmptyString: true
+});
+//=> 'a=1&d=4'
+```
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({a: '', b: ''}, {
+	skipEmptyString: true
+});
+//=> ''
+```
+
 ### .extract(string)
 
 Extract a query string from a URL that can be passed into `.parse()`.
@@ -314,15 +334,40 @@ Note: This behaviour can be changed with the `skipNull` option.
 
 Extract the URL and the query string as an object.
 
-The `options` are the same as for `.parse()`.
-
 Returns an object with a `url` and `query` property.
+
+If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 ```js
 const queryString = require('query-string');
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
+```
+
+#### options
+
+Type: `object`
+
+The options are the same as for `.parse()`.
+
+Extra options are as below.
+
+##### parseFragmentIdentifier
+
+Parse the fragment identifier from the URL.
+
+Type: `boolean`\
+Default: `false`
+
+```js
+const queryString = require('query-string');
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 
 ### .stringifyUrl(object, options?)
@@ -335,12 +380,23 @@ Returns a string with the URL and a query string.
 
 Query items in the `query` property overrides queries in the `url` property.
 
+The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
+
 ```js
 queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
 
 queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {
+		top: 'foo'
+	},
+	fragmentIdentifier: 'bar'
+});
+//=> 'https://foo.bar?top=foo#bar'
 ```
 
 #### object

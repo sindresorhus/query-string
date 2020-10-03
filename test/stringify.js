@@ -204,6 +204,16 @@ test('should ignore null when skipNull is set', t => {
 	}), 'a=1&c=3');
 });
 
+test('should ignore emptyString when skipEmptyString is set', t => {
+	t.is(queryString.stringify({
+		a: 1,
+		b: '',
+		c: 3
+	}, {
+		skipEmptyString: true
+	}), 'a=1&c=3');
+});
+
 test('should ignore undefined when skipNull is set', t => {
 	t.is(queryString.stringify({
 		a: 1,
@@ -258,6 +268,50 @@ test('should ignore both null and undefined when skipNull is set for arrayFormat
 		skipNull: true,
 		arrayFormat: 'index'
 	}), 'a[0]=1&a[1]=2&c=1');
+});
+
+test('should ignore empty string when skipEmptyString is set for arrayFormat', t => {
+	t.is(queryString.stringify({
+		a: ['', 1, '', 2],
+		b: '',
+		c: 1
+	}, {
+		skipEmptyString: true
+	}), 'a=1&a=2&c=1');
+
+	t.is(queryString.stringify({
+		a: ['', 1, '', 2],
+		b: '',
+		c: 1
+	}, {
+		skipEmptyString: true,
+		arrayFormat: 'bracket'
+	}), 'a[]=1&a[]=2&c=1');
+
+	t.is(queryString.stringify({
+		a: ['', 1, '', 2],
+		b: '',
+		c: 1
+	}, {
+		skipEmptyString: true,
+		arrayFormat: 'comma'
+	}), 'a=1,2&c=1');
+
+	t.is(queryString.stringify({
+		a: ['', 1, '', 2],
+		b: '',
+		c: 1
+	}, {
+		skipEmptyString: true,
+		arrayFormat: 'index'
+	}), 'a[0]=1&a[1]=2&c=1');
+
+	t.is(queryString.stringify({
+		a: ['', '', '', ''],
+		c: 1
+	}, {
+		skipEmptyString: true
+	}), 'c=1');
 });
 
 test('stringify throws TypeError for invalid arrayFormatSeparator', t => {

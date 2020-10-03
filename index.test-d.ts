@@ -23,6 +23,7 @@ expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'comma'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {sort: false}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {skipNull: true}));
+expectType<string>(queryString.stringify({foo: 'bar'}, {skipEmptyString: true}));
 const order = ['c', 'a', 'b'];
 expectType<string>(
 	queryString.stringify(
@@ -86,6 +87,29 @@ expectType<queryString.ParsedUrl>(
 expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=true', {parseBooleans: true})
 );
+expectType<queryString.ParsedUrl>(
+	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true})
+);
 
 // Extract
 expectType<string>(queryString.extract('http://foo.bar/?abc=def&hij=klm'));
+
+expectType<string>(
+	queryString.stringifyUrl({
+		url: 'https://sindresorhus.com',
+		query: {
+			fooMixedArray: [
+				'a',
+				1,
+				true,
+				null,
+				undefined
+			],
+			fooNumber: 1,
+			fooBoolean: true,
+			fooNull: null,
+			fooUndefined: undefined,
+			fooString: 'hi'
+		},
+	})
+);

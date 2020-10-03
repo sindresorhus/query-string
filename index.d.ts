@@ -121,10 +121,25 @@ export interface ParseOptions {
 	```
 	*/
 	readonly parseBooleans?: boolean;
+
+	/**
+	Parse the fragment identifier from the URL and add it to result object.
+
+	@default false
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+	//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
+	```
+	*/
+	readonly parseFragmentIdentifier?: boolean;
 }
 
 export interface ParsedQuery<T = string> {
-	[key: string]: T | T[] | null | undefined;
+	[key: string]: T | T[] | null;
 }
 
 /**
@@ -142,10 +157,19 @@ export function parse(query: string, options?: ParseOptions): ParsedQuery;
 export interface ParsedUrl {
 	readonly url: string;
 	readonly query: ParsedQuery;
+
+	/**
+	The fragment identifier of the URL.
+
+	Present when the `parseFragmentIdentifier` option is `true`.
+	*/
+	readonly fragmentIdentifier?: string;
 }
 
 /**
 Extract the URL and the query string as an object.
+
+If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 @param url - The URL to parse.
 
@@ -155,6 +179,9 @@ import queryString = require('query-string');
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
+
+queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
+//=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 */
 export function parseUrl(url: string, options?: ParseOptions): ParsedUrl;
@@ -283,13 +310,47 @@ export interface StringifyOptions {
 	```
 	*/
 	readonly skipNull?: boolean;
+
+	/**
+	Skip keys with an empty string as the value.
+
+	@default false
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.stringify({a: 1, b: '', c: '', d: 4}, {
+		skipEmptyString: true
+	});
+	//=> 'a=1&d=4'
+	```
+
+	@example
+	```
+	import queryString = require('query-string');
+
+	queryString.stringify({a: '', b: ''}, {
+		skipEmptyString: true
+	});
+	//=> ''
+	```
+	*/
+	readonly skipEmptyString?: boolean;
 }
+
+export type Stringifiable = string | boolean | number | null | undefined;
+
+export type StringifiableRecord = Record<
+	string,
+	Stringifiable | Stringifiable[]
+>;
 
 /**
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: {[key: string]: any},
+	object: StringifiableRecord,
 	options?: StringifyOptions
 ): string;
 
@@ -300,10 +361,26 @@ Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
 
+export interface UrlObject {
+	readonly url: string;
+
+	/**
+	Overrides queries in the `url` property.
+	*/
+	readonly query: StringifiableRecord;
+
+	/**
+	Overrides the fragment identifier in the `url` property.
+	*/
+	readonly fragmentIdentifier?: string;
+}
+
 /**
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
 
 Query items in the `query` property overrides queries in the `url` property.
+
+The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
 
 @example
 ```
@@ -312,9 +389,18 @@ queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'bar'}});
 
 queryString.stringifyUrl({url: 'https://foo.bar?foo=baz', query: {foo: 'bar'}});
 //=> 'https://foo.bar?foo=bar'
+
+queryString.stringifyUrl({
+	url: 'https://foo.bar',
+	query: {
+		top: 'foo'
+	},
+	fragmentIdentifier: 'bar'
+});
+//=> 'https://foo.bar?top=foo#bar'
 ```
 */
 export function stringifyUrl(
-	object: ParsedUrl,
+	object: UrlObject,
 	options?: StringifyOptions
 ): string;
