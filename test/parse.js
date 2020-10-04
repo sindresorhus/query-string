@@ -75,7 +75,7 @@ test('handle `+` correctly', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 });
 
-test('additional tests to clarify exisiting number parsing behavior', t => {
+test('parses numbers with exponential notation as string', t => {
 	t.deepEqual(queryString.parse('192e11=bar'), {'192e11': 'bar'});
 	t.deepEqual(queryString.parse('bar=192e11'), {bar: '192e11'});
 });
