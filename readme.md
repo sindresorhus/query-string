@@ -415,10 +415,10 @@ Type: `object`
 
 Query items to add to the URL.
 
-### .filterElements(url, includeParams, options?)
+### .filterElements(url, keysToKeep, options?)
 ### .filterElements(url, filter, options?)
 
-Filter query parameters from a url.
+Filter query parameters from a URL.
 
 ```js
 queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
@@ -434,17 +434,17 @@ Type: `string`
 
 The url containing the query parameters to filter.
 
-#### includeParams
+#### keysToKeep
 
 Type: `string[]`
 
-The names of the query parameters to retain. All other query parameters will be removed from the url.
+The names of the query parameters to retain. All other query parameters will be removed from the URL.
 
 #### filter
 
-Type: `(name, value) => boolean`
+Type: `(key, value) => boolean`
 
-A filter predicate that will be provided the name of each query parameter and its value. The predicate will be provided with the `name` of the query parameter and its `value`. The `parseNumbers` and `parseBooleans` options affect `value`.
+A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
 #### options
 

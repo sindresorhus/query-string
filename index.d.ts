@@ -406,11 +406,12 @@ export function stringifyUrl(
 ): string;
 
 /**
-Filter query parameters from a url.
+Filter query parameters from a URL.
 
-@param url The url containing the query parameters to filter.
-@param includeParams The names of the query parameters to retain. All other query parameters will be removed from the url.
-@param filter A filter predicate that will be provided the name of each query parameter and its value.
+@param url - The URL containing the query parameters to filter.
+@param keysToKeep - The names of the query parameters to retain. All other query parameters will be removed from the URL.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+@returns The URL with the specified query parameters removed.
 
 @example
 ```
@@ -423,21 +424,21 @@ queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) =>
 */
 export function filterElements(
 	url: string,
-	includeParams: readonly string[],
+	keysToKeep: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
 export function filterElements(
 	url: string,
-	filter: (name: string, value: string | boolean | number) => boolean,
+	filter: (key: string, value: string | boolean | number) => boolean,
 	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
 ): string
 export function filterElements(
 	url: string,
-	filter: (name: string, value: string | boolean) => boolean,
+	filter: (key: string, value: string | boolean) => boolean,
 	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
 ): string
 export function filterElements(
 	url: string,
-	filter: (name: string, value: string | number) => boolean,
+	filter: (key: string, value: string | number) => boolean,
 	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
 ): string
