@@ -423,7 +423,7 @@ queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) =>
 */
 export function filterElements(
 	url: string,
-	includeParams: ReadonlyArray<string>,
+	includeParams: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
 export function filterElements(
