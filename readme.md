@@ -420,6 +420,8 @@ Query items to add to the URL.
 
 Filter query parameters from a URL.
 
+Returns a string with the new URL.
+
 ```js
 queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?foo=1#hello'
@@ -432,13 +434,13 @@ queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) =>
 
 Type: `string`
 
-The url containing the query parameters to filter.
+The URL containing the query parameters to filter.
 
 #### keysToKeep
 
 Type: `string[]`
 
-The names of the query parameters to retain. All other query parameters will be removed from the URL.
+The names of the query parameters to keep. All other query parameters will be removed from the URL.
 
 #### filter
 
