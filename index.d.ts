@@ -415,29 +415,29 @@ Filter query parameters from a URL.
 
 @example
 ```
-queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+queryString.filter('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?foo=1#hello'
 
-queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+queryString.filter('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
 //=> 'https://foo.bar?bar=2#hello'
 ```
 */
-export function filterElements(
+export function filter(
 	url: string,
 	keysToKeep: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
-export function filterElements(
+export function filter(
 	url: string,
 	filter: (key: string, value: string | boolean | number) => boolean,
 	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
 ): string
-export function filterElements(
+export function filter(
 	url: string,
 	filter: (key: string, value: string | boolean) => boolean,
 	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
 ): string
-export function filterElements(
+export function filter(
 	url: string,
 	filter: (key: string, value: string | number) => boolean,
 	options?: {parseNumbers: true} & ParseOptions & StringifyOptions

@@ -415,18 +415,18 @@ Type: `object`
 
 Query items to add to the URL.
 
-### .filterElements(url, keysToKeep, options?)
-### .filterElements(url, filter, options?)
+### .filter(url, keysToKeep, options?)
+### .filter(url, filter, options?)
 
 Filter query parameters from a URL.
 
 Returns a string with the new URL.
 
 ```js
-queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+queryString.filter('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?foo=1#hello'
 
-queryString.filterElements('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+queryString.filter('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
 //=> 'https://foo.bar?bar=2#hello'
 ```
 

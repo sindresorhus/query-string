@@ -378,7 +378,7 @@ exports.stringifyUrl = (input, options) => {
 	return `${url}${queryString}${hash}`;
 };
 
-exports.filterElements = (input, filter, options) => {
+exports.filter = (input, filter, options) => {
 	options = Object.assign({
 		parseFragmentIdentifier: true
 	}, options);
