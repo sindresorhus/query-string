@@ -323,7 +323,7 @@ test('value should not be decoded twice with `arrayFormat` option set as `separa
 });
 
 // See https://github.com/sindresorhus/query-string/issues/242
-test.failing('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
+test('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
 	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
 		id: [1, 2, 3]
 	});
