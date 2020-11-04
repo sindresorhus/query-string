@@ -14,6 +14,7 @@
 		"node": ">=6"
 	},
 	"scripts": {
+		"build": "USE_POLYFILLS=off rollup --config rollup.config.js && USE_POLYFILLS=on rollup --config rollup.config.js",
 		"benchmark": "node benchmark.js",
 		"test": "xo && ava && tsd"
 	},
@@ -42,10 +43,18 @@
 		"strict-uri-encode": "^2.0.0"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.12.3",
+		"@babel/preset-env": "^7.12.1",
+		"@rollup/plugin-commonjs": "^16.0.0",
+		"@rollup/plugin-node-resolve": "^10.0.0",
 		"ava": "^1.4.1",
 		"benchmark": "^2.1.4",
+		"core-js": "^3.6.5",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
+		"rollup": "^2.33.1",
+		"rollup-plugin-babel": "^4.4.0",
+		"rollup-plugin-terser": "^7.0.2",
 		"tsd": "^0.7.3",
 		"xo": "^0.24.0"
 	}
