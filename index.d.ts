@@ -343,7 +343,7 @@ export type Stringifiable = string | boolean | number | null | undefined;
 
 export type StringifiableRecord = Record<
 	string,
-	Stringifiable | Stringifiable[]
+	Stringifiable | readonly Stringifiable[]
 >;
 
 /**
