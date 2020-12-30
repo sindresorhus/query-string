@@ -35,6 +35,17 @@ expectType<string>(
 	)
 );
 
+// Ensure it accepts an `interface`.
+interface Query {
+	foo: string;
+}
+
+const query: Query = {
+	foo: 'bar'
+};
+
+queryString.stringify(query);
+
 // Parse
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
 

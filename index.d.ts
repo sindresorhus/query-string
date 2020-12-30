@@ -350,7 +350,12 @@ export type StringifiableRecord = Record<
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: StringifiableRecord,
+	// TODO: Use the below instead when the following TS issues are fixed:
+	// - https://github.com/microsoft/TypeScript/issues/15300
+	// - https://github.com/microsoft/TypeScript/issues/42021
+	// Context: https://github.com/sindresorhus/query-string/issues/298
+	// object: StringifiableRecord,
+	object: Record<string, any>,
 	options?: StringifyOptions
 ): string;
 
