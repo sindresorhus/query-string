@@ -1,4 +1,4 @@
-# query-string [![Build Status](https://travis-ci.com/sindresorhus/query-string.svg?branch=master)](https://travis-ci.com/github/sindresorhus/query-string) [![](https://badgen.net/bundlephobia/minzip/query-string)](https://bundlephobia.com/result?p=query-string)
+# query-string
 
 > Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
 
