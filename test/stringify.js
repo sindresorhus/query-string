@@ -132,7 +132,7 @@ test('array stringify representation with array commas and null value', t => {
 		bar: [null]
 	}, {
 		arrayFormat: 'comma'
-	}), 'foo=a');
+	}), 'bar=&foo=,a,,');
 });
 
 test('array stringify representation with array commas and 0 value', t => {
@@ -141,7 +141,7 @@ test('array stringify representation with array commas and 0 value', t => {
 		bar: [null]
 	}, {
 		arrayFormat: 'comma'
-	}), 'foo=a,0');
+	}), 'bar=&foo=a,,0');
 });
 
 test('array stringify representation with a bad array format', t => {
