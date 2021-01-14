@@ -59,7 +59,10 @@ export interface ParseOptions {
 		queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3']}
 
-	    queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		queryString.parse('foo[]=1||3||5', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '', 3, '', '5']}
+
+		queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
 		```
 
@@ -272,7 +275,11 @@ export interface StringifyOptions {
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1|2|3'
 
-	    queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		queryString.stringify({foo: [1, '', 3, null, null, 5]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1||3|6'
+		// Note that the nulls were dropped but the empty string was not.
+
+		queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 		```
 
