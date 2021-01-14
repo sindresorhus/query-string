@@ -55,6 +55,9 @@ export interface ParseOptions {
 
 		queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3']}
+
+	    queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
 		```
 
 	- `none`: Parse arrays with elements using duplicate keys:
@@ -262,6 +265,9 @@ export interface StringifyOptions {
 
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1|2|3'
+
+	    queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 		```
 
 	- `none`: Serialize arrays by using duplicate keys:
