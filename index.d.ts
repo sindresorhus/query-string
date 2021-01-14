@@ -50,6 +50,9 @@ export interface ParseOptions {
 		```
 		import queryString = require('query-string');
 
+	    queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: []}
+
 		queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 	 	//=> {foo: ['1']}
 
@@ -259,6 +262,9 @@ export interface StringifyOptions {
 
 		```
 		import queryString = require('query-string');
+
+	    queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]'
 
 		queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1'

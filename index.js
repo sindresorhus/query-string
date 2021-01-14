@@ -371,6 +371,10 @@ exports.stringify = (object, options) => {
 		}
 
 		if (Array.isArray(value)) {
+			if (value.length === 0 && options.arrayFormat === 'bracket-separator') {
+				return encode(key, options) + '[]';
+			}
+
 			return value
 				.reduce(formatter(key), [])
 				.join('&');

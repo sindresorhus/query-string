@@ -159,6 +159,15 @@ test('array stringify representation with array indexes and sparse array', t => 
 	t.is(queryString.stringify({bar: fixture}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
 });
 
+test('array stringify representation with brackets and separators with empty array', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: []
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]&foo');
+});
+
 test('array stringify representation with brackets and separators with single value', t => {
 	t.is(queryString.stringify({
 		foo: null,
