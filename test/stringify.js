@@ -204,6 +204,15 @@ test('array stringify representation with brackets and separators with a multipl
 	}), 'bar[]=,two,&foo');
 });
 
+test('array stringify representation with brackets and separators with dropped null values', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', null, 'three', null, '', 'six']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=one,three,,six&foo');
+});
+
 test('should sort keys in given order', t => {
 	const fixture = ['c', 'a', 'b'];
 	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);
