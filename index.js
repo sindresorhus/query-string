@@ -244,6 +244,10 @@ function parse(query, options) {
 	}
 
 	for (const param of query.split('&')) {
+		if (param === '') {
+			continue;
+		}
+
 		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
 
 		// Missing `=` should be `null`:
