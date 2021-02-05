@@ -378,7 +378,7 @@ exports.stringifyUrl = (input, options) => {
 	return `${url}${queryString}${hash}`;
 };
 
-exports.filter = (input, filter, options) => {
+exports.pick = (input, filter, options) => {
 	options = Object.assign({
 		parseFragmentIdentifier: true
 	}, options);
@@ -390,3 +390,5 @@ exports.filter = (input, filter, options) => {
 		fragmentIdentifier
 	}, options);
 };
+
+exports.exclude = (input, filter, options) => exports.pick(input, Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value), options);

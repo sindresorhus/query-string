@@ -406,38 +406,76 @@ export function stringifyUrl(
 ): string;
 
 /**
-Filter query parameters from a URL.
+Pick query parameters from a URL.
 
-@param url - The URL containing the query parameters to filter.
+@param url - The URL containing the query parameters to pick.
 @param keysToKeep - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
-@returns The URL with the query parameters filtered.
+@returns The URL with the query parameters picked.
 
 @example
 ```
-queryString.filter('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?foo=1#hello'
 
-queryString.filter('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
 //=> 'https://foo.bar?bar=2#hello'
 ```
 */
-export function filter(
+export function pick(
 	url: string,
 	keysToKeep: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
-export function filter(
+export function pick(
 	url: string,
 	filter: (key: string, value: string | boolean | number) => boolean,
 	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
 ): string
-export function filter(
+export function pick(
 	url: string,
 	filter: (key: string, value: string | boolean) => boolean,
 	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
 ): string
-export function filter(
+export function pick(
+	url: string,
+	filter: (key: string, value: string | number) => boolean,
+	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+
+/**
+Exclude query parameters from a URL. Like `.pick()` but reversed.
+
+@param url - The URL containing the query parameters to exclude.
+@param keysToRemove - The names of the query parameters to remove. All other query parameters will be removed from the URL.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+@returns The URL with the query parameters excluded.
+
+@example
+```
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?bar=2#hello'
+
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?foo=1#hello'
+```
+*/
+export function exclude(
+	url: string,
+	keysToRemove: readonly string[],
+	options?: ParseOptions & StringifyOptions
+): string
+export function exclude(
+	url: string,
+	filter: (key: string, value: string | boolean | number) => boolean,
+	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+export function exclude(
+	url: string,
+	filter: (key: string, value: string | boolean) => boolean,
+	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+): string
+export function exclude(
 	url: string,
 	filter: (key: string, value: string | number) => boolean,
 	options?: {parseNumbers: true} & ParseOptions & StringifyOptions

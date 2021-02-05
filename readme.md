@@ -415,10 +415,18 @@ Type: `object`
 
 Query items to add to the URL.
 
-### .filter(url, keysToKeep, options?)
-### .filter(url, filter, options?)
+### .pick(url, keysToKeep, options?)
+### .pick(url, filter, options?)
 
-Filter query parameters from a URL.
+Pick query parameters from a URL.
+
+Returns a string with the new URL.
+
+### .exclude(url, keysToRemove, options?)
+
+### .exclude(url, filter, options?)
+
+Exclude query parameters from a URL.
 
 Returns a string with the new URL.
 
@@ -436,7 +444,7 @@ Type: `string`
 
 The URL containing the query parameters to filter.
 
-#### keysToKeep
+#### keysToKeep | keysToRemove
 
 Type: `string[]`
 
