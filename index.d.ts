@@ -411,7 +411,7 @@ Pick query parameters from a URL.
 @param url - The URL containing the query parameters to pick.
 @param keysToKeep - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
-@returns The URL with the query parameters picked.
+@returns The URL with the picked query parameters.
 
 @example
 ```
