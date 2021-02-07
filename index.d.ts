@@ -448,7 +448,7 @@ export function pick(
 Exclude query parameters from a URL. Like `.pick()` but reversed.
 
 @param url - The URL containing the query parameters to exclude.
-@param keys - The names of the query parameters to remove. All other query parameters will be removed from the URL.
+@param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
 @returns The URL without the excluded the query parameters.
