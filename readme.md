@@ -415,14 +415,14 @@ Type: `object`
 
 Query items to add to the URL.
 
-### .pick(url, keysToKeep, options?)
+### .pick(url, keys, options?)
 ### .pick(url, filter, options?)
 
 Pick query parameters from a URL.
 
 Returns a string with the new URL.
 
-### .exclude(url, keysToRemove, options?)
+### .exclude(url, keys, options?)
 
 ### .exclude(url, filter, options?)
 
@@ -444,11 +444,11 @@ Type: `string`
 
 The URL containing the query parameters to filter.
 
-#### keysToKeep | keysToRemove
+#### keys
 
 Type: `string[]`
 
-The names of the query parameters to keep. All other query parameters will be removed from the URL.
+The names of the query parameters to keep or remove depending on the function used. All other query parameters will be removed from the URL.
 
 #### filter
 

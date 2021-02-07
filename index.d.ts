@@ -409,8 +409,9 @@ export function stringifyUrl(
 Pick query parameters from a URL.
 
 @param url - The URL containing the query parameters to pick.
-@param keysToKeep - The names of the query parameters to keep. All other query parameters will be removed from the URL.
+@param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+
 @returns The URL with the picked query parameters.
 
 @example
@@ -424,7 +425,7 @@ queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value ===
 */
 export function pick(
 	url: string,
-	keysToKeep: readonly string[],
+	keys: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
 export function pick(
@@ -447,9 +448,10 @@ export function pick(
 Exclude query parameters from a URL. Like `.pick()` but reversed.
 
 @param url - The URL containing the query parameters to exclude.
-@param keysToRemove - The names of the query parameters to remove. All other query parameters will be removed from the URL.
+@param keys - The names of the query parameters to remove. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
-@returns The URL with the query parameters excluded.
+
+@returns The URL without the excluded the query parameters.
 
 @example
 ```
@@ -462,7 +464,7 @@ queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value 
 */
 export function exclude(
 	url: string,
-	keysToRemove: readonly string[],
+	keys: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string
 export function exclude(
