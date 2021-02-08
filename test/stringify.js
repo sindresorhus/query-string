@@ -126,13 +126,24 @@ test('array stringify representation with array commas', t => {
 	}), 'bar=one,two&foo');
 });
 
-test('array stringify representation with array commas and null value', t => {
+test('array stringify representation with array commas, null value and empty value', t => {
 	t.is(queryString.stringify({
 		foo: [null, 'a', null, ''],
 		bar: [null]
 	}, {
 		arrayFormat: 'comma'
 	}), 'bar=&foo=,a,,');
+});
+
+test('array stringify representation with array commas, null value and empty value (should ignore both)', t => {
+	t.is(queryString.stringify({
+		foo: [null, 'a', null, ''],
+		bar: [null]
+	}, {
+		skipNull: true,
+		skipEmptyString: true,
+		arrayFormat: 'comma'
+	}), 'foo=a');
 });
 
 test('array stringify representation with array commas and 0 value', t => {
