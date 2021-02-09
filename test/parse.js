@@ -13,6 +13,11 @@ test('query strings starting with a `&`', t => {
 	t.deepEqual(queryString.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
+test('query strings ending with a `&`', t => {
+	t.deepEqual(queryString.parse('foo=bar&'), {foo: 'bar'});
+	t.deepEqual(queryString.parse('foo=bar&&&'), {foo: 'bar'});
+});
+
 test('parse a query string', t => {
 	t.deepEqual(queryString.parse('foo=bar'), {foo: 'bar'});
 });
