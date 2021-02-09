@@ -422,6 +422,16 @@ Pick query parameters from a URL.
 
 Returns a string with the new URL.
 
+```js
+const queryString = require('query-string');
+
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?foo=1#hello'
+
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?bar=2#hello'
+```
+
 ### .exclude(url, keys, options?)
 ### .exclude(url, filter, options?)
 
@@ -430,11 +440,13 @@ Exclude query parameters from a URL.
 Returns a string with the new URL.
 
 ```js
-queryString.filter('https://foo.bar?foo=1&bar=2#hello', ['foo']);
-//=> 'https://foo.bar?foo=1#hello'
+const queryString = require('query-string');
 
-queryString.filter('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?bar=2#hello'
+
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?foo=1#hello'
 ```
 
 #### url
