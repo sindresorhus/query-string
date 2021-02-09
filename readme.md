@@ -459,7 +459,7 @@ The URL containing the query parameters to filter.
 
 Type: `string[]`
 
-The names of the query parameters to keep or remove depending on the function used. All other query parameters will be removed from the URL.
+The names of the query parameters to filter based on the function used.
 
 #### filter
 
