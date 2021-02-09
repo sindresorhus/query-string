@@ -423,7 +423,6 @@ Pick query parameters from a URL.
 Returns a string with the new URL.
 
 ### .exclude(url, keys, options?)
-
 ### .exclude(url, filter, options?)
 
 Exclude query parameters from a URL.
