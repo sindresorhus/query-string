@@ -237,27 +237,30 @@ test('circuit original -> parse - > stringify -> sorted original', t => {
 });
 
 test('circuit parse -> stringify with array commas', t => {
-	const original = 'a=&b=&c=,a,,';
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
 	const expected = {
-		c: [null, 'a', '', null],
-		b: [null],
-		a: ['']
+		c: ['', 'a', '', ''],
+		b: '',
+		a: ''
 	};
-
-	// Z const actually = {
-	// 	c: ['', 'a', '', ''],
-	// 	b: '',
-	// 	a: ''
-	// };
-
 	const options = {
-		// HOW_ABOUT skipEmpty: true,
 		arrayFormat: 'comma'
 	};
 
-	t.deepEqual(queryString.parse(original, options), original);
+	t.deepEqual(queryString.parse(original, options), expected);
 
-	t.is(queryString.stringify(expected, options), original);
+	t.is(queryString.stringify(expected, options), sortedOriginal);
+});
+
+test('circuit original -> parse - > stringify with array commas -> sorted original', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const options = {
+		arrayFormat: 'comma'
+	};
+
+	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
 });
 
 test('decode keys and values', t => {
