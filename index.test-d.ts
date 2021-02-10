@@ -124,3 +124,9 @@ expectType<string>(
 		},
 	})
 );
+
+// Pick
+expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']))
+
+// Exclude
+expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']))

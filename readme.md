@@ -415,6 +415,64 @@ Type: `object`
 
 Query items to add to the URL.
 
+### .pick(url, keys, options?)
+### .pick(url, filter, options?)
+
+Pick query parameters from a URL.
+
+Returns a string with the new URL.
+
+```js
+const queryString = require('query-string');
+
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?foo=1#hello'
+
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?bar=2#hello'
+```
+
+### .exclude(url, keys, options?)
+### .exclude(url, filter, options?)
+
+Exclude query parameters from a URL.
+
+Returns a string with the new URL.
+
+```js
+const queryString = require('query-string');
+
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?bar=2#hello'
+
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?foo=1#hello'
+```
+
+#### url
+
+Type: `string`
+
+The URL containing the query parameters to filter.
+
+#### keys
+
+Type: `string[]`
+
+The names of the query parameters to filter based on the function used.
+
+#### filter
+
+Type: `(key, value) => boolean`
+
+A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+
+#### options
+
+Type: `object`
+
+[Parse options](#options) and [stringify options](#options-1).
+
 ## Nesting
 
 This module intentionally doesn't support nesting as it's not spec'd and varies between implementations, which causes a lot of [edge cases](https://github.com/visionmedia/node-querystring/issues).
