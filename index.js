@@ -393,6 +393,6 @@ exports.pick = (input, filter, options) => {
 
 exports.exclude = (input, filter, options) => {
 	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
-	
+
 	return exports.pick(input, exclusionFilter, options);
 };
