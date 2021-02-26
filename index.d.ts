@@ -372,7 +372,7 @@ export interface UrlObject {
 	/**
 	Overrides queries in the `url` property.
 	*/
-	readonly query: StringifiableRecord;
+	readonly query?: StringifiableRecord;
 
 	/**
 	Overrides the fragment identifier in the `url` property.
