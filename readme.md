@@ -231,7 +231,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 
 queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 //=> 'foo=1,,'
-// Note that typing information for null values are lost
+// Note that typing information for null values is lost
 // and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
 ```
 
