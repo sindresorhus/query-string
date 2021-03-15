@@ -130,7 +130,7 @@ queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: 
 ```js
 const queryString = require('query-string');
 
-//Can handle arrays on a single value to product explicit array
+// Can handle arrays on a single value to product explicit array
 queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> {foo: ['1']}
 
