@@ -261,7 +261,7 @@ export interface StringifyOptions {
 		//=> 'foo=1|2|3'
 		```
 
-	- `bracket-separator`: Serialize arrays by putting an explicitly trailing bracket and separating elements with character:
+	- `bracket-separator`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
 
 		```
 		import queryString = require('query-string');

@@ -125,17 +125,25 @@ queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: 
 //=> {foo: ['1', '2', '3']}
 ```
 
-- `'bracket-separator'`: Parse explicitly bracket-postfixed arrays with elements separated by a custom character:
+- `'bracket-separator'`: Parse arrays (that are explicitly marked with brackets) with elements separated by a custom character:
 
 ```js
 const queryString = require('query-string');
 
-// Can handle arrays on a single value to product explicit array
+queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: []}
+
 queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> {foo: ['1']}
 
-queryString.parse('foo[]=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> {foo: ['1', '2', '3']}
+
+queryString.parse('foo[]=1||3||5', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '', 3, '', '5']}
+
+queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
 ```
 
 - `'none'`: Parse arrays with elements using duplicate keys:
@@ -252,13 +260,26 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSe
 //=> 'foo=1|2|3'
 ```
 
-- `'bracket-separator'`: Serialize arrays by explicitly postfixing arrays with brackets and separating elements with a custom character:
+- `'bracket-separator'`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
 
 ```js
 const queryString = require('query-string');
 
+queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]'
+
+queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1'
+
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> 'foo[]=1|2|3'
+
+queryString.stringify({foo: [1, '', 3, null, null, 5]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1||3|6'
+// Note that the nulls were dropped but the empty string was not.
+
+queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 ```
 
 - `'none'`: Serialize arrays by using duplicate keys:
