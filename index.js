@@ -48,12 +48,19 @@ function encoderForArrayFormat(options) {
 
 		case 'comma':
 		case 'separator':
+		case 'bracket-separator': {
+			const isBracketSeparator = options.arrayFormat === 'bracket-separator';
+
 			return key => (result, value) => {
-				if (value === null || value === undefined || value.length === 0) {
+				if (
+					value === null ||
+					value === undefined ||
+					(value.length === 0 && !isBracketSeparator) // Explicitly allow empty strings for bracket-separator only
+				) {
 					return result;
 				}
 
-				const keyValueSep = options.arrayFormat === 'bracket-separator' ?
+				const keyValueSep = isBracketSeparator ?
 					'[]=' :
 					'=';
 
@@ -63,23 +70,7 @@ function encoderForArrayFormat(options) {
 
 				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
 			};
-
-		case 'bracket-separator':
-			return key => (result, value) => {
-				if (value === null || value === undefined) { // Explicitly allow empty strings
-					return result;
-				}
-
-				const keyValueSep = options.arrayFormat === 'bracket-separator' ?
-					'[]=' :
-					'=';
-
-				if (result.length === 0) {
-					return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
-				}
-
-				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
-			};
+		}
 
 		default:
 			return key => (result, value) => {
