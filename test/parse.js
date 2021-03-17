@@ -13,6 +13,11 @@ test('query strings starting with a `&`', t => {
 	t.deepEqual(queryString.parse('&foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
+test('query strings ending with a `&`', t => {
+	t.deepEqual(queryString.parse('foo=bar&'), {foo: 'bar'});
+	t.deepEqual(queryString.parse('foo=bar&&&'), {foo: 'bar'});
+});
+
 test('parse a query string', t => {
 	t.deepEqual(queryString.parse('foo=bar'), {foo: 'bar'});
 });
@@ -73,6 +78,11 @@ test('return empty object if no qss can be found', t => {
 
 test('handle `+` correctly', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
+});
+
+test('parses numbers with exponential notation as string', t => {
+	t.deepEqual(queryString.parse('192e11=bar'), {'192e11': 'bar'});
+	t.deepEqual(queryString.parse('bar=192e11'), {bar: '192e11'});
 });
 
 test('handle `+` correctly when not decoding', t => {
@@ -238,7 +248,7 @@ test('query strings having ordered index arrays and format option as `index`', t
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
 });
 
-test('circuit parse -> stringify', t => {
+test('circuit parse → stringify', t => {
 	const original = 'foo[3]=foo&foo[2]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const expected = {bat: 'buz', foo: ['', 'one', null, 'foo']};
@@ -251,11 +261,38 @@ test('circuit parse -> stringify', t => {
 	t.is(queryString.stringify(expected, options), sortedOriginal);
 });
 
-test('circuit original -> parse - > stringify -> sorted original', t => {
+test('circuit original → parse → stringify → sorted original', t => {
 	const original = 'foo[21474836471]=foo&foo[21474836470]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const options = {
 		arrayFormat: 'index'
+	};
+
+	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
+});
+
+test('circuit parse → stringify with array commas', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const expected = {
+		c: ['', 'a', '', ''],
+		b: '',
+		a: ''
+	};
+	const options = {
+		arrayFormat: 'comma'
+	};
+
+	t.deepEqual(queryString.parse(original, options), expected);
+
+	t.is(queryString.stringify(expected, options), sortedOriginal);
+});
+
+test('circuit original → parse → stringify with array commas → sorted original', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const options = {
+		arrayFormat: 'comma'
 	};
 
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
@@ -348,7 +385,7 @@ test('value should not be decoded twice with `arrayFormat` option set as `separa
 });
 
 // See https://github.com/sindresorhus/query-string/issues/242
-test.failing('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
+test('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
 	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
 		id: [1, 2, 3]
 	});

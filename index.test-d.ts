@@ -35,6 +35,17 @@ expectType<string>(
 	)
 );
 
+// Ensure it accepts an `interface`.
+interface Query {
+	foo: string;
+}
+
+const query: Query = {
+	foo: 'bar'
+};
+
+queryString.stringify(query);
+
 // Parse
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
 
@@ -93,3 +104,29 @@ expectType<queryString.ParsedUrl>(
 
 // Extract
 expectType<string>(queryString.extract('http://foo.bar/?abc=def&hij=klm'));
+
+expectType<string>(
+	queryString.stringifyUrl({
+		url: 'https://sindresorhus.com',
+		query: {
+			fooMixedArray: [
+				'a',
+				1,
+				true,
+				null,
+				undefined
+			],
+			fooNumber: 1,
+			fooBoolean: true,
+			fooNull: null,
+			fooUndefined: undefined,
+			fooString: 'hi'
+		},
+	})
+);
+
+// Pick
+expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']))
+
+// Exclude
+expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']))

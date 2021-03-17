@@ -250,6 +250,11 @@ export interface StringifyOptions {
 
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 		//=> 'foo=1,2,3'
+
+		queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
+		//=> 'foo=1,,'
+		// Note that typing information for null values is lost
+		// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
 		```
 
 	- `separator`: Serialize arrays by separating elements with character:
@@ -382,11 +387,23 @@ export interface StringifyOptions {
 	readonly skipEmptyString?: boolean;
 }
 
+export type Stringifiable = string | boolean | number | null | undefined;
+
+export type StringifiableRecord = Record<
+	string,
+	Stringifiable | readonly Stringifiable[]
+>;
+
 /**
 Stringify an object into a query string and sort the keys.
 */
 export function stringify(
-	object: {[key: string]: any},
+	// TODO: Use the below instead when the following TS issues are fixed:
+	// - https://github.com/microsoft/TypeScript/issues/15300
+	// - https://github.com/microsoft/TypeScript/issues/42021
+	// Context: https://github.com/sindresorhus/query-string/issues/298
+	// object: StringifiableRecord,
+	object: Record<string, any>,
 	options?: StringifyOptions
 ): string;
 
@@ -396,6 +413,20 @@ Extract a query string from a URL that can be passed into `.parse()`.
 Note: This behaviour can be changed with the `skipNull` option.
 */
 export function extract(url: string): string;
+
+export interface UrlObject {
+	readonly url: string;
+
+	/**
+	Overrides queries in the `url` property.
+	*/
+	readonly query?: StringifiableRecord;
+
+	/**
+	Overrides the fragment identifier in the `url` property.
+	*/
+	readonly fragmentIdentifier?: string;
+}
 
 /**
 Stringify an object into a URL with a query string and sorting the keys. The inverse of [`.parseUrl()`](https://github.com/sindresorhus/query-string#parseurlstring-options)
@@ -423,6 +454,84 @@ queryString.stringifyUrl({
 ```
 */
 export function stringifyUrl(
-	object: ParsedUrl,
+	object: UrlObject,
 	options?: StringifyOptions
 ): string;
+
+/**
+Pick query parameters from a URL.
+
+@param url - The URL containing the query parameters to pick.
+@param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+
+@returns The URL with the picked query parameters.
+
+@example
+```
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?foo=1#hello'
+
+queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?bar=2#hello'
+```
+*/
+export function pick(
+	url: string,
+	keys: readonly string[],
+	options?: ParseOptions & StringifyOptions
+): string
+export function pick(
+	url: string,
+	filter: (key: string, value: string | boolean | number) => boolean,
+	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+export function pick(
+	url: string,
+	filter: (key: string, value: string | boolean) => boolean,
+	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+): string
+export function pick(
+	url: string,
+	filter: (key: string, value: string | number) => boolean,
+	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+
+/**
+Exclude query parameters from a URL. Like `.pick()` but reversed.
+
+@param url - The URL containing the query parameters to exclude.
+@param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+
+@returns The URL without the excluded the query parameters.
+
+@example
+```
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', ['foo']);
+//=> 'https://foo.bar?bar=2#hello'
+
+queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value === 2, {parseNumbers: true});
+//=> 'https://foo.bar?foo=1#hello'
+```
+*/
+export function exclude(
+	url: string,
+	keys: readonly string[],
+	options?: ParseOptions & StringifyOptions
+): string
+export function exclude(
+	url: string,
+	filter: (key: string, value: string | boolean | number) => boolean,
+	options?: {parseBooleans: true, parseNumbers: true} & ParseOptions & StringifyOptions
+): string
+export function exclude(
+	url: string,
+	filter: (key: string, value: string | boolean) => boolean,
+	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+): string
+export function exclude(
+	url: string,
+	filter: (key: string, value: string | number) => boolean,
+	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string
