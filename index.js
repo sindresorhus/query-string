@@ -50,12 +50,20 @@ function encoderForArrayFormat(options) {
 		case 'comma':
 		case 'separator':
 			return key => (result, value) => {
-				if (value === null || value === undefined || value.length === 0) {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
 				if (result.length === 0) {
-					return [[encode(key, options), '=', encode(value, options)].join('')];
+					return [[encode(key, options), '=', encode(value === null ? '' : value, options)].join('')];
+				}
+
+				if (value === null || value === '') {
+					return [[result, ''].join(options.arrayFormatSeparator)];
 				}
 
 				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];

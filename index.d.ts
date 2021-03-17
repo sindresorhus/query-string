@@ -229,6 +229,11 @@ export interface StringifyOptions {
 
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 		//=> 'foo=1,2,3'
+
+		queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
+		//=> 'foo=1,,'
+		// Note that typing information for null values is lost
+		// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
 		```
 
   - `separator`: Serialize arrays by separating elements with character:
