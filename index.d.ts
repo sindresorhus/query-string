@@ -53,14 +53,17 @@ export interface ParseOptions {
 		queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: []}
 
+		queryString.parse('foo[]=', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['']}
+
 		queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 	 	//=> {foo: ['1']}
 
 		queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3']}
 
-		queryString.parse('foo[]=1||3||5', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-		//=> {foo: ['1', '', 3, '', '5']}
+		queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '', 3, '', '', '6']}
 
 		queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
@@ -274,15 +277,20 @@ export interface StringifyOptions {
 		queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]'
 
+		queryString.stringify({foo: ['']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]='
+
 		queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1'
 
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1|2|3'
 
-		queryString.stringify({foo: [1, '', 3, null, null, 5]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1||3|||6'
+
+		queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|', skipNull: true});
 		//=> 'foo[]=1||3|6'
-		// Note that the nulls were dropped but the empty string was not.
 
 		queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
