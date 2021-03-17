@@ -141,7 +141,7 @@ function parserForArrayFormat(options) {
 
 		case 'bracket-separator':
 			return (key, value, accumulator) => {
-				const isArray = /(\[\])$/.exec(key);
+				const isArray = /(\[\])$/.test(key);
 				key = key.replace(/\[\]$/, '');
 
 				if (!isArray) {
@@ -149,16 +149,16 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				const arrValue = value === null ?
+				const arrayValue = value === null ?
 					[] :
 					value.split(options.arrayFormatSeparator).map(item => decode(item, options));
 
 				if (accumulator[key] === undefined) {
-					accumulator[key] = arrValue;
+					accumulator[key] = arrayValue;
 					return;
 				}
 
-				accumulator[key] = [].concat(accumulator[key], arrValue);
+				accumulator[key] = [].concat(accumulator[key], arrayValue);
 			};
 
 		default:
