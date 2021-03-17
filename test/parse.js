@@ -213,7 +213,7 @@ test('query strings having ordered index arrays and format option as `index`', t
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
 });
 
-test('circuit parse -> stringify', t => {
+test('circuit parse → stringify', t => {
 	const original = 'foo[3]=foo&foo[2]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const expected = {bat: 'buz', foo: ['', 'one', null, 'foo']};
@@ -226,7 +226,7 @@ test('circuit parse -> stringify', t => {
 	t.is(queryString.stringify(expected, options), sortedOriginal);
 });
 
-test('circuit original -> parse - > stringify -> sorted original', t => {
+test('circuit original → parse → stringify → sorted original', t => {
 	const original = 'foo[21474836471]=foo&foo[21474836470]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const options = {
@@ -236,7 +236,7 @@ test('circuit original -> parse - > stringify -> sorted original', t => {
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
 });
 
-test('circuit parse -> stringify with array commas', t => {
+test('circuit parse → stringify with array commas', t => {
 	const original = 'c=,a,,&b=&a=';
 	const sortedOriginal = 'a=&b=&c=,a,,';
 	const expected = {
@@ -253,7 +253,7 @@ test('circuit parse -> stringify with array commas', t => {
 	t.is(queryString.stringify(expected, options), sortedOriginal);
 });
 
-test('circuit original -> parse - > stringify with array commas -> sorted original', t => {
+test('circuit original → parse → stringify with array commas → sorted original', t => {
 	const original = 'c=,a,,&b=&a=';
 	const sortedOriginal = 'a=&b=&c=,a,,';
 	const options = {
