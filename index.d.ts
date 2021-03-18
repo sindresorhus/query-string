@@ -45,6 +45,30 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3']}
 		```
 
+	- `bracket-separator`: Parse arrays (that are explicitly marked with brackets) with elements separated by a custom character:
+
+		```
+		import queryString = require('query-string');
+
+		queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: []}
+
+		queryString.parse('foo[]=', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['']}
+
+		queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+	 	//=> {foo: ['1']}
+
+		queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '2', '3']}
+
+		queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '', 3, '', '', '6']}
+
+		queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
+		```
+
 	- `none`: Parse arrays with elements using duplicate keys:
 
 		```
@@ -54,7 +78,7 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -236,13 +260,40 @@ export interface StringifyOptions {
 		// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
 		```
 
-  - `separator`: Serialize arrays by separating elements with character:
+	- `separator`: Serialize arrays by separating elements with character:
 
 		```
 		import queryString = require('query-string');
 
 		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
 		//=> 'foo=1|2|3'
+		```
+
+	- `bracket-separator`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
+
+		```
+		import queryString = require('query-string');
+
+		queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]'
+
+		queryString.stringify({foo: ['']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]='
+
+		queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1'
+
+		queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1|2|3'
+
+		queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1||3|||6'
+
+		queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|', skipNull: true});
+		//=> 'foo[]=1||3|6'
+
+		queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 		```
 
 	- `none`: Serialize arrays by using duplicate keys:
@@ -254,7 +305,7 @@ export interface StringifyOptions {
 		//=> 'foo=1&foo=2&foo=3'
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.

@@ -49,6 +49,11 @@ function encoderForArrayFormat(options) {
 
 		case 'comma':
 		case 'separator':
+		case 'bracket-separator': {
+			const keyValueSep = options.arrayFormat === 'bracket-separator' ?
+				'[]=' :
+				'=';
+
 			return key => (result, value) => {
 				if (
 					value === undefined ||
@@ -58,16 +63,16 @@ function encoderForArrayFormat(options) {
 					return result;
 				}
 
-				if (result.length === 0) {
-					return [[encode(key, options), '=', encode(value === null ? '' : value, options)].join('')];
-				}
+				// Translate null to an empty string so that it doesn't serialize as 'null'
+				value = value === null ? '' : value;
 
-				if (value === null || value === '') {
-					return [[result, ''].join(options.arrayFormatSeparator)];
+				if (result.length === 0) {
+					return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
 				}
 
 				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
 			};
+		}
 
 		default:
 			return key => (result, value) => {
@@ -136,6 +141,28 @@ function parserForArrayFormat(options) {
 				value = isEncodedArray ? decode(value, options) : value;
 				const newValue = isArray || isEncodedArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
+			};
+
+		case 'bracket-separator':
+			return (key, value, accumulator) => {
+				const isArray = /(\[\])$/.test(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!isArray) {
+					accumulator[key] = value ? decode(value, options) : value;
+					return;
+				}
+
+				const arrayValue = value === null ?
+					[] :
+					value.split(options.arrayFormatSeparator).map(item => decode(item, options));
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = arrayValue;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], arrayValue);
 			};
 
 		default:
@@ -261,7 +288,7 @@ function parse(query, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : ['comma', 'separator'].includes(options.arrayFormat) ? value : decode(value, options);
+		value = value === undefined ? null : ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options);
 		formatter(decode(key, options), value, ret);
 	}
 
@@ -343,6 +370,10 @@ exports.stringify = (object, options) => {
 		}
 
 		if (Array.isArray(value)) {
+			if (value.length === 0 && options.arrayFormat === 'bracket-separator') {
+				return encode(key, options) + '[]';
+			}
+
 			return value
 				.reduce(formatter(key), [])
 				.join('&');
