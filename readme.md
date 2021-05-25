@@ -56,7 +56,9 @@
 $ npm install query-string
 ```
 
-This module targets Node.js 6 or later and the latest version of Chrome, Firefox, and Safari. If you want support for older browsers, or, if your project is using create-react-app v1, use version 5: `npm install query-string@5`.
+**Not `npm install querystring`!!!!!**
+
+This module targets Node.js 6 or later and the latest version of Chrome, Firefox, and Safari.
 
 ## Usage
 
