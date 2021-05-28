@@ -5,6 +5,22 @@ const splitOnFirst = require('split-on-first');
 const filterObject = require('filter-obj');
 
 const isNullOrUndefined = value => value === null || value === undefined;
+// eslint-disable-next-line no-self-compare
+const numberIsNaN = input => typeof input === 'number' && input !== input;
+const assign = (...objects) => {
+	const merged = {};
+
+	for (let i = 0; i < objects.length; i++) {
+		const obj = objects[i];
+		for (const param in obj) {
+			if (Object.prototype.hasOwnProperty.call(obj, param)) {
+				merged[param] = obj[param];
+			}
+		}
+	}
+
+	return merged;
+};
 
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
@@ -243,7 +259,7 @@ function extract(input) {
 }
 
 function parseValue(value, options) {
-	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+	if (options.parseNumbers && !numberIsNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
 		value = Number(value);
 	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 		value = value.toLowerCase() === 'true';
@@ -253,7 +269,7 @@ function parseValue(value, options) {
 }
 
 function parse(query, options) {
-	options = Object.assign({
+	options = assign({
 		decode: true,
 		sort: true,
 		arrayFormat: 'none',
@@ -328,7 +344,7 @@ exports.stringify = (object, options) => {
 		return '';
 	}
 
-	options = Object.assign({
+	options = assign({
 		encode: true,
 		strict: true,
 		arrayFormat: 'none',
@@ -384,13 +400,13 @@ exports.stringify = (object, options) => {
 };
 
 exports.parseUrl = (url, options) => {
-	options = Object.assign({
+	options = assign({
 		decode: true
 	}, options);
 
 	const [url_, hash] = splitOnFirst(url, '#');
 
-	return Object.assign(
+	return assign(
 		{
 			url: url_.split('?')[0] || '',
 			query: parse(extract(url), options)
@@ -400,7 +416,7 @@ exports.parseUrl = (url, options) => {
 };
 
 exports.stringifyUrl = (object, options) => {
-	options = Object.assign({
+	options = assign({
 		encode: true,
 		strict: true
 	}, options);
@@ -409,7 +425,7 @@ exports.stringifyUrl = (object, options) => {
 	const queryFromUrl = exports.extract(object.url);
 	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
 
-	const query = Object.assign(parsedQueryFromUrl, object.query);
+	const query = assign(parsedQueryFromUrl, object.query);
 	let queryString = exports.stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
@@ -424,7 +440,7 @@ exports.stringifyUrl = (object, options) => {
 };
 
 exports.pick = (input, filter, options) => {
-	options = Object.assign({
+	options = assign({
 		parseFragmentIdentifier: true
 	}, options);
 
