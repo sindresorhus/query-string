@@ -136,8 +136,8 @@ function parserForArrayFormat(options) {
 		case 'comma':
 		case 'separator':
 			return (key, value, accumulator) => {
-				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
-				const isEncodedArray = (typeof value === 'string' && !isArray && decode(value, options).includes(options.arrayFormatSeparator));
+				const isArray = typeof value === 'string' && value.indexOf(options.arrayFormatSeparator) !== -1;
+				const isEncodedArray = (typeof value === 'string' && !isArray && decode(value, options).indexOf(options.arrayFormatSeparator) !== -1);
 				value = isEncodedArray ? decode(value, options) : value;
 				const newValue = isArray || isEncodedArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
@@ -288,7 +288,7 @@ function parse(query, options) {
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options);
+		value = value === undefined ? null : ['comma', 'separator', 'bracket-separator'].indexOf(options.arrayFormat) === -1 ? decode(value, options) : value;
 		formatter(decode(key, options), value, ret);
 	}
 
@@ -437,7 +437,7 @@ exports.pick = (input, filter, options) => {
 };
 
 exports.exclude = (input, filter, options) => {
-	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
+	const exclusionFilter = Array.isArray(filter) ? key => filter.indexOf(key) === -1 : (key, value) => !filter(key, value);
 
 	return exports.pick(input, exclusionFilter, options);
 };
