@@ -620,6 +620,12 @@ queryString.stringify({foo: undefined});
 //=> ''
 ```
 
+## FAQ
+
+### Why is it parsing `+` as a space?
+
+See [this answer](https://github.com/sindresorhus/query-string/issues/305).
+
 ## query-string for enterprise
 
 Available as part of the Tidelift Subscription.
