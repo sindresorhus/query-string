@@ -15,3 +15,7 @@ test('excludes elements in a URL with a filter predicate', t => {
 		parseNumbers: true
 	}), 'http://example.com/?b=2&c=3#a');
 });
+
+test('excludes elements in a URL without encoding fragment identifiers', t => {
+	t.is(queryString.exclude('https://example.com?a=b#/home', ['a']), 'https://example.com#/home');
+});

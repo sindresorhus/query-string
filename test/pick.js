@@ -15,3 +15,7 @@ test('picks elements in a URL with a filter predicate', t => {
 		parseNumbers: true
 	}), 'http://example.com/?a=1#a');
 });
+
+test('picks elements in a URL without encoding fragment identifiers', t => {
+	t.is(queryString.pick('https://example.com?a=b#/home', []), 'https://example.com#/home');
+});
