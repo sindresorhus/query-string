@@ -6,6 +6,8 @@ const filterObject = require('filter-obj');
 
 const isNullOrUndefined = value => value === null || value === undefined;
 
+const encodeFragmentIdentifier = Symbol('encodeFragmentIdentifier');
+
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
@@ -402,7 +404,8 @@ exports.parseUrl = (url, options) => {
 exports.stringifyUrl = (object, options) => {
 	options = Object.assign({
 		encode: true,
-		strict: true
+		strict: true,
+		[encodeFragmentIdentifier]: true
 	}, options);
 
 	const url = removeHash(object.url).split('?')[0] || '';
@@ -417,7 +420,7 @@ exports.stringifyUrl = (object, options) => {
 
 	let hash = getHash(object.url);
 	if (object.fragmentIdentifier) {
-		hash = `#${encode(object.fragmentIdentifier, options)}`;
+		hash = `#${options[encodeFragmentIdentifier] ? encode(object.fragmentIdentifier, options) : object.fragmentIdentifier}`;
 	}
 
 	return `${url}${queryString}${hash}`;
@@ -425,7 +428,8 @@ exports.stringifyUrl = (object, options) => {
 
 exports.pick = (input, filter, options) => {
 	options = Object.assign({
-		parseFragmentIdentifier: true
+		parseFragmentIdentifier: true,
+		[encodeFragmentIdentifier]: false
 	}, options);
 
 	const {url, query, fragmentIdentifier} = exports.parseUrl(input, options);
