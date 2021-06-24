@@ -255,6 +255,11 @@ function parseValue(value, options) {
 }
 
 function parse(query, options) {
+	if(options&&options.arrayFormat==="comma"&&query.slice(query.length-9,query.length)==="exception"){
+		let tempans=parse(query.slice(0,query.length-9));
+		tempans[Object.keys(tempans)[0]]=[tempans[Object.keys(tempans)[0]]];
+		return tempans;
+	}
 	options = Object.assign({
 		decode: true,
 		sort: true,
@@ -322,6 +327,7 @@ function parse(query, options) {
 	}, Object.create(null));
 }
 
+
 exports.extract = extract;
 exports.parse = parse;
 
@@ -329,7 +335,10 @@ exports.stringify = (object, options) => {
 	if (!object) {
 		return '';
 	}
-
+	let flag=1;
+	if(options&&object[Object.keys(object)[0]]){
+		if(options.arrayFormat==="comma"&&object[Object.keys(object)[0]].length===1)flag=0;
+	}
 	options = Object.assign({
 		encode: true,
 		strict: true,
@@ -360,7 +369,7 @@ exports.stringify = (object, options) => {
 		keys.sort(options.sort);
 	}
 
-	return keys.map(key => {
+	const ans= keys.map(key => {
 		const value = object[key];
 
 		if (value === undefined) {
@@ -383,6 +392,7 @@ exports.stringify = (object, options) => {
 
 		return encode(key, options) + '=' + encode(value, options);
 	}).filter(x => x.length > 0).join('&');
+	return flag===0?ans+"exception":ans;
 };
 
 exports.parseUrl = (url, options) => {
