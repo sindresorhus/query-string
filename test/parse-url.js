@@ -28,9 +28,9 @@ test('handles strings with fragment identifier', t => {
 test('throws for invalid values', t => {
 	t.throws(() => {
 		parseUrl(null);
-	}, TypeError);
+	}, {instanceOf: TypeError});
 
 	t.throws(() => {
 		parseUrl(undefined);
-	}, TypeError);
+	}, {instanceOf: TypeError});
 });

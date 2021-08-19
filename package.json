@@ -51,5 +51,11 @@
 		"fast-check": "^1.5.0",
 		"tsd": "^0.7.3",
 		"xo": "^0.24.0"
+	},
+	"xo": {
+		"rules": {
+			"unicorn/import-index": 0,
+			"import/extensions": 0
+		}
 	}
 }

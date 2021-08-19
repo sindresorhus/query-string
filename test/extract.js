@@ -18,9 +18,9 @@ test('handles strings not containing query string', t => {
 test('throws for invalid values', t => {
 	t.throws(() => {
 		extract(null);
-	}, TypeError);
+	}, {instanceOf: TypeError});
 
 	t.throws(() => {
 		extract(undefined);
-	}, TypeError);
+	}, {instanceOf: TypeError});
 });
