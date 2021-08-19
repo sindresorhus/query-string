@@ -1,8 +1,7 @@
-'use strict';
-const strictUriEncode = require('strict-uri-encode');
-const decodeComponent = require('decode-uri-component');
-const splitOnFirst = require('split-on-first');
-const filterObject = require('filter-obj');
+import strictUriEncode from 'strict-uri-encode';
+import decodeComponent from 'decode-uri-component';
+import splitOnFirst from 'split-on-first';
+import filterObject from 'filter-obj';
 
 const isNullOrUndefined = value => value === null || value === undefined;
 
@@ -234,7 +233,7 @@ function getHash(url) {
 	return hash;
 }
 
-function extract(input) {
+export function extract(input) {
 	input = removeHash(input);
 	const queryStart = input.indexOf('?');
 	if (queryStart === -1) {
@@ -254,15 +253,13 @@ function parseValue(value, options) {
 	return value;
 }
 
-function parse(query, options) {
-	options = Object.assign({
-		decode: true,
+export function parse(query, options) {
+	options = {decode: true,
 		sort: true,
 		arrayFormat: 'none',
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
-		parseBooleans: false
-	}, options);
+		parseBooleans: false, ...options};
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
@@ -322,20 +319,15 @@ function parse(query, options) {
 	}, Object.create(null));
 }
 
-exports.extract = extract;
-exports.parse = parse;
-
-exports.stringify = (object, options) => {
+export function stringify(object, options) {
 	if (!object) {
 		return '';
 	}
 
-	options = Object.assign({
-		encode: true,
+	options = {encode: true,
 		strict: true,
 		arrayFormat: 'none',
-		arrayFormatSeparator: ','
-	}, options);
+		arrayFormatSeparator: ',', ...options};
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
@@ -383,37 +375,31 @@ exports.stringify = (object, options) => {
 
 		return encode(key, options) + '=' + encode(value, options);
 	}).filter(x => x.length > 0).join('&');
-};
+}
 
-exports.parseUrl = (url, options) => {
-	options = Object.assign({
-		decode: true
-	}, options);
+export function parseUrl(url, options) {
+	options = {decode: true, ...options};
 
 	const [url_, hash] = splitOnFirst(url, '#');
 
-	return Object.assign(
-		{
-			url: url_.split('?')[0] || '',
-			query: parse(extract(url), options)
-		},
-		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
-	);
-};
+	return {
+		url: url_.split('?')[0] || '',
+		query: parse(extract(url), options),
+		...(options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {})
+	};
+}
 
-exports.stringifyUrl = (object, options) => {
-	options = Object.assign({
-		encode: true,
+export function stringifyUrl(object, options) {
+	options = {encode: true,
 		strict: true,
-		[encodeFragmentIdentifier]: true
-	}, options);
+		[encodeFragmentIdentifier]: true, ...options};
 
 	const url = removeHash(object.url).split('?')[0] || '';
-	const queryFromUrl = exports.extract(object.url);
-	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
+	const queryFromUrl = extract(object.url);
+	const parsedQueryFromUrl = parse(queryFromUrl, {sort: false});
 
 	const query = Object.assign(parsedQueryFromUrl, object.query);
-	let queryString = exports.stringify(query, options);
+	let queryString = stringify(query, options);
 	if (queryString) {
 		queryString = `?${queryString}`;
 	}
@@ -424,24 +410,22 @@ exports.stringifyUrl = (object, options) => {
 	}
 
 	return `${url}${queryString}${hash}`;
-};
+}
 
-exports.pick = (input, filter, options) => {
-	options = Object.assign({
-		parseFragmentIdentifier: true,
-		[encodeFragmentIdentifier]: false
-	}, options);
+export function pick(input, filter, options) {
+	options = {parseFragmentIdentifier: true,
+		[encodeFragmentIdentifier]: false, ...options};
 
-	const {url, query, fragmentIdentifier} = exports.parseUrl(input, options);
-	return exports.stringifyUrl({
+	const {url, query, fragmentIdentifier} = parseUrl(input, options);
+	return stringifyUrl({
 		url,
 		query: filterObject(query, filter),
 		fragmentIdentifier
 	}, options);
-};
+}
 
-exports.exclude = (input, filter, options) => {
+export function exclude(input, filter, options) {
 	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
 
-	return exports.pick(input, exclusionFilter, options);
-};
+	return pick(input, exclusionFilter, options);
+}

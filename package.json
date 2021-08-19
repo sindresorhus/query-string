@@ -13,6 +13,7 @@
 	"engines": {
 		"node": ">=12"
 	},
+	"type": "module",
 	"scripts": {
 		"benchmark": "node benchmark.js",
 		"test": "xo && ava && tsd"
