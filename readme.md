@@ -72,7 +72,7 @@ This module targets Node.js 6 or later and the latest version of Chrome, Firefox
 ## Usage
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 console.log(location.search);
 //=> '?foo=bar'
@@ -127,7 +127,7 @@ Default: `'none'`
 - `'bracket'`: Parse arrays with bracket representation:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
 //=> {foo: ['1', '2', '3']}
@@ -136,7 +136,7 @@ queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
 - `'index'`: Parse arrays with index representation:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 //=> {foo: ['1', '2', '3']}
@@ -145,7 +145,7 @@ queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 - `'comma'`: Parse arrays with elements separated by comma:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 //=> {foo: ['1', '2', '3']}
@@ -154,7 +154,7 @@ queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 - `'separator'`: Parse arrays with elements separated by a custom character:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: '|'});
 //=> {foo: ['1', '2', '3']}
@@ -163,7 +163,7 @@ queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: 
 - `'bracket-separator'`: Parse arrays (that are explicitly marked with brackets) with elements separated by a custom character:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> {foo: []}
@@ -187,7 +187,7 @@ queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separ
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo=1&foo=2&foo=3');
 //=> {foo: ['1', '2', '3']}
@@ -213,7 +213,7 @@ Type: `boolean`\
 Default: `false`
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo=1', {parseNumbers: true});
 //=> {foo: 1}
@@ -227,7 +227,7 @@ Type: `boolean`\
 Default: `false`
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('foo=true', {parseBooleans: true});
 //=> {foo: true}
@@ -265,7 +265,7 @@ Default: `'none'`
 - `'bracket'`: Serialize arrays using bracket representation:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
 //=> 'foo[]=1&foo[]=2&foo[]=3'
@@ -274,7 +274,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
 - `'index'`: Serialize arrays using index representation:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
 //=> 'foo[0]=1&foo[1]=2&foo[2]=3'
@@ -283,7 +283,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
 - `'comma'`: Serialize arrays by separating elements with comma:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 //=> 'foo=1,2,3'
@@ -297,7 +297,7 @@ queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 - `'separator'`: Serialize arrays by separating elements with a custom character:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
 //=> 'foo=1|2|3'
@@ -306,7 +306,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSe
 - `'bracket-separator'`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> 'foo[]'
@@ -333,7 +333,7 @@ queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: '
 - `'none'`: Serialize arrays by using duplicate keys:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: [1, 2, 3]});
 //=> 'foo=1&foo=2&foo=3'
@@ -353,7 +353,7 @@ Type: `Function | boolean`
 Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 const order = ['c', 'a', 'b'];
 
@@ -364,7 +364,7 @@ queryString.stringify({a: 1, b: 2, c: 3}, {
 ```
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 //=> 'b=1&c=2&a=3'
@@ -382,7 +382,7 @@ Type: `boolean`\
 Default: `false`
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
 	skipNull: true
@@ -391,7 +391,7 @@ queryString.stringify({a: 1, b: undefined, c: null, d: 4}, {
 ```
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({a: undefined, b: null}, {
 	skipNull: true
@@ -407,7 +407,7 @@ Type: `boolean`\
 Default: `false`
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({a: 1, b: '', c: '', d: 4}, {
 	skipEmptyString: true
@@ -416,7 +416,7 @@ queryString.stringify({a: 1, b: '', c: '', d: 4}, {
 ```
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({a: '', b: ''}, {
 	skipEmptyString: true
@@ -439,7 +439,7 @@ Returns an object with a `url` and `query` property.
 If the `parseFragmentIdentifier` option is `true`, the object will also contain a `fragmentIdentifier` property.
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parseUrl('https://foo.bar?foo=bar');
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}}
@@ -464,7 +464,7 @@ Type: `boolean`\
 Default: `false`
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: true});
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
@@ -523,7 +523,7 @@ Pick query parameters from a URL.
 Returns a string with the new URL.
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.pick('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?foo=1#hello'
@@ -540,7 +540,7 @@ Exclude query parameters from a URL.
 Returns a string with the new URL.
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.exclude('https://foo.bar?foo=1&bar=2#hello', ['foo']);
 //=> 'https://foo.bar?bar=2#hello'
@@ -580,7 +580,7 @@ This module intentionally doesn't support nesting as it's not spec'd and varies 
 You're much better off just converting the object to a JSON string:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({
 	foo: 'bar',
@@ -594,7 +594,7 @@ queryString.stringify({
 However, there is support for multiple instances of the same key:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.parse('likes=cake&name=bob&likes=icecream');
 //=> {likes: ['cake', 'icecream'], name: 'bob'}
@@ -608,7 +608,7 @@ queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
 Sometimes you want to unset a key, or maybe just make it present without assigning a value to it. Here is how falsy values are stringified:
 
 ```js
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 queryString.stringify({foo: false});
 //=> 'foo=false'
