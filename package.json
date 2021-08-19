@@ -14,6 +14,7 @@
 		"node": ">=12"
 	},
 	"type": "module",
+	"exports": "./index.js",
 	"scripts": {
 		"benchmark": "node benchmark.js",
 		"test": "xo && ava && tsd"
