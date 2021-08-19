@@ -1,12 +1,12 @@
 import test from 'ava';
-import queryString from '..';
+import {exclude} from '../index.js';
 
 test('excludes elements in a URL with a filter array', t => {
-	t.is(queryString.exclude('http://example.com/?a=1&b=2&c=3#a', ['c']), 'http://example.com/?a=1&b=2#a');
+	t.is(exclude('http://example.com/?a=1&b=2&c=3#a', ['c']), 'http://example.com/?a=1&b=2#a');
 });
 
 test('excludes elements in a URL with a filter predicate', t => {
-	t.is(queryString.exclude('http://example.com/?a=1&b=2&c=3#a', (name, value) => {
+	t.is(exclude('http://example.com/?a=1&b=2&c=3#a', (name, value) => {
 		t.is(typeof name, 'string');
 		t.is(typeof value, 'number');
 
@@ -17,5 +17,5 @@ test('excludes elements in a URL with a filter predicate', t => {
 });
 
 test('excludes elements in a URL without encoding fragment identifiers', t => {
-	t.is(queryString.exclude('https://example.com?a=b#/home', ['a']), 'https://example.com#/home');
+	t.is(exclude('https://example.com?a=b#/home', ['a']), 'https://example.com#/home');
 });

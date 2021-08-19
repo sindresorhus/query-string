@@ -1,7 +1,7 @@
 import deepEqual from 'deep-equal';
 import * as fastCheck from 'fast-check';
 import test from 'ava';
-import queryString from '..';
+import {parse, stringify} from '../index.js';
 
 // Valid query parameters must follow:
 // - key can be any unicode string (not empty)
@@ -31,7 +31,7 @@ test('should read correctly from stringified query params', t => {
 			fastCheck.property(
 				queryParamsArbitrary,
 				optionsArbitrary,
-				(object, options) => deepEqual(queryString.parse(queryString.stringify(object, options), options), object)
+				(object, options) => deepEqual(parse(stringify(object, options), options), object)
 			)
 		);
 	});
