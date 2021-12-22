@@ -390,3 +390,11 @@ test('value separated by encoded comma will not be parsed as array with `arrayFo
 		id: [1, 2, 3]
 	});
 });
+
+test('query strings having (:list) colon-list-separator arrays', t => {
+	t.deepEqual(queryString.parse('bar:list=one&bar:list=two', {arrayFormat: 'colon-list-separator'}), {bar: ['one', 'two']});
+});
+
+test('query strings having (:list) colon-list-separator arrays including null values', t => {
+	t.deepEqual(queryString.parse('bar:list=one&bar:list=two&foo', {arrayFormat: 'colon-list-separator'}), {bar: ['one', 'two'], foo: null});
+});
