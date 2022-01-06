@@ -184,6 +184,15 @@ queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separ
 //=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
 ```
 
+- `'colon-list-separator'`: Parse arrays with parameter names that are explicitly marked with `:list`:
+
+```js
+const queryString = require('query-string');
+
+queryString.parse('foo:list=one&foo:list=two', {arrayFormat: 'colon-list-separator'});
+//=> {foo: ['one', 'two']}
+```
+
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
@@ -328,6 +337,15 @@ queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-s
 
 queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
+```
+
+- `'colon-list-separator'`: Serialize arrays with parameter names that are explicitly marked with `:list`:
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: ['one', 'two']}, {arrayFormat: 'colon-list-separator'});
+//=> 'foo:list=one&foo:list=two'
 ```
 
 - `'none'`: Serialize arrays by using duplicate keys:

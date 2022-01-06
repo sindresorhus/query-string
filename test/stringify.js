@@ -400,3 +400,27 @@ test('stringify throws TypeError for invalid arrayFormatSeparator', t => {
 		instanceOf: TypeError
 	});
 });
+
+test('array stringify representation with (:list) colon-list-separator', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'colon-list-separator'
+	}), 'bar:list=one&bar:list=two&foo');
+});
+
+test('array stringify representation with (:list) colon-list-separator with null values', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', '']
+	}, {
+		arrayFormat: 'colon-list-separator'
+	}), 'bar:list=one&bar:list=&foo');
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', null]
+	}, {
+		arrayFormat: 'colon-list-separator'
+	}), 'bar:list=one&bar:list=&foo');
+});

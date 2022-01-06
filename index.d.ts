@@ -69,6 +69,15 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
 		```
 
+	- `colon-list-separator`: Parse arrays with parameter names that are explicitly marked with `:list`:
+
+		```
+		import queryString = require('query-string');
+
+		queryString.parse('foo:list=one&foo:list=two', {arrayFormat: 'colon-list-separator'});
+		//=> {foo: ['one', 'two']}
+		```
+
 	- `none`: Parse arrays with elements using duplicate keys:
 
 		```
@@ -78,7 +87,7 @@ export interface ParseOptions {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'colon-list-separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -296,6 +305,15 @@ export interface StringifyOptions {
 		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 		```
 
+	- `colon-list-separator`: Serialize arrays with parameter names that are explicitly marked with `:list`:
+
+		```js
+		import queryString = require('query-string');
+
+		queryString.stringify({foo: ['one', 'two']}, {arrayFormat: 'colon-list-separator'});
+		//=> 'foo:list=one&foo:list=two'
+		```
+
 	- `none`: Serialize arrays by using duplicate keys:
 
 		```
@@ -305,7 +323,7 @@ export interface StringifyOptions {
 		//=> 'foo=1&foo=2&foo=3'
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'none';
+	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'colon-list-separator' | 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
