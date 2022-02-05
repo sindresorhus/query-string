@@ -172,7 +172,7 @@ export interface ParseOptions {
 }
 
 export interface ParsedQuery<T = string> {
-	[key: string]: T | T[] | null;
+	[key: string]: T | null | Array<T | null>;
 }
 
 /**
