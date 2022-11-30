@@ -1,6 +1,6 @@
 'use strict';
 const strictUriEncode = require('strict-uri-encode');
-const decodeComponent = require('decode-uri-component');
+const decodeComponent = require('safe-decode-uri-component');
 const splitOnFirst = require('split-on-first');
 const filterObject = require('filter-obj');
 

@@ -1,9 +1,9 @@
 {
-	"name": "query-string",
+	"name": "@swipejobs/query-string",
 	"version": "7.1.1",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
-	"repository": "sindresorhus/query-string",
+	"repository": "swipejobs/query-string",
 	"funding": "https://github.com/sponsors/sindresorhus",
 	"author": {
 		"name": "Sindre Sorhus",
@@ -38,8 +38,8 @@
 		"filter"
 	],
 	"dependencies": {
-		"decode-uri-component": "^0.2.0",
 		"filter-obj": "^1.1.0",
+		"safe-decode-uri-component": "^1.2.1",
 		"split-on-first": "^1.0.0",
 		"strict-uri-encode": "^2.0.0"
 	},
