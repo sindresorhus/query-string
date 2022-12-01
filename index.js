@@ -215,8 +215,8 @@ function parserForArrayFormat(options) {
 }
 
 function validateArrayFormatSeparator(value) {
-	if (typeof value !== 'string' || value.length !== 1) {
-		throw new TypeError('arrayFormatSeparator must be single character string');
+	if (typeof value !== 'string' || value.length === 0) {
+		throw new TypeError('arrayFormatSeparator must be a non-empty string');
 	}
 }
 

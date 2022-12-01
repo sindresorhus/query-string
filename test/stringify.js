@@ -172,6 +172,15 @@ test('array stringify representation with array indexes and sparse array', t => 
 	t.is(queryString.stringify({bar: fixture}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
 });
 
+test('array stringify representation with multi-character separator', t => {
+	t.is(queryString.stringify({
+		bar: ['one', 'two']
+	}, {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: ';;'
+	}), 'bar=one;;two');
+});
+
 test('array stringify representation with brackets and separators with empty array', t => {
 	t.is(queryString.stringify({
 		foo: null,
@@ -393,7 +402,7 @@ test('should ignore empty string when skipEmptyString is set for arrayFormat', t
 });
 
 test('stringify throws TypeError for invalid arrayFormatSeparator', t => {
-	t.throws(_ => queryString.stringify({}, {arrayFormatSeparator: ',,'}), {
+	t.throws(_ => queryString.stringify({}, {arrayFormatSeparator: ''}), {
 		instanceOf: TypeError
 	});
 	t.throws(_ => queryString.stringify({}, {arrayFormatSeparator: []}), {

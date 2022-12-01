@@ -160,6 +160,13 @@ test('query strings having pipe separated arrays and format option as `separator
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having multi-character seperated arrays and format option as `separator`', t => {
+	t.deepEqual(queryString.parse('foo=bar;;baz', {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: ';;'
+	}), {foo: ['bar', 'baz']});
+});
+
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
 	t.deepEqual(queryString.parse('bar[]&foo[]=a&foo[]&foo[]=', {
 		arrayFormat: 'bracket'
@@ -361,7 +368,7 @@ test('parseNumbers and parseBooleans can work with arrayFormat at the same time'
 });
 
 test('parse throws TypeError for invalid arrayFormatSeparator', t => {
-	t.throws(_ => queryString.parse('', {arrayFormatSeparator: ',,'}), {
+	t.throws(_ => queryString.parse('', {arrayFormatSeparator: ''}), {
 		instanceOf: TypeError
 	});
 	t.throws(_ => queryString.parse('', {arrayFormatSeparator: []}), {
