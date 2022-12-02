@@ -38,7 +38,7 @@
 		"filter"
 	],
 	"dependencies": {
-		"decode-uri-component": "^0.2.1",
+		"decode-uri-component": "^0.2.2",
 		"filter-obj": "^1.1.0",
 		"split-on-first": "^1.0.0",
 		"strict-uri-encode": "^2.0.0"
