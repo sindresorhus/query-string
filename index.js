@@ -455,7 +455,9 @@ exports.stringifyUrl = (object, options) => {
 
 	let hash = getHash(object.url);
 	if (object.fragmentIdentifier) {
-		hash = `#${options[encodeFragmentIdentifier] ? encode(object.fragmentIdentifier, options) : object.fragmentIdentifier}`;
+		const urlObjectForFragmentEncode = new URL(url);
+		urlObjectForFragmentEncode.hash = object.fragmentIdentifier;
+		hash = options[encodeFragmentIdentifier] ? urlObjectForFragmentEncode.hash : `#${object.fragmentIdentifier}`;
 	}
 
 	return `${url}${queryString}${hash}`;

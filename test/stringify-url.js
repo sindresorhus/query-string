@@ -26,6 +26,7 @@ test('stringify URL with fragment identifier', t => {
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/#abc', query: {}, fragmentIdentifier: 'top'}), 'https://foo.bar/#top');
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {}}), 'https://foo.bar');
 	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar', query: {}, fragmentIdentifier: 'foo bar'}), 'https://foo.bar#foo%20bar');
+	t.deepEqual(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '/foo/bar'}), 'https://foo.bar/#/foo/bar');
 });
 
 test('skipEmptyString:: stringify URL with a query string', t => {
