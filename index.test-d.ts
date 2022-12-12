@@ -1,5 +1,5 @@
 import {expectType} from 'tsd';
-import * as queryString from '.';
+import queryString from './index.js';
 
 // Stringify
 expectType<string>(
@@ -9,14 +9,14 @@ expectType<string>(
 		num: 123,
 		numArray: [456],
 		bool: true,
-		boolArray: [false]
-	})
+		boolArray: [false],
+	}),
 );
 
 expectType<string>(queryString.stringify({foo: 'bar'}, {strict: false}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {encode: false}));
 expectType<string>(
-	queryString.stringify({foo: 'bar'}, {arrayFormat: 'bracket'})
+	queryString.stringify({foo: 'bar'}, {arrayFormat: 'bracket'}),
 );
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'index'}));
 expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'}));
@@ -30,18 +30,18 @@ expectType<string>(
 		{foo: 'bar'},
 		{
 			sort: (itemLeft, itemRight) =>
-				order.indexOf(itemLeft) - order.indexOf(itemRight)
-		}
-	)
+				order.indexOf(itemLeft) - order.indexOf(itemRight),
+		},
+	),
 );
 
 // Ensure it accepts an `interface`.
-interface Query {
+type Query = {
 	foo: string;
-}
+};
 
 const query: Query = {
-	foo: 'bar'
+	foo: 'bar',
 };
 
 queryString.stringify(query);
@@ -50,56 +50,56 @@ queryString.stringify(query);
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
 
 expectType<queryString.ParsedQuery>(
-	queryString.parse('?foo=bar', {decode: false})
+	queryString.parse('?foo=bar', {decode: false}),
 );
 expectType<queryString.ParsedQuery>(
-	queryString.parse('?foo=bar', {arrayFormat: 'bracket'})
+	queryString.parse('?foo=bar', {arrayFormat: 'bracket'}),
 );
 expectType<queryString.ParsedQuery>(
-	queryString.parse('?foo=bar', {arrayFormat: 'index'})
+	queryString.parse('?foo=bar', {arrayFormat: 'index'}),
 );
 expectType<queryString.ParsedQuery>(
-	queryString.parse('?foo=bar', {arrayFormat: 'none'})
+	queryString.parse('?foo=bar', {arrayFormat: 'none'}),
 );
 expectType<queryString.ParsedQuery>(
-	queryString.parse('?foo=bar', {arrayFormat: 'comma'})
+	queryString.parse('?foo=bar', {arrayFormat: 'comma'}),
 );
 expectType<queryString.ParsedQuery<string | number>>(
-	queryString.parse('?foo=1', {parseNumbers: true})
+	queryString.parse('?foo=1', {parseNumbers: true}),
 );
 expectType<queryString.ParsedQuery<string | boolean>>(
-	queryString.parse('?foo=true', {parseBooleans: true})
+	queryString.parse('?foo=true', {parseBooleans: true}),
 );
 expectType<queryString.ParsedQuery<string | boolean | number>>(
-	queryString.parse('?foo=true', {parseBooleans: true, parseNumbers: true})
+	queryString.parse('?foo=true', {parseBooleans: true, parseNumbers: true}),
 );
 
 // Parse URL
 expectType<queryString.ParsedUrl>(queryString.parseUrl('?foo=bar'));
 
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=bar', {decode: false})
+	queryString.parseUrl('?foo=bar', {decode: false}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=bar', {arrayFormat: 'bracket'})
+	queryString.parseUrl('?foo=bar', {arrayFormat: 'bracket'}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=bar', {arrayFormat: 'index'})
+	queryString.parseUrl('?foo=bar', {arrayFormat: 'index'}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=bar', {arrayFormat: 'none'})
+	queryString.parseUrl('?foo=bar', {arrayFormat: 'none'}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=bar', {arrayFormat: 'comma'})
+	queryString.parseUrl('?foo=bar', {arrayFormat: 'comma'}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=1', {parseNumbers: true})
+	queryString.parseUrl('?foo=1', {parseNumbers: true}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=true', {parseBooleans: true})
+	queryString.parseUrl('?foo=true', {parseBooleans: true}),
 );
 expectType<queryString.ParsedUrl>(
-	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true})
+	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true}),
 );
 
 // Extract
@@ -114,19 +114,19 @@ expectType<string>(
 				1,
 				true,
 				null,
-				undefined
+				undefined,
 			],
 			fooNumber: 1,
 			fooBoolean: true,
 			fooNull: null,
 			fooUndefined: undefined,
-			fooString: 'hi'
+			fooString: 'hi',
 		},
-	})
+	}),
 );
 
 // Pick
-expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']))
+expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']));
 
 // Exclude
-expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']))
+expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']));

@@ -1,6 +1,5 @@
-'use strict';
-const Benchmark = require('benchmark');
-const queryString = require('.');
+import Benchmark from 'benchmark';
+import queryString from './index.js';
 
 const {stringify, stringifyUrl} = queryString;
 const suite = new Benchmark.Suite();
@@ -13,7 +12,7 @@ const TEST_OBJECT = {
 	published: true,
 	symbols: 'πµ',
 	chapters: [1, 2, 3],
-	none: null
+	none: null,
 };
 const TEST_HOST = 'https://foo.bar/';
 const TEST_STRING = stringify(TEST_OBJECT);

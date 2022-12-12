@@ -10,8 +10,13 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
+	"exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
 	"engines": {
-		"node": ">=6"
+		"node": ">=14.16"
 	},
 	"scripts": {
 		"benchmark": "node benchmark.js",
@@ -19,7 +24,9 @@
 	},
 	"files": [
 		"index.js",
-		"index.d.ts"
+		"index.d.ts",
+		"base.js",
+		"base.d.ts"
 	],
 	"keywords": [
 		"browser",
@@ -39,16 +46,20 @@
 	],
 	"dependencies": {
 		"decode-uri-component": "^0.2.2",
-		"filter-obj": "^1.1.0",
-		"split-on-first": "^1.0.0",
-		"strict-uri-encode": "^2.0.0"
+		"filter-obj": "^5.1.0",
+		"split-on-first": "^1.0.0"
 	},
 	"devDependencies": {
-		"ava": "^1.4.1",
+		"ava": "^5.1.0",
 		"benchmark": "^2.1.4",
-		"deep-equal": "^1.0.1",
-		"fast-check": "^1.5.0",
-		"tsd": "^0.7.3",
-		"xo": "^0.24.0"
+		"deep-equal": "^2.1.0",
+		"fast-check": "^3.4.0",
+		"tsd": "^0.25.0",
+		"xo": "^0.53.1"
+	},
+	"tsd": {
+		"compilerOptions": {
+			"module": "node16"
+		}
 	}
 }

@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '..';
+import queryString from '../index.js';
 
 test('query strings starting with a `?`', t => {
 	t.deepEqual(queryString.parse('?foo=bar'), {foo: 'bar'});
@@ -25,24 +25,24 @@ test('parse a query string', t => {
 test('parse multiple query string', t => {
 	t.deepEqual(queryString.parse('foo=bar&key=val'), {
 		foo: 'bar',
-		key: 'val'
+		key: 'val',
 	});
 });
 
 test('parse multiple query string retain order when not sorted', t => {
 	const expectedKeys = ['b', 'a', 'c'];
 	const parsed = queryString.parse('b=foo&a=bar&c=yay', {sort: false});
-	Object.keys(parsed).forEach((key, index) => {
+	for (const [index, key] of Object.keys(parsed).entries()) {
 		t.is(key, expectedKeys[index]);
-	});
+	}
 });
 
 test('parse multiple query string sorted keys', t => {
 	const fixture = ['a', 'b', 'c'];
 	const parsed = queryString.parse('a=foo&c=bar&b=yay');
-	Object.keys(parsed).forEach((key, index) => {
+	for (const [index, key] of Object.keys(parsed).entries()) {
 		t.is(key, fixture[index]);
-	});
+	}
 });
 
 test('should sort parsed keys in given order', t => {
@@ -50,20 +50,20 @@ test('should sort parsed keys in given order', t => {
 	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);
 
 	const parsed = queryString.parse('a=foo&b=bar&c=yay', {sort});
-	Object.keys(parsed).forEach((key, index) => {
+	for (const [index, key] of Object.keys(parsed).entries()) {
 		t.is(key, fixture[index]);
-	});
+	}
 });
 
 test('parse query string without a value', t => {
 	t.deepEqual(queryString.parse('foo'), {foo: null});
 	t.deepEqual(queryString.parse('foo&key'), {
 		foo: null,
-		key: null
+		key: null,
 	});
 	t.deepEqual(queryString.parse('foo=bar&key'), {
 		foo: 'bar',
-		key: null
+		key: null,
 	});
 	t.deepEqual(queryString.parse('a&a'), {a: [null, null]});
 	t.deepEqual(queryString.parse('a=&a'), {a: ['', null]});
@@ -143,74 +143,74 @@ test('query string having a bracketed value and a single value and format option
 
 test('query strings having brackets arrays and format option as `bracket`', t => {
 	t.deepEqual(queryString.parse('foo[]=bar&foo[]=baz', {
-		arrayFormat: 'bracket'
+		arrayFormat: 'bracket',
 	}), {foo: ['bar', 'baz']});
 });
 
 test('query strings having comma separated arrays and format option as `comma`', t => {
 	t.deepEqual(queryString.parse('foo=bar,baz', {
-		arrayFormat: 'comma'
+		arrayFormat: 'comma',
 	}), {foo: ['bar', 'baz']});
 });
 
 test('query strings having pipe separated arrays and format option as `separator`', t => {
 	t.deepEqual(queryString.parse('foo=bar|baz', {
 		arrayFormat: 'separator',
-		arrayFormatSeparator: '|'
+		arrayFormatSeparator: '|',
 	}), {foo: ['bar', 'baz']});
 });
 
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
 	t.deepEqual(queryString.parse('bar[]&foo[]=a&foo[]&foo[]=', {
-		arrayFormat: 'bracket'
+		arrayFormat: 'bracket',
 	}), {
 		foo: ['a', null, ''],
-		bar: [null]
+		bar: [null],
 	});
 });
 
 test('query strings having comma separated arrays with null and format option as `comma`', t => {
 	t.deepEqual(queryString.parse('bar&foo=a,', {
-		arrayFormat: 'comma'
+		arrayFormat: 'comma',
 	}), {
 		foo: ['a', ''],
-		bar: null
+		bar: null,
 	});
 });
 
 test('query strings having indexed arrays and format option as `index`', t => {
 	t.deepEqual(queryString.parse('foo[0]=bar&foo[1]=baz', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['bar', 'baz']});
 });
 
 test('query strings having brackets+separator arrays and format option as `bracket-separator` with 1 value', t => {
 	t.deepEqual(queryString.parse('foo[]=bar', {
-		arrayFormat: 'bracket-separator'
+		arrayFormat: 'bracket-separator',
 	}), {foo: ['bar']});
 });
 
 test('query strings having brackets+separator arrays and format option as `bracket-separator` with multiple values', t => {
 	t.deepEqual(queryString.parse('foo[]=bar,baz,,,biz', {
-		arrayFormat: 'bracket-separator'
+		arrayFormat: 'bracket-separator',
 	}), {foo: ['bar', 'baz', '', '', 'biz']});
 });
 
 test('query strings with multiple brackets+separator arrays and format option as `bracket-separator` using same key name', t => {
 	t.deepEqual(queryString.parse('foo[]=bar,baz&foo[]=biz,boz', {
-		arrayFormat: 'bracket-separator'
+		arrayFormat: 'bracket-separator',
 	}), {foo: ['bar', 'baz', 'biz', 'boz']});
 });
 
 test('query strings having an empty brackets+separator array and format option as `bracket-separator`', t => {
 	t.deepEqual(queryString.parse('foo[]', {
-		arrayFormat: 'bracket-separator'
+		arrayFormat: 'bracket-separator',
 	}), {foo: []});
 });
 
 test('query strings having a brackets+separator array and format option as `bracket-separator` with a single empty string', t => {
 	t.deepEqual(queryString.parse('foo[]=', {
-		arrayFormat: 'bracket-separator'
+		arrayFormat: 'bracket-separator',
 	}), {foo: ['']});
 });
 
@@ -220,31 +220,31 @@ test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
 
 test('query strings having ordered index arrays and format option as `index`', t => {
 	t.deepEqual(queryString.parse('foo[1]=bar&foo[0]=baz&foo[3]=one&foo[2]=two', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['baz', 'bar', 'two', 'one']});
 
 	t.deepEqual(queryString.parse('foo[0]=bar&foo[1]=baz&foo[2]=one&foo[3]=two', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['bar', 'baz', 'one', 'two']});
 
 	t.deepEqual(queryString.parse('foo[3]=three&foo[2]=two&foo[1]=one&foo[0]=zero', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['zero', 'one', 'two', 'three']});
 
 	t.deepEqual(queryString.parse('foo[3]=three&foo[2]=two&foo[1]=one&foo[0]=zero&bat=buz', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['zero', 'one', 'two', 'three'], bat: 'buz'});
 
 	t.deepEqual(queryString.parse('foo[1]=bar&foo[0]=baz', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {foo: ['baz', 'bar']});
 
 	t.deepEqual(queryString.parse('foo[102]=three&foo[2]=two&foo[1]=one&foo[0]=zero&bat=buz', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {bat: 'buz', foo: ['zero', 'one', 'two', 'three']});
 
 	t.deepEqual(queryString.parse('foo[102]=three&foo[2]=two&foo[100]=one&foo[0]=zero&bat=buz', {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
 });
 
@@ -253,7 +253,7 @@ test('circuit parse → stringify', t => {
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const expected = {bat: 'buz', foo: ['', 'one', null, 'foo']};
 	const options = {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	};
 
 	t.deepEqual(queryString.parse(original, options), expected);
@@ -265,7 +265,7 @@ test('circuit original → parse → stringify → sorted original', t => {
 	const original = 'foo[21474836471]=foo&foo[21474836470]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const options = {
-		arrayFormat: 'index'
+		arrayFormat: 'index',
 	};
 
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
@@ -277,10 +277,10 @@ test('circuit parse → stringify with array commas', t => {
 	const expected = {
 		c: ['', 'a', '', ''],
 		b: '',
-		a: ''
+		a: '',
 	};
 	const options = {
-		arrayFormat: 'comma'
+		arrayFormat: 'comma',
 	};
 
 	t.deepEqual(queryString.parse(original, options), expected);
@@ -292,7 +292,7 @@ test('circuit original → parse → stringify with array commas → sorted orig
 	const original = 'c=,a,,&b=&a=';
 	const sortedOriginal = 'a=&b=&c=,a,,';
 	const options = {
-		arrayFormat: 'comma'
+		arrayFormat: 'comma',
 	};
 
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
@@ -361,11 +361,16 @@ test('parseNumbers and parseBooleans can work with arrayFormat at the same time'
 });
 
 test('parse throws TypeError for invalid arrayFormatSeparator', t => {
-	t.throws(_ => queryString.parse('', {arrayFormatSeparator: ',,'}), {
-		instanceOf: TypeError
+	t.throws(() => {
+		queryString.parse('', {arrayFormatSeparator: ',,'});
+	}, {
+		instanceOf: TypeError,
 	});
-	t.throws(_ => queryString.parse('', {arrayFormatSeparator: []}), {
-		instanceOf: TypeError
+
+	t.throws(() => {
+		queryString.parse('', {arrayFormatSeparator: []});
+	}, {
+		instanceOf: TypeError,
 	});
 });
 
@@ -373,21 +378,21 @@ test('query strings having comma encoded and format option as `comma`', t => {
 	t.deepEqual(queryString.parse('foo=zero%2Cone,two%2Cthree', {arrayFormat: 'comma'}), {
 		foo: [
 			'zero,one',
-			'two,three'
-		]
+			'two,three',
+		],
 	});
 });
 
 test('value should not be decoded twice with `arrayFormat` option set as `separator`', t => {
 	t.deepEqual(queryString.parse('foo=2020-01-01T00:00:00%2B03:00', {arrayFormat: 'separator'}), {
-		foo: '2020-01-01T00:00:00+03:00'
+		foo: '2020-01-01T00:00:00+03:00',
 	});
 });
 
 // See https://github.com/sindresorhus/query-string/issues/242
 test('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
 	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
-		id: [1, 2, 3]
+		id: [1, 2, 3],
 	});
 });
 

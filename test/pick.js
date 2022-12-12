@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '..';
+import queryString from '../index.js';
 
 test('picks elements in a URL with a filter array', t => {
 	t.is(queryString.pick('http://example.com/?a=1&b=2&c=3#a', ['a', 'b']), 'http://example.com/?a=1&b=2#a');
@@ -12,7 +12,7 @@ test('picks elements in a URL with a filter predicate', t => {
 
 		return name === 'a';
 	}, {
-		parseNumbers: true
+		parseNumbers: true,
 	}), 'http://example.com/?a=1#a');
 });
 
