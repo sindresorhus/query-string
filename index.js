@@ -1,1 +1,3 @@
-export * as default from './base.js';
+import * as queryString from './base.js';
+
+export default queryString;
