@@ -171,7 +171,8 @@ export type ParseOptions = {
 	readonly parseFragmentIdentifier?: boolean;
 };
 
-export type ParsedQuery<T = string> = Record<string, T | undefined | Array<T | undefined>>;
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type ParsedQuery<T = string> = Record<string, T | null | Array<T | null>>;
 
 /**
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
