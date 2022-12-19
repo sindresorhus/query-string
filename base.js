@@ -353,12 +353,12 @@ export function parse(query, options) {
 			continue;
 		}
 
-		const param = options.decode ? parameter.replace(/\+/g, ' ') : parameter;
+		const parameter_ = options.decode ? parameter.replace(/\+/g, ' ') : parameter;
 
-		let [key, value] = splitOnFirst(param, '=');
+		let [key, value] = splitOnFirst(parameter_, '=');
 
 		if (key === undefined) {
-			key = param;
+			key = parameter_;
 		}
 
 		// Missing `=` should be `null`:
