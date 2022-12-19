@@ -353,7 +353,13 @@ export function parse(query, options) {
 			continue;
 		}
 
-		let [key, value] = splitOnFirst(options.decode ? parameter.replace(/\+/g, ' ') : parameter, '=');
+		const param = options.decode ? parameter.replace(/\+/g, ' ') : parameter;
+
+		let [key, value] = splitOnFirst(param, '=');
+
+		if (key === undefined) {
+			key = param;
+		}
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
@@ -454,7 +460,11 @@ export function parseUrl(url, options) {
 		...options,
 	};
 
-	const [url_, hash] = splitOnFirst(url, '#');
+	let [url_, hash] = splitOnFirst(url, '#');
+
+	if (url_ === undefined) {
+		url_ = url;
+	}
 
 	return {
 		url: url_?.split('?')?.[0] ?? '',
