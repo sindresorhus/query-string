@@ -324,6 +324,31 @@ test('NaN value returns as string if option is set', t => {
 	t.deepEqual(queryString.parse('foo=   &bar=', {parseNumbers: true}), {foo: '   ', bar: ''});
 });
 
+test('exceed JavaScript\'s maximum safe integer value returns as string if option is set', t => {
+	// 9007199254740991 is Number.MAX_SAFE_INTEGER
+	t.deepEqual(queryString.parse('foo=9007199254740991', {parseNumbers: true}), {foo: Number.MAX_SAFE_INTEGER});
+	t.deepEqual(queryString.parse('foo=9007199254740992', {parseNumbers: true}), {foo: '9007199254740992'});
+	t.deepEqual(queryString.parse('foo=9007199254740992', {parseNumbers: {includes: ['foo']}}), {foo: '9007199254740992'});
+	t.deepEqual(queryString.parse('foo=9007199254740992', {parseNumbers: {excludes: ['foo']}}), {foo: '9007199254740992'});
+});
+
+test('only keys that match the includes configuration in parseNumbers will return number if parseNumbers.includes is set', t => {
+	t.deepEqual(queryString.parse('foo=1&bar=2', {parseNumbers: {includes: ['foo', 'bar']}}), {foo: 1, bar: 2});
+	t.deepEqual(queryString.parse('foo=1&bar=2', {parseNumbers: {includes: ['foo']}}), {foo: 1, bar: '2'});
+	t.deepEqual(queryString.parse('foo=null&bar=2', {parseNumbers: {includes: ['foo']}}), {foo: 'null', bar: '2'});
+	t.deepEqual(queryString.parse('foo=1&bar=2&baz=3', {parseNumbers: {includes: []}}), {foo: '1', bar: '2', baz: '3'});
+	t.deepEqual(queryString.parse('foo=1&bar=2&baz=3', {parseNumbers: {includes: ['foo'], excludes: ['baz']}}), {foo: 1, bar: '2', baz: '3'});
+	t.deepEqual(queryString.parse('foo=1&bar=2&baz=3', {parseNumbers: {includes: []}}), {foo: '1', bar: '2', baz: '3'});
+});
+
+test('only keys that does not match the excludes configuration in parseNumbers will return number if parseNumbers.excludes is set', t => {
+	t.deepEqual(queryString.parse('foo=1&bar=2', {parseNumbers: {excludes: ['foo', 'bar']}}), {foo: '1', bar: '2'});
+	t.deepEqual(queryString.parse('foo=1&bar=2', {parseNumbers: {excludes: ['foo']}}), {foo: '1', bar: 2});
+	t.deepEqual(queryString.parse('foo=1&bar=2', {parseNumbers: {excludes: []}}), {foo: 1, bar: 2});
+	t.deepEqual(queryString.parse('foo=1&bar=null', {parseNumbers: {excludes: ['foo']}}), {foo: '1', bar: 'null'});
+	t.deepEqual(queryString.parse('foo=1&bar=2&baz=3', {parseNumbers: {excludes: ['baz']}}), {foo: 1, bar: 2, baz: '3'});
+});
+
 test('parseNumbers works with arrayFormat', t => {
 	t.deepEqual(queryString.parse('foo[]=1&foo[]=2&foo[]=3&bar=1', {parseNumbers: true, arrayFormat: 'bracket'}), {foo: [1, 2, 3], bar: 1});
 	t.deepEqual(queryString.parse('foo=1,2,a', {parseNumbers: true, arrayFormat: 'comma'}), {foo: [1, 2, 'a']});

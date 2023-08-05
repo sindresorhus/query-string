@@ -300,11 +300,31 @@ function getHash(url) {
 	return hash;
 }
 
-function parseValue(value, options) {
-	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		value = Number(value);
-	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-		value = value.toLowerCase() === 'true';
+function getNumberValue(value) {
+	const numberValue = Number(value);
+
+	return Number.isNaN(numberValue) || numberValue > Number.MAX_SAFE_INTEGER ? value : numberValue;
+}
+
+function parseValue(key, value, options, returnValue) {
+	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		return value.toLowerCase() === 'true';
+	}
+
+	if (options.parseNumbers && (typeof value === 'string' && value.trim() !== '')) {
+		if (typeof options.parseNumbers === 'object') {
+			const {includes = Object.keys(returnValue), excludes = []} = options.parseNumbers;
+
+			if (!includes.includes(key)) {
+				return value;
+			}
+
+			if (excludes.includes(key)) {
+				return value;
+			}
+		}
+
+		return getNumberValue(value);
 	}
 
 	return value;
@@ -370,10 +390,10 @@ export function parse(query, options) {
 	for (const [key, value] of Object.entries(returnValue)) {
 		if (typeof value === 'object' && value !== null) {
 			for (const [key2, value2] of Object.entries(value)) {
-				value[key2] = parseValue(value2, options);
+				value[key2] = parseValue(key2, value2, options, returnValue);
 			}
 		} else {
-			returnValue[key] = parseValue(value, options);
+			returnValue[key] = parseValue(key, value, options, returnValue);
 		}
 	}
 
@@ -385,12 +405,7 @@ export function parse(query, options) {
 	// eslint-disable-next-line unicorn/no-array-reduce
 	return (options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort)).reduce((result, key) => {
 		const value = returnValue[key];
-		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
-			// Sort object keys, not values
-			result[key] = keysSorter(value);
-		} else {
-			result[key] = value;
-		}
+		result[key] = Boolean(value) && typeof value === 'object' && !Array.isArray(value) ? keysSorter(value) : value;
 
 		return result;
 	}, Object.create(null));

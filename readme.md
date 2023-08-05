@@ -197,7 +197,7 @@ Supports both `Function` as a custom sorting function or `false` to disable sort
 
 ##### parseNumbers
 
-Type: `boolean`\
+Type: `boolean | { includes?: string[], excludes?: string[] }`\
 Default: `false`
 
 ```js
@@ -205,9 +205,16 @@ import queryString from 'query-string';
 
 queryString.parse('foo=1', {parseNumbers: true});
 //=> {foo: 1}
-```
 
+queryString.parse('foo=1&bar=2', {parseNumbers: {includes: ['foo']}});
+//=> {foo: 1, bar: '2'}
+
+queryString.parse('foo=1&bar=2', {parseNumbers: {excludes: ['foo']}});
+//=> {foo: '1', bar: 2}
+```
 Parse the value as a number type instead of string type if it's a number.
+
+> Note: will always return a string if it exceeds the maximum safe integer in JavaScript
 
 ##### parseBooleans
 

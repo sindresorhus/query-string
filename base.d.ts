@@ -127,6 +127,7 @@ export type ParseOptions = {
 
 	/**
 	Parse the value as a number type instead of string type if it's a number.
+    Note: will always return a string if it exceeds the maximum safe integer in JavaScript
 
 	@default false
 
@@ -136,9 +137,15 @@ export type ParseOptions = {
 
 	queryString.parse('foo=1', {parseNumbers: true});
 	//=> {foo: 1}
+
+	queryString.parse('foo=1&bar=2', {parseNumbers: {includes: ['foo']}});
+	//=> {foo: 1, bar: '2'}
+
+	queryString.parse('foo=1&bar=2', {parseNumbers: {excludes: ['foo']}});
+	//=> {foo: '1', bar: 2}
 	```
 	*/
-	readonly parseNumbers?: boolean;
+	readonly parseNumbers?: boolean | {includes?: string[]; excludes?: string[]};
 
 	/**
 	Parse the value as a boolean type instead of string type if it's a boolean.
