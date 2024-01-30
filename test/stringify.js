@@ -14,6 +14,13 @@ test('different types', t => {
 	t.is(queryString.stringify(0), '');
 });
 
+test('primitive types', t => {
+	t.is(queryString.stringify({a: 'string'}), 'a=string');
+	t.is(queryString.stringify({a: true, b: false}), 'a=true&b=false');
+	t.is(queryString.stringify({a: 0, b: 1n}), 'a=0&b=1');
+	t.is(queryString.stringify({a: null, b: undefined}), 'a');
+});
+
 test('URI encode', t => {
 	t.is(queryString.stringify({'foo bar': 'baz faz'}), 'foo%20bar=baz%20faz');
 	t.is(queryString.stringify({'foo bar': 'baz\'faz'}), 'foo%20bar=baz%27faz');
