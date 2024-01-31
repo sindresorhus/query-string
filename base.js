@@ -385,13 +385,7 @@ export function parse(query, options) {
 	// eslint-disable-next-line unicorn/no-array-reduce
 	return (options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort)).reduce((result, key) => {
 		const value = returnValue[key];
-		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
-			// Sort object keys, not values
-			result[key] = keysSorter(value);
-		} else {
-			result[key] = value;
-		}
-
+		result[key] = Boolean(value) && typeof value === 'object' && !Array.isArray(value) ? keysSorter(value) : value;
 		return result;
 	}, Object.create(null));
 }
