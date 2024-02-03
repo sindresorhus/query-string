@@ -55,7 +55,7 @@
 		"deep-equal": "^2.1.0",
 		"fast-check": "^3.4.0",
 		"tsd": "^0.25.0",
-		"xo": "^0.53.1"
+		"xo": "^0.54.2"
 	},
 	"tsd": {
 		"compilerOptions": {

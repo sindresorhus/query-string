@@ -412,7 +412,7 @@ export type StringifyOptions = {
 	readonly skipEmptyString?: boolean;
 };
 
-export type Stringifiable = string | boolean | number | null | undefined; // eslint-disable-line @typescript-eslint/ban-types
+export type Stringifiable = string | boolean | number | bigint | null | undefined; // eslint-disable-line @typescript-eslint/ban-types
 
 export type StringifiableRecord = Record<
 string,
