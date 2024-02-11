@@ -44,7 +44,9 @@
 npm install query-string
 ```
 
-**Not `npm install querystring`!!!!!**
+> [!WARNING]
+> Remember the hyphen! Do not install [the deprecated](https://github.com/Gozala/querystring) `querystring` library!
+
 
 For browser usage, this package targets the latest version of Chrome, Firefox, and Safari.
 
