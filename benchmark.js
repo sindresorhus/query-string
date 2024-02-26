@@ -24,10 +24,10 @@ const TEST_URL = stringifyUrl({url: TEST_HOST, query: TEST_OBJECT});
 
 // Creates a test case and adds it to the suite
 const defineTestCase = (methodName, input, options) => {
-	const fn = queryString[methodName];
+	const function_ = queryString[methodName];
 	const label = options ? ` (${stringify(options)})` : '';
 
-	suite.add(methodName + label, () => fn(input, options || {}));
+	suite.add(methodName + label, () => function_(input, options || {}));
 };
 
 // Define all test cases

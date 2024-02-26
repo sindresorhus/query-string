@@ -2,7 +2,6 @@ import test from 'ava';
 import queryString from '../index.js';
 
 test('handles strings with query string', t => {
-	console.log('f', queryString.parseUrl('https://foo.bar#top?foo=bar'));
 	t.deepEqual(queryString.parseUrl('https://foo.bar#top?foo=bar'), {url: 'https://foo.bar', query: {}});
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar&foo=baz#top'), {url: 'https://foo.bar', query: {foo: ['bar', 'baz']}});
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar&foo=baz'), {url: 'https://foo.bar', query: {foo: ['bar', 'baz']}});

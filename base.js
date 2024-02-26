@@ -5,7 +5,7 @@ import {includeKeys} from 'filter-obj';
 const isNullOrUndefined = value => value === null || value === undefined;
 
 // eslint-disable-next-line unicorn/prefer-code-point
-const strictUriEncode = string => encodeURIComponent(string).replace(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
+const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
 const encodeFragmentIdentifier = Symbol('encodeFragmentIdentifier');
 
@@ -87,7 +87,7 @@ function encoderForArrayFormat(options) {
 		case 'comma':
 		case 'separator':
 		case 'bracket-separator': {
-			const keyValueSep = options.arrayFormat === 'bracket-separator'
+			const keyValueSeparator = options.arrayFormat === 'bracket-separator'
 				? '[]='
 				: '=';
 
@@ -104,7 +104,7 @@ function encoderForArrayFormat(options) {
 				value = value === null ? '' : value;
 
 				if (result.length === 0) {
-					return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
+					return [[encode(key, options), keyValueSeparator, encode(value, options)].join('')];
 				}
 
 				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
@@ -353,7 +353,7 @@ export function parse(query, options) {
 			continue;
 		}
 
-		const parameter_ = options.decode ? parameter.replace(/\+/g, ' ') : parameter;
+		const parameter_ = options.decode ? parameter.replaceAll('+', ' ') : parameter;
 
 		let [key, value] = splitOnFirst(parameter_, '=');
 
@@ -395,10 +395,13 @@ export function stringify(object, options) {
 		return '';
 	}
 
-	options = {encode: true,
+	options = {
+		encode: true,
 		strict: true,
 		arrayFormat: 'none',
-		arrayFormatSeparator: ',', ...options};
+		arrayFormatSeparator: ',',
+		...options,
+	};
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
@@ -484,9 +487,7 @@ export function stringifyUrl(object, options) {
 	};
 
 	let queryString = stringify(query, options);
-	if (queryString) {
-		queryString = `?${queryString}`;
-	}
+	queryString &&= `?${queryString}`;
 
 	let hash = getHash(object.url);
 	if (typeof object.fragmentIdentifier === 'string') {

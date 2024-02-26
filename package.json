@@ -17,7 +17,7 @@
 	},
 	"sideEffects": false,
 	"engines": {
-		"node": ">=14.16"
+		"node": ">=18"
 	},
 	"scripts": {
 		"benchmark": "node benchmark.js",
@@ -51,12 +51,12 @@
 		"split-on-first": "^3.0.0"
 	},
 	"devDependencies": {
-		"ava": "^5.1.0",
+		"ava": "^6.1.1",
 		"benchmark": "^2.1.4",
-		"deep-equal": "^2.1.0",
-		"fast-check": "^3.4.0",
-		"tsd": "^0.25.0",
-		"xo": "^0.54.2"
+		"deep-equal": "^2.2.3",
+		"fast-check": "^3.15.1",
+		"tsd": "^0.30.7",
+		"xo": "^0.57.0"
 	},
 	"tsd": {
 		"compilerOptions": {
