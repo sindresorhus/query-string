@@ -20,6 +20,7 @@ test('query strings ending with a `&`', t => {
 
 test('parse a query string', t => {
 	t.deepEqual(queryString.parse('foo=bar'), {foo: 'bar'});
+	t.deepEqual(queryString.parse('foo=null'), {foo: 'null'});
 });
 
 test('parse multiple query string', t => {
