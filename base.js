@@ -300,8 +300,16 @@ function getHash(url) {
 	return hash;
 }
 
-function parseValue(value, options) {
-	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+function parseValue(value, options, type) {
+	if (type === 'string' && (typeof value === 'string')) {
+		return value;
+	}
+
+	if (typeof type === 'function' && (typeof value === 'string')) {
+		value = type(value);
+	} else if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		value = Number(value);
+	} else if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
 		value = Number(value);
 	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 		value = value.toLowerCase() === 'true';
@@ -328,6 +336,7 @@ export function parse(query, options) {
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false,
+		types: Object.create(null),
 		...options,
 	};
 
@@ -368,12 +377,15 @@ export function parse(query, options) {
 	}
 
 	for (const [key, value] of Object.entries(returnValue)) {
-		if (typeof value === 'object' && value !== null) {
+		if (typeof value === 'object' && value !== null && options.types[key] !== 'string') {
 			for (const [key2, value2] of Object.entries(value)) {
-				value[key2] = parseValue(value2, options);
+				const type = options.types[key] ? options.types[key].replace('[]', '') : undefined;
+				value[key2] = parseValue(value2, options, type);
 			}
+		} else if (typeof value === 'object' && value !== null && options.types[key] === 'string') {
+			returnValue[key] = Object.values(value).join(options.arrayFormatSeparator);
 		} else {
-			returnValue[key] = parseValue(value, options);
+			returnValue[key] = parseValue(value, options, options.types[key]);
 		}
 	}
 
