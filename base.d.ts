@@ -1,5 +1,3 @@
-export type CustomValueParser = (value: string) => unknown;
-
 export type ParseOptions = {
 	/**
 	Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
@@ -173,31 +171,90 @@ export type ParseOptions = {
 	readonly parseFragmentIdentifier?: boolean;
 
 	/**
-	Specify a pre-defined schema to be used when parsing values.
-	Use this feature to override configuration options: parseNumber, parseBooleans, and arrayFormat.
-	pre-defined types specified here will be used even if parsing options such parseNumber as are not enabled.
+	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over global parameters such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+
+	Use this feature to override the type for a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
+
+	Types specified here will be used even when global parsing options such as `parseNumber`, and `arrayFormat` are not enabled (see example 3).
+
+	NOTE: array types (`string[]` and `number[]`) will not work if `arrayFormat` is set to `none`.
 
 	@default {}
 
 	@example
+	Parse `phoneNumber` as a string, overriding the `parseNumber` option:
 	```
 	import queryString from 'query-string';
 
-	queryString.parse("ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&nums=1%2C2%2C3&double=5&number=20",
-		{ arrayFormat: "comma", types: {
-				ids: "string",
-				items: "string[]",
-				price: "string",
-				nums: "number[]",
-				double: (value) => value * 2,
-				number: "number",
+	queryString.parse('?phoneNumber=%2B380951234567&id=1', {
+		parseNumbers: true,
+		types: {
+			phoneNumber: 'string',
+		}
+	});
+	//=> {phoneNumber: '+380951234567', id: 1}
+	```
+
+	@example
+	Parse `items` as an array of strings, overriding the `parseNumber` option:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&items=1%2C2%2C3', {
+		parseNumber: true,
+		types: {
+			items: 'string[]',
+		}
+	});
+	//=> {age: 20, items: ['1', '2', '3']}
+	```
+
+	@example
+	Parse `age` as a number, even when `parseNumber` is false:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&id=01234&zipcode=90210', {
+		types: {
+			age: 'number',
+		}
+	});
+	//=> {age: 20, id: '01234', zipcode: '90210 }
+	```
+
+	@example
+	Parse `age` using a custom value parser:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&id=01234&zipcode=90210', {
+		types: {
+			age: (value) => value * 2,
+		}
+	});
+	//=> {age: 40, id: '01234', zipcode: '90210 }
+	```
+
+	@example
+	Parse a query utilizing all types:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse("ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&nums=1%2C2%2C3&double=5&number=20", {
+		arrayFormat: "comma",
+		types: {
+			ids: "string",
+			items: "string[]",
+			price: "string",
+			nums: "number[]",
+			double: (value) => value * 2,
+			number: "number",
 		},
 	});
-	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', nums: [1, 2, 3], double: 10, number: 20,}
-
+	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', nums: [1, 2, 3], double: 10, number: 20}
 	```
 	*/
-	readonly types?: Record<string, 'number' | 'string' | 'string[]' | 'number[]' | CustomValueParser>;
+	readonly types?: Record<string, 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)>;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
