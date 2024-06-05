@@ -405,7 +405,7 @@ test('query strings having (:list) colon-list-separator arrays including null va
 	t.deepEqual(queryString.parse('bar:list=one&bar:list=two&foo', {arrayFormat: 'colon-list-separator'}), {bar: ['one', 'two'], foo: null});
 });
 
-test('pre-defined types parsing: can override a parsed number to be a string ', t => {
+test('types option: can override a parsed number to be a string ', t => {
 	t.deepEqual(queryString.parse('phoneNumber=%2B380951234567', {
 		parseNumbers: true,
 		types: {
@@ -414,9 +414,22 @@ test('pre-defined types parsing: can override a parsed number to be a string ', 
 	}), {phoneNumber: '+380951234567'});
 });
 
-test('pre-defined types parsing: can override parsed numbers arrays to be string[]', t => {
+test('types option: can override a parsed boolean value to be a string', t => {
+	t.deepEqual(queryString.parse('question=true', {
+		parseBooleans: true,
+		types: {
+			question: 'string',
+		},
+	}), {
+		question: 'true',
+	});
+});
+
+test('types option: can override parsed numbers arrays to be string[]', t => {
 	t.deepEqual(queryString.parse('ids=999%2C998%2C997&items=1%2C2%2C3', {
-		arrayFormat: 'comma', parseNumbers: true, types: {
+		arrayFormat: 'comma',
+		parseNumbers: true,
+		types: {
 			ids: 'string[]',
 		},
 	}), {
@@ -425,9 +438,10 @@ test('pre-defined types parsing: can override parsed numbers arrays to be string
 	});
 });
 
-test('pre-defined types parsing: can override string arrays to be number[]', t => {
+test('types option: can override string arrays to be number[]', t => {
 	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
-		arrayFormat: 'comma', types: {
+		arrayFormat: 'comma',
+		types: {
 			ids: 'number[]',
 		},
 	}), {
@@ -436,9 +450,11 @@ test('pre-defined types parsing: can override string arrays to be number[]', t =
 	});
 });
 
-test('pre-defined types parsing: can override an array to be string', t => {
+test('types option: can override an array to be string', t => {
 	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
-		arrayFormat: 'comma', parseNumbers: true, types: {
+		arrayFormat: 'comma',
+		parseNumbers: true,
+		types: {
 			ids: 'string',
 		},
 	}), {
@@ -447,9 +463,12 @@ test('pre-defined types parsing: can override an array to be string', t => {
 	});
 });
 
-test('pre-defined types parsing: can override a separator array to be string ', t => {
+test('types option: can override a separator array to be string ', t => {
 	t.deepEqual(queryString.parse('ids=001|002|003&items=1|2|3', {
-		arrayFormat: 'separator', arrayFormatSeparator: '|', parseNumbers: true, types: {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: '|',
+		parseNumbers: true,
+		types: {
 			ids: 'string',
 		},
 	}), {
@@ -458,9 +477,9 @@ test('pre-defined types parsing: can override a separator array to be string ', 
 	});
 });
 
-test('pre-defined types parsing: when value is not of specified type, it will safely parse the value as string', t => {
+test('types option: when value is not of specified type, it will safely parse the value as string', t => {
 	t.deepEqual(queryString.parse('id=example', {
-		arrayFormat: 'comma', types: {
+		types: {
 			id: 'number',
 		},
 	}), {
@@ -468,9 +487,10 @@ test('pre-defined types parsing: when value is not of specified type, it will sa
 	});
 });
 
-test('pre-defined types parsing: will parse the value as number if specified in type but parseNumbers is false', t => {
+test('types option: will parse the value as number if specified in type but parseNumbers is false', t => {
 	t.deepEqual(queryString.parse('id=123', {
-		arrayFormat: 'comma', types: {
+		arrayFormat: 'comma',
+		types: {
 			id: 'number',
 		},
 	}), {
@@ -478,9 +498,10 @@ test('pre-defined types parsing: will parse the value as number if specified in 
 	});
 });
 
-test('pre-defined types parsing: all supported types work in conjunction with one another', t => {
+test('types option: all supported types work in conjunction with one another', t => {
 	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&nums=1%2C2%2C3&double=5&number=20', {
-		arrayFormat: 'comma', types: {
+		arrayFormat: 'comma',
+		types: {
 			ids: 'string',
 			items: 'string[]',
 			price: 'string',
