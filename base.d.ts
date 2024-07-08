@@ -240,18 +240,18 @@ export type ParseOptions = {
 	```
 	import queryString from 'query-string';
 
-	queryString.parse("ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&nums=1%2C2%2C3&double=5&number=20", {
+	queryString.parse("ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20", {
 		arrayFormat: "comma",
 		types: {
 			ids: "string",
 			items: "string[]",
 			price: "string",
-			nums: "number[]",
+			numbers: "number[]",
 			double: (value) => value * 2,
 			number: "number",
 		},
 	});
-	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', nums: [1, 2, 3], double: 10, number: 20}
+	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', numbers: [1, 2, 3], double: 10, number: 20}
 	```
 	*/
 	readonly types?: Record<string, 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)>;
