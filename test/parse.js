@@ -487,6 +487,19 @@ test('types option: when value is not of specified type, it will safely parse th
 	});
 });
 
+test('types option: array types will have no effect if arrayFormat is set to "none"', t => {
+	t.deepEqual(queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+		arrayFormat: 'none',
+		types: {
+			ids: 'number[]',
+			foods: 'string[]',
+		},
+	}), {
+		ids: '001,002,003',
+		foods: 'apple,orange,mango',
+	});
+});
+
 test('types option: will parse the value as number if specified in type but parseNumbers is false', t => {
 	t.deepEqual(queryString.parse('id=123', {
 		arrayFormat: 'comma',
