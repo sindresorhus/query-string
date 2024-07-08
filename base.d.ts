@@ -87,7 +87,14 @@ export type ParseOptions = {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'colon-list-separator' | 'none';
+	readonly arrayFormat?:
+	| 'bracket'
+	| 'index'
+	| 'comma'
+	| 'separator'
+	| 'bracket-separator'
+	| 'colon-list-separator'
+	| 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -175,7 +182,9 @@ export type ParseOptions = {
 
 	Use this feature to override the type for a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
 
-	NOTE: array types (`string[]` and `number[]`) will not work if `arrayFormat` is set to `none`.
+	It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value (see example 4).
+
+	NOTE: array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none` (see example 5).
 
 	@default {}
 
@@ -234,11 +243,24 @@ export type ParseOptions = {
 	```
 
 	@example
+	Array types will have no effect when `arrayFormat` is set to `none`
+	```
+	queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+		arrayFormat: 'none',
+		types: {
+			ids: 'number[]',
+			foods: 'string[]',
+		},
+	}
+	//=> {ids:'001,002,003', foods:'apple,orange,mango'}
+	```
+
+	@example
 	Parse a query utilizing all types:
 	```
 	import queryString from 'query-string';
 
-	queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+	queryString.parse('?ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
 		arrayFormat: 'comma',
 		types: {
 			ids: 'string',
@@ -252,7 +274,10 @@ export type ParseOptions = {
 	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', numbers: [1, 2, 3], double: 10, number: 20}
 	```
 	*/
-	readonly types?: Record<string, 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)>;
+	readonly types?: Record<
+	string,
+	'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
+	>;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
