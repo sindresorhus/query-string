@@ -1,6 +1,6 @@
 import decodeComponent from 'decode-uri-component';
-import splitOnFirst from 'split-on-first';
 import {includeKeys} from 'filter-obj';
+import splitOnFirst from 'split-on-first';
 
 const isNullOrUndefined = value => value === null || value === undefined;
 
@@ -301,18 +301,24 @@ function getHash(url) {
 }
 
 function parseValue(value, options, type) {
-	if (type === 'string' && (typeof value === 'string')) {
+	if (type === 'string' && typeof value === 'string') {
 		return value;
 	}
 
-	if (typeof type === 'function' && (typeof value === 'string')) {
-		value = type(value);
-	} else if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		value = Number(value);
-	} else if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		value = Number(value);
-	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-		value = value.toLowerCase() === 'true';
+	if (typeof type === 'function' && typeof value === 'string') {
+		return type(value);
+	}
+
+	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		return value.toLowerCase() === 'true';
+	}
+
+	if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		return Number(value);
+	}
+
+	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		return Number(value);
 	}
 
 	return value;
