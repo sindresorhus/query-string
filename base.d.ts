@@ -171,11 +171,9 @@ export type ParseOptions = {
 	readonly parseFragmentIdentifier?: boolean;
 
 	/**
-	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over global parameters such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
 
 	Use this feature to override the type for a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
-
-	Types specified here will be used even when global parsing options such as `parseNumber`, and `arrayFormat` are not enabled (see example 3).
 
 	NOTE: array types (`string[]` and `number[]`) will not work if `arrayFormat` is set to `none`.
 
@@ -240,15 +238,15 @@ export type ParseOptions = {
 	```
 	import queryString from 'query-string';
 
-	queryString.parse("ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20", {
-		arrayFormat: "comma",
+	queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+		arrayFormat: 'comma',
 		types: {
-			ids: "string",
-			items: "string[]",
-			price: "string",
-			numbers: "number[]",
+			ids: 'string',
+			items: 'string[]',
+			price: 'string',
+			numbers: 'number[]',
 			double: (value) => value * 2,
-			number: "number",
+			number: 'number',
 		},
 	});
 	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', numbers: [1, 2, 3], double: 10, number: 20}
