@@ -184,7 +184,7 @@ export type ParseOptions = {
 
 	It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value (see example 4).
 
-	NOTE: array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none` (see example 5).
+	NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none` (see example 5).
 
 	@default {}
 
