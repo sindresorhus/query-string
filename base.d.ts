@@ -180,7 +180,7 @@ export type ParseOptions = {
 	/**
 	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
 
-	Use this feature to override the type for a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
+	Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
 
 	It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value (see example 4).
 
