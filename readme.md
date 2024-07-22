@@ -224,6 +224,114 @@ queryString.parse('foo=true', {parseBooleans: true});
 
 Parse the value as a boolean type instead of string type if it's a boolean.
 
+##### types
+
+Type: `object`\
+Default: `{}`
+
+Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+
+Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number.
+
+It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value.
+
+Supported Types:
+
+- `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumber` option):
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?phoneNumber=%2B380951234567&id=1', {
+	parseNumbers: true,
+	types: {
+		phoneNumber: 'string',
+	}
+});
+//=> {phoneNumber: '+380951234567', id: 1}
+```
+
+- `'number'`:  Parse `age` as a number (even when `parseNumber` is false):
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?age=20&id=01234&zipcode=90210', {
+	types: {
+		age: 'number',
+	}
+});
+//=> {age: 20, id: '01234', zipcode: '90210 }
+```
+
+- `'string[]'`:  Parse `items` as an array of strings (overriding the `parseNumber` option):
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?age=20&items=1%2C2%2C3', {
+	parseNumber: true,
+	types: {
+		items: 'string[]',
+	}
+});
+//=> {age: 20, items: ['1', '2', '3']}
+```
+
+- `'number[]'`:  Parse `items` as an array of numbers (even when `parseNumber` is false):
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?age=20&items=1%2C2%2C3', {
+	types: {
+		items: 'number[]',
+	}
+});
+//=> {age: '20', items: [1, 2, 3]}
+```
+
+- `'Function'`: Provide a custom function as the parameter type. The parameter's value will equal the function's return value.
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?age=20&id=01234&zipcode=90210', {
+	types: {
+		age: (value) => value * 2,
+	}
+});
+//=> {age: 40, id: '01234', zipcode: '90210 }
+```
+
+NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none`.
+
+```js
+queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+	arrayFormat: 'none',
+	types: {
+		ids: 'number[]',
+		foods: 'string[]',
+	},
+}
+//=> {ids:'001,002,003', foods:'apple,orange,mango'}
+```
+
+###### Function
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('?age=20&id=01234&zipcode=90210', {
+	types: {
+		age: (value) => value * 2,
+	}
+});
+//=> {age: 40, id: '01234', zipcode: '90210 }
+```
+
+Parse the value as a boolean type instead of string type if it's a boolean.
+
 ### .stringify(object, options?)
 
 Stringify an object into a query string and sorting the keys.

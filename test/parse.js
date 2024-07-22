@@ -404,3 +404,130 @@ test('query strings having (:list) colon-list-separator arrays', t => {
 test('query strings having (:list) colon-list-separator arrays including null values', t => {
 	t.deepEqual(queryString.parse('bar:list=one&bar:list=two&foo', {arrayFormat: 'colon-list-separator'}), {bar: ['one', 'two'], foo: null});
 });
+
+test('types option: can override a parsed number to be a string ', t => {
+	t.deepEqual(queryString.parse('phoneNumber=%2B380951234567', {
+		parseNumbers: true,
+		types: {
+			phoneNumber: 'string',
+		},
+	}), {phoneNumber: '+380951234567'});
+});
+
+test('types option: can override a parsed boolean value to be a string', t => {
+	t.deepEqual(queryString.parse('question=true', {
+		parseBooleans: true,
+		types: {
+			question: 'string',
+		},
+	}), {
+		question: 'true',
+	});
+});
+
+test('types option: can override parsed numbers arrays to be string[]', t => {
+	t.deepEqual(queryString.parse('ids=999%2C998%2C997&items=1%2C2%2C3', {
+		arrayFormat: 'comma',
+		parseNumbers: true,
+		types: {
+			ids: 'string[]',
+		},
+	}), {
+		ids: ['999', '998', '997'],
+		items: [1, 2, 3],
+	});
+});
+
+test('types option: can override string arrays to be number[]', t => {
+	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
+		arrayFormat: 'comma',
+		types: {
+			ids: 'number[]',
+		},
+	}), {
+		ids: [1, 2, 3],
+		items: ['1', '2', '3'],
+	});
+});
+
+test('types option: can override an array to be string', t => {
+	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
+		arrayFormat: 'comma',
+		parseNumbers: true,
+		types: {
+			ids: 'string',
+		},
+	}), {
+		ids: '001,002,003',
+		items: [1, 2, 3],
+	});
+});
+
+test('types option: can override a separator array to be string ', t => {
+	t.deepEqual(queryString.parse('ids=001|002|003&items=1|2|3', {
+		arrayFormat: 'separator',
+		arrayFormatSeparator: '|',
+		parseNumbers: true,
+		types: {
+			ids: 'string',
+		},
+	}), {
+		ids: '001|002|003',
+		items: [1, 2, 3],
+	});
+});
+
+test('types option: when value is not of specified type, it will safely parse the value as string', t => {
+	t.deepEqual(queryString.parse('id=example', {
+		types: {
+			id: 'number',
+		},
+	}), {
+		id: 'example',
+	});
+});
+
+test('types option: array types will have no effect if arrayFormat is set to "none"', t => {
+	t.deepEqual(queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+		arrayFormat: 'none',
+		types: {
+			ids: 'number[]',
+			foods: 'string[]',
+		},
+	}), {
+		ids: '001,002,003',
+		foods: 'apple,orange,mango',
+	});
+});
+
+test('types option: will parse the value as number if specified in type but parseNumbers is false', t => {
+	t.deepEqual(queryString.parse('id=123', {
+		arrayFormat: 'comma',
+		types: {
+			id: 'number',
+		},
+	}), {
+		id: 123,
+	});
+});
+
+test('types option: all supported types work in conjunction with one another', t => {
+	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+		arrayFormat: 'comma',
+		types: {
+			ids: 'string',
+			items: 'string[]',
+			price: 'string',
+			numbers: 'number[]',
+			double: value => value * 2,
+			number: 'number',
+		},
+	}), {
+		ids: '001,002,003',
+		items: ['1', '2', '3'],
+		price: '22.00',
+		numbers: [1, 2, 3],
+		double: 10,
+		number: 20,
+	});
+});

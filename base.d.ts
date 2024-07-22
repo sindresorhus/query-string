@@ -87,7 +87,14 @@ export type ParseOptions = {
 		//=> {foo: ['1', '2', '3']}
 		```
 	*/
-	readonly arrayFormat?: 'bracket' | 'index' | 'comma' | 'separator' | 'bracket-separator' | 'colon-list-separator' | 'none';
+	readonly arrayFormat?:
+	| 'bracket'
+	| 'index'
+	| 'comma'
+	| 'separator'
+	| 'bracket-separator'
+	| 'colon-list-separator'
+	| 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -169,6 +176,108 @@ export type ParseOptions = {
 	```
 	*/
 	readonly parseFragmentIdentifier?: boolean;
+
+	/**
+	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+
+	Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
+
+	It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value (see example 4).
+
+	NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none` (see example 5).
+
+	@default {}
+
+	@example
+	Parse `phoneNumber` as a string, overriding the `parseNumber` option:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?phoneNumber=%2B380951234567&id=1', {
+		parseNumbers: true,
+		types: {
+			phoneNumber: 'string',
+		}
+	});
+	//=> {phoneNumber: '+380951234567', id: 1}
+	```
+
+	@example
+	Parse `items` as an array of strings, overriding the `parseNumber` option:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&items=1%2C2%2C3', {
+		parseNumber: true,
+		types: {
+			items: 'string[]',
+		}
+	});
+	//=> {age: 20, items: ['1', '2', '3']}
+	```
+
+	@example
+	Parse `age` as a number, even when `parseNumber` is false:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&id=01234&zipcode=90210', {
+		types: {
+			age: 'number',
+		}
+	});
+	//=> {age: 20, id: '01234', zipcode: '90210 }
+	```
+
+	@example
+	Parse `age` using a custom value parser:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?age=20&id=01234&zipcode=90210', {
+		types: {
+			age: (value) => value * 2,
+		}
+	});
+	//=> {age: 40, id: '01234', zipcode: '90210 }
+	```
+
+	@example
+	Array types will have no effect when `arrayFormat` is set to `none`
+	```
+	queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+		arrayFormat: 'none',
+		types: {
+			ids: 'number[]',
+			foods: 'string[]',
+		},
+	}
+	//=> {ids:'001,002,003', foods:'apple,orange,mango'}
+	```
+
+	@example
+	Parse a query utilizing all types:
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('?ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+		arrayFormat: 'comma',
+		types: {
+			ids: 'string',
+			items: 'string[]',
+			price: 'string',
+			numbers: 'number[]',
+			double: (value) => value * 2,
+			number: 'number',
+		},
+	});
+	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', numbers: [1, 2, 3], double: 10, number: 20}
+	```
+	*/
+	readonly types?: Record<
+	string,
+	'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
+	>;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types

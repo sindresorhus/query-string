@@ -1,6 +1,6 @@
 import decodeComponent from 'decode-uri-component';
-import splitOnFirst from 'split-on-first';
 import {includeKeys} from 'filter-obj';
+import splitOnFirst from 'split-on-first';
 
 const isNullOrUndefined = value => value === null || value === undefined;
 
@@ -300,11 +300,25 @@ function getHash(url) {
 	return hash;
 }
 
-function parseValue(value, options) {
+function parseValue(value, options, type) {
+	if (type === 'string' && typeof value === 'string') {
+		return value;
+	}
+
+	if (typeof type === 'function' && typeof value === 'string') {
+		return type(value);
+	}
+
+	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		return value.toLowerCase() === 'true';
+	}
+
+	if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		return Number(value);
+	}
+
 	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		value = Number(value);
-	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-		value = value.toLowerCase() === 'true';
+		return Number(value);
 	}
 
 	return value;
@@ -328,6 +342,7 @@ export function parse(query, options) {
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false,
+		types: Object.create(null),
 		...options,
 	};
 
@@ -368,12 +383,15 @@ export function parse(query, options) {
 	}
 
 	for (const [key, value] of Object.entries(returnValue)) {
-		if (typeof value === 'object' && value !== null) {
+		if (typeof value === 'object' && value !== null && options.types[key] !== 'string') {
 			for (const [key2, value2] of Object.entries(value)) {
-				value[key2] = parseValue(value2, options);
+				const type = options.types[key] ? options.types[key].replace('[]', '') : undefined;
+				value[key2] = parseValue(value2, options, type);
 			}
+		} else if (typeof value === 'object' && value !== null && options.types[key] === 'string') {
+			returnValue[key] = Object.values(value).join(options.arrayFormatSeparator);
 		} else {
-			returnValue[key] = parseValue(value, options);
+			returnValue[key] = parseValue(value, options, options.types[key]);
 		}
 	}
 
