@@ -235,7 +235,6 @@ Use this feature to override the type of a value. This can be useful when the ty
 
 It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value.
 
-
 Supported Types:
 
 - `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumber` option):
@@ -321,7 +320,6 @@ queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
 ###### Function
 
 ```js
-
 import queryString from 'query-string';
 
 queryString.parse('?age=20&id=01234&zipcode=90210', {
