@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '../index.js';
+import queryString from '../dist/index.js';
 
 test('stringify URL without a query string', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar/'}), 'https://foo.bar/');

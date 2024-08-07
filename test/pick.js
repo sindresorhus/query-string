@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '../index.js';
+import queryString from '../dist/index.js';
 
 test('picks elements in a URL with a filter array', t => {
 	t.is(queryString.pick('http://example.com/?a=1&b=2&c=3#a', ['a', 'b']), 'http://example.com/?a=1&b=2#a');

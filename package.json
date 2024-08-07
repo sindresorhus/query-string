@@ -13,7 +13,7 @@
 	"type": "module",
 	"exports": {
 		"types": "./index.d.ts",
-		"default": "./index.js"
+		"default": "./dist/index.js"
 	},
 	"sideEffects": false,
 	"engines": {
@@ -21,10 +21,11 @@
 	},
 	"scripts": {
 		"benchmark": "node benchmark.js",
-		"test": "xo && ava && tsd"
+		"test": "xo && ava && tsd",
+		"build": "rollup -c rollup.config.js"
 	},
 	"files": [
-		"index.js",
+		"dist/index.js",
 		"index.d.ts",
 		"base.js",
 		"base.d.ts"
@@ -51,10 +52,13 @@
 		"split-on-first": "^3.0.0"
 	},
 	"devDependencies": {
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-swc": "^0.3.1",
 		"ava": "^6.1.1",
 		"benchmark": "^2.1.4",
 		"deep-equal": "^2.2.3",
 		"fast-check": "^3.15.1",
+		"rollup": "^4.20.0",
 		"tsd": "^0.30.7",
 		"xo": "^0.57.0"
 	},

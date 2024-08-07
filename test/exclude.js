@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '../index.js';
+import queryString from '../dist/index.js';
 
 test('excludes elements in a URL with a filter array', t => {
 	t.is(queryString.exclude('http://example.com/?a=1&b=2&c=3#a', ['c']), 'http://example.com/?a=1&b=2#a');

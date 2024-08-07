@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '../index.js';
+import queryString from '../dist/index.js';
 
 test('query strings starting with a `?`', t => {
 	t.deepEqual(queryString.parse('?foo=bar'), {foo: 'bar'});

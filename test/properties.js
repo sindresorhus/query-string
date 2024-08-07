@@ -1,7 +1,7 @@
 import deepEqual from 'deep-equal';
 import fastCheck from 'fast-check';
 import test from 'ava';
-import queryString from '../index.js';
+import queryString from '../dist/index.js';
 
 // Valid query parameters must follow:
 // - key can be any unicode string (not empty)
