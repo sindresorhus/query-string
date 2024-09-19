@@ -221,7 +221,7 @@ function parserForArrayFormat(options) {
 
 				const arrayValue = value === null
 					? []
-					: value.split(options.arrayFormatSeparator).map(item => decode(item, options));
+					: decode(value, options).split(options.arrayFormatSeparator)
 
 				if (accumulator[key] === undefined) {
 					accumulator[key] = arrayValue;

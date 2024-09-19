@@ -215,6 +215,16 @@ test('query strings having a brackets+separator array and format option as `brac
 	}), {foo: ['']});
 });
 
+test('query strings having a brackets+separator array and format option as `bracket-separator` with a URL encoded value', t => {
+	t.deepEqual(queryString.parse('?testA%5B%5D=1&testB%5B%5D=a%2Cb%2Cc%2Cd%2Ce%2Cf&testC=true', {
+		arrayFormat: 'bracket-separator',
+	}), {
+		testA: ['1'],
+      	testB: ['a', 'b', 'c', 'd', 'e', 'f'],
+      	testC: 'true',
+	});
+});
+
 test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
 	t.deepEqual(queryString.parse('foo=bar=&foo=ba=z='), {foo: ['bar=', 'ba=z=']});
 });
