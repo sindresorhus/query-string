@@ -220,8 +220,8 @@ test('query strings having a brackets+separator array and format option as `brac
 		arrayFormat: 'bracket-separator',
 	}), {
 		testA: ['1'],
-      	testB: ['a', 'b', 'c', 'd', 'e', 'f'],
-      	testC: 'true',
+		testB: ['a', 'b', 'c', 'd', 'e', 'f'],
+		testC: 'true',
 	});
 });
 
