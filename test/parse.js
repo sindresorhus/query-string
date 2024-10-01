@@ -216,12 +216,12 @@ test('query strings having a brackets+separator array and format option as `brac
 });
 
 test('query strings having a brackets+separator array and format option as `bracket-separator` with a URL encoded value', t => {
-	t.deepEqual(queryString.parse('?testA%5B%5D=1&testB%5B%5D=a%2Cb%2Cc%2Cd%2Ce%2Cf&testC=true', {
+	const key = 'foo[]';
+	const value = 'a,b,c,d,e,f';
+	t.deepEqual(queryString.parse(`?${encodeURIComponent(key)}=${encodeURIComponent(value)}`, {
 		arrayFormat: 'bracket-separator',
 	}), {
-		testA: ['1'],
-		testB: ['a', 'b', 'c', 'd', 'e', 'f'],
-		testC: 'true',
+		foo: ['a', 'b', 'c', 'd', 'e', 'f'],
 	});
 });
 
