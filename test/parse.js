@@ -110,7 +110,8 @@ test('handle multiple values and preserve appearance order with indexes', t => {
 });
 
 test('query strings params including embedded `=`', t => {
-	t.deepEqual(queryString.parse('?param=https%3A%2F%2Fsomeurl%3Fid%3D2837'), {param: 'https://someurl?id=2837'});
+	const value = 'https://someurl?id=2837';
+	t.deepEqual(queryString.parse(`param=${encodeURIComponent(value)}`), {param: 'https://someurl?id=2837'});
 });
 
 test('object properties', t => {
@@ -315,7 +316,8 @@ test('decode keys and values', t => {
 });
 
 test('disable decoding of keys and values', t => {
-	t.deepEqual(queryString.parse('tags=postal%20office,burger%2C%20fries%20and%20coke', {decode: false}), {tags: 'postal%20office,burger%2C%20fries%20and%20coke'});
+	const value = 'postal office,burger, fries and coke';
+	t.deepEqual(queryString.parse(`tags=${encodeURIComponent(value)}`, {decode: false}), {tags: 'postal%20office%2Cburger%2C%20fries%20and%20coke'});
 });
 
 test('number value returns as string by default', t => {
@@ -386,7 +388,8 @@ test('parse throws TypeError for invalid arrayFormatSeparator', t => {
 });
 
 test('query strings having comma encoded and format option as `comma`', t => {
-	t.deepEqual(queryString.parse('foo=zero%2Cone,two%2Cthree', {arrayFormat: 'comma'}), {
+	const values = ['zero,one', 'two,three'];
+	t.deepEqual(queryString.parse(`foo=${encodeURIComponent(values[0])},${encodeURIComponent(values[1])}`, {arrayFormat: 'comma'}), {
 		foo: [
 			'zero,one',
 			'two,three',
@@ -402,7 +405,8 @@ test('value should not be decoded twice with `arrayFormat` option set as `separa
 
 // See https://github.com/sindresorhus/query-string/issues/242
 test('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
-	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
+	const value = '1,2,3';
+	t.deepEqual(queryString.parse(`id=${encodeURIComponent(value)}`, {arrayFormat: 'comma', parseNumbers: true}), {
 		id: [1, 2, 3],
 	});
 });
@@ -416,7 +420,8 @@ test('query strings having (:list) colon-list-separator arrays including null va
 });
 
 test('types option: can override a parsed number to be a string ', t => {
-	t.deepEqual(queryString.parse('phoneNumber=%2B380951234567', {
+	const phoneNumber = '+380951234567';
+	t.deepEqual(queryString.parse(`phoneNumber=${encodeURIComponent(phoneNumber)}`, {
 		parseNumbers: true,
 		types: {
 			phoneNumber: 'string',
@@ -436,7 +441,7 @@ test('types option: can override a parsed boolean value to be a string', t => {
 });
 
 test('types option: can override parsed numbers arrays to be string[]', t => {
-	t.deepEqual(queryString.parse('ids=999%2C998%2C997&items=1%2C2%2C3', {
+	t.deepEqual(queryString.parse('ids=999,998,997&items=1,2,3', {
 		arrayFormat: 'comma',
 		parseNumbers: true,
 		types: {
@@ -449,7 +454,7 @@ test('types option: can override parsed numbers arrays to be string[]', t => {
 });
 
 test('types option: can override string arrays to be number[]', t => {
-	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
+	t.deepEqual(queryString.parse('ids=1,2,3&items=1,2,3', {
 		arrayFormat: 'comma',
 		types: {
 			ids: 'number[]',
@@ -461,7 +466,7 @@ test('types option: can override string arrays to be number[]', t => {
 });
 
 test('types option: can override an array to be string', t => {
-	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3', {
+	t.deepEqual(queryString.parse('ids=001,002,003&items=1,2,3', {
 		arrayFormat: 'comma',
 		parseNumbers: true,
 		types: {
@@ -498,7 +503,7 @@ test('types option: when value is not of specified type, it will safely parse th
 });
 
 test('types option: array types will have no effect if arrayFormat is set to "none"', t => {
-	t.deepEqual(queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+	t.deepEqual(queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
 		arrayFormat: 'none',
 		types: {
 			ids: 'number[]',
@@ -522,7 +527,7 @@ test('types option: will parse the value as number if specified in type but pars
 });
 
 test('types option: all supported types work in conjunction with one another', t => {
-	t.deepEqual(queryString.parse('ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+	t.deepEqual(queryString.parse('ids=001,002,003&items=1,2,3&price=22.00&numbers=1,2,3&double=5&number=20', {
 		arrayFormat: 'comma',
 		types: {
 			ids: 'string',
