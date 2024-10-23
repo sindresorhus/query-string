@@ -126,6 +126,18 @@ test('array stringify representation with array commas', t => {
 	}), 'bar=one,two&foo');
 });
 
+test('array stringify representation with array commas and null/empty values', t => {
+    const result = queryString.stringify({
+        list: ['item', null, 'last', '']
+    }, {
+        arrayFormat: 'comma',
+        skipNull: false,
+        skipEmptyString: false
+    });
+
+    t.is(result, 'list=item,,last,');
+});
+
 test('array stringify representation with array commas and null value', t => {
 	t.is(queryString.stringify({
 		foo: [null, 'a', null, ''],
