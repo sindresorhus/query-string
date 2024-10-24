@@ -10,14 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 14
-          - 12
-          - 10
-          - 8
-          - 6
+          - 20
+          - 18
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install

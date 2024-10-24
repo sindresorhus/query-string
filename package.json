@@ -1,6 +1,6 @@
 {
 	"name": "query-string",
-	"version": "6.13.8",
+	"version": "9.1.1",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
 	"repository": "sindresorhus/query-string",
@@ -10,8 +10,14 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
+	"exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
+	"sideEffects": false,
 	"engines": {
-		"node": ">=6"
+		"node": ">=18"
 	},
 	"scripts": {
 		"benchmark": "node benchmark.js",
@@ -19,7 +25,9 @@
 	},
 	"files": [
 		"index.js",
-		"index.d.ts"
+		"index.d.ts",
+		"base.js",
+		"base.d.ts"
 	],
 	"keywords": [
 		"browser",
@@ -34,19 +42,25 @@
 		"stringify",
 		"encode",
 		"decode",
-		"searchparams"
+		"searchparams",
+		"filter"
 	],
 	"dependencies": {
-		"decode-uri-component": "^0.2.0",
-		"split-on-first": "^1.0.0",
-		"strict-uri-encode": "^2.0.0"
+		"decode-uri-component": "^0.4.1",
+		"filter-obj": "^5.1.0",
+		"split-on-first": "^3.0.0"
 	},
 	"devDependencies": {
-		"ava": "^1.4.1",
+		"ava": "^6.1.1",
 		"benchmark": "^2.1.4",
-		"deep-equal": "^1.0.1",
-		"fast-check": "^1.5.0",
-		"tsd": "^0.7.3",
-		"xo": "^0.24.0"
+		"deep-equal": "^2.2.3",
+		"fast-check": "^3.15.1",
+		"tsd": "^0.30.7",
+		"xo": "^0.57.0"
+	},
+	"tsd": {
+		"compilerOptions": {
+			"module": "node16"
+		}
 	}
 }

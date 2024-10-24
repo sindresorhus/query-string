@@ -1,5 +1,5 @@
 import test from 'ava';
-import queryString from '..';
+import queryString from '../index.js';
 
 test('extracts query string from url', t => {
 	t.is(queryString.extract('https://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
@@ -18,9 +18,13 @@ test('handles strings not containing query string', t => {
 test('throws for invalid values', t => {
 	t.throws(() => {
 		queryString.extract(null);
-	}, TypeError);
+	}, {
+		instanceOf: TypeError,
+	});
 
 	t.throws(() => {
 		queryString.extract(undefined);
-	}, TypeError);
+	}, {
+		instanceOf: TypeError,
+	});
 });
