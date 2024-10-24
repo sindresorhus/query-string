@@ -133,13 +133,25 @@ test('array stringify representation with array commas', t => {
 	}), 'bar=one,two&foo');
 });
 
+test('array stringify representation with array commas and null/empty values', t => {
+    const result = queryString.stringify({
+        list: ['item', null, 'last', '']
+    }, {
+        arrayFormat: 'comma',
+        skipNull: false,
+        skipEmptyString: false
+    });
+
+    t.is(result, 'list=item,,last,');
+});
+
 test('array stringify representation with array commas, null & empty string', t => {
 	t.is(queryString.stringify({
 		c: [null, 'a', '', null],
 		b: [null],
-		a: [''],
+		a: ['']
 	}, {
-		arrayFormat: 'comma',
+		arrayFormat: 'comma'
 	}), 'a=&b=&c=,a,,');
 });
 
@@ -147,11 +159,11 @@ test('array stringify representation with array commas, null & empty string (ski
 	t.is(queryString.stringify({
 		c: [null, 'a', '', null],
 		b: [null],
-		a: [''],
+		a: ['']
 	}, {
 		skipNull: true,
 		skipEmptyString: true,
-		arrayFormat: 'comma',
+		arrayFormat: 'comma'
 	}), 'c=a');
 });
 
@@ -160,7 +172,7 @@ test('array stringify representation with array commas and 0 value', t => {
 		foo: ['a', null, 0],
 		bar: [null],
 	}, {
-		arrayFormat: 'comma',
+		arrayFormat: 'comma'
 	}), 'bar=&foo=a,,0');
 });
 

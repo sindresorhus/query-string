@@ -310,6 +310,33 @@ test('circuit original → parse → stringify with array commas → sorted orig
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
 });
 
+test('circuit parse → stringify with array commas', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const expected = {
+		c: ['', 'a', '', ''],
+		b: '',
+		a: ''
+	};
+	const options = {
+		arrayFormat: 'comma'
+	};
+
+	t.deepEqual(queryString.parse(original, options), expected);
+
+	t.is(queryString.stringify(expected, options), sortedOriginal);
+});
+
+test('circuit original → parse → stringify with array commas → sorted original', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const options = {
+		arrayFormat: 'comma'
+	};
+
+	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
+});
+
 test('decode keys and values', t => {
 	t.deepEqual(queryString.parse('st%C3%A5le=foo'), {ståle: 'foo'});
 	t.deepEqual(queryString.parse('foo=%7B%ab%%7C%de%%7D+%%7Bst%C3%A5le%7D%'), {foo: '{%ab%|%de%} %{ståle}%'});

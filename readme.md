@@ -379,51 +379,6 @@ queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 // and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
 ```
 
-- `'separator'`: Serialize arrays by separating elements with a custom character:
-
-```js
-import queryString from 'query-string';
-
-queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
-//=> 'foo=1|2|3'
-```
-
-- `'bracket-separator'`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
-
-```js
-import queryString from 'query-string';
-
-queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]'
-
-queryString.stringify({foo: ['']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]='
-
-queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]=1'
-
-queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]=1|2|3'
-
-queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]=1||3|||6'
-
-queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|', skipNull: true});
-//=> 'foo[]=1||3|6'
-
-queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
-```
-
-- `'colon-list-separator'`: Serialize arrays with parameter names that are explicitly marked with `:list`:
-
-```js
-import queryString from 'query-string';
-
-queryString.stringify({foo: ['one', 'two']}, {arrayFormat: 'colon-list-separator'});
-//=> 'foo:list=one&foo:list=two'
-```
-
 - `'none'`: Serialize arrays by using duplicate keys:
 
 ```js
