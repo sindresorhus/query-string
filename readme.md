@@ -217,7 +217,7 @@ Parse the value as a boolean type instead of string type if it's a boolean.
 Type: `object`\
 Default: `{}`
 
-Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumbers`, `parseBooleans`, and `arrayFormat`.
 
 Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number.
 
@@ -225,7 +225,7 @@ It is possible to provide a custom function as the parameter type. The parameter
 
 Supported Types:
 
-- `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumber` option):
+- `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumbers` option):
 
 ```js
 import queryString from 'query-string';
@@ -239,7 +239,7 @@ queryString.parse('?phoneNumber=%2B380951234567&id=1', {
 //=> {phoneNumber: '+380951234567', id: 1}
 ```
 
-- `'number'`:  Parse `age` as a number (even when `parseNumber` is false):
+- `'number'`:  Parse `age` as a number (even when `parseNumbers` is false):
 
 ```js
 import queryString from 'query-string';
@@ -252,13 +252,13 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 //=> {age: 20, id: '01234', zipcode: '90210 }
 ```
 
-- `'string[]'`:  Parse `items` as an array of strings (overriding the `parseNumber` option):
+- `'string[]'`:  Parse `items` as an array of strings (overriding the `parseNumbers` option):
 
 ```js
 import queryString from 'query-string';
 
 queryString.parse('?age=20&items=1%2C2%2C3', {
-	parseNumber: true,
+	parseNumbers: true,
 	types: {
 		items: 'string[]',
 	}
@@ -266,7 +266,7 @@ queryString.parse('?age=20&items=1%2C2%2C3', {
 //=> {age: 20, items: ['1', '2', '3']}
 ```
 
-- `'number[]'`:  Parse `items` as an array of numbers (even when `parseNumber` is false):
+- `'number[]'`:  Parse `items` as an array of numbers (even when `parseNumbers` is false):
 
 ```js
 import queryString from 'query-string';
