@@ -547,8 +547,7 @@ test('types option: all supported types work in conjunction with one another', t
 	});
 });
 
-// https://github.com/sindresorhus/query-string/issues/404
-test.failing('types option: single element with `{arrayFormat: "comma"}`', t => {
+test('types option: single element with `{arrayFormat: "comma"} and type: string[]`', t => {
 	t.deepEqual(queryString.parse('a=b', {
 		arrayFormat: 'comma',
 		types: {
@@ -556,5 +555,16 @@ test.failing('types option: single element with `{arrayFormat: "comma"}`', t => 
 		},
 	}), {
 		a: ['b'],
+	});
+});
+
+test('types option: single element with `{arrayFormat: "comma"}, and type: number[]`', t => {
+	t.deepEqual(queryString.parse('a=1', {
+		arrayFormat: 'comma',
+		types: {
+			a: 'number[]',
+		},
+	}), {
+		a: [1],
 	});
 });

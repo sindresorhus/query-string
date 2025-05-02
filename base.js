@@ -309,12 +309,20 @@ function parseValue(value, options, type) {
 		return type(value);
 	}
 
-	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-		return value.toLowerCase() === 'true';
+	if (type === 'string[]' && options.arrayFormat !== 'none' && typeof value === 'string') {
+		return [value];
+	}
+
+	if (type === 'number[]' && options.arrayFormat !== 'none' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		return [Number(value)];
 	}
 
 	if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
 		return Number(value);
+	}
+
+	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		return value.toLowerCase() === 'true';
 	}
 
 	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
