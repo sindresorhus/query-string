@@ -568,3 +568,14 @@ test('types option: single element with `{arrayFormat: "comma"}, and type: numbe
 		a: [1],
 	});
 });
+
+test('types option: can parse boolean when parseboolean is false', t => {
+	t.deepEqual(queryString.parse('a=true', {
+		parsebooleans: false,
+		types: {
+			a: 'boolean',
+		},
+	}), {
+		a: true,
+	});
+});
