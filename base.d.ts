@@ -287,8 +287,8 @@ export type ParseOptions = {
 	````
 	*/
 	readonly types?: Record<
-		string,
-		'boolean' | 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
+	string,
+	'boolean' | 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
 	>;
 };
 
