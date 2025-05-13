@@ -226,7 +226,7 @@ export type ParseOptions = {
 			age: 'number',
 		}
 	});
-	//=> {age: 20, id: '01234', zipcode: '90210 }
+	//=> {age: 20, id: '01234', zipcode: '90210'}
 	```
 
 	@example
@@ -239,7 +239,7 @@ export type ParseOptions = {
 			age: (value) => value * 2,
 		}
 	});
-	//=> {age: 40, id: '01234', zipcode: '90210 }
+	//=> {age: 40, id: '01234', zipcode: '90210'}
 	```
 
 	@example

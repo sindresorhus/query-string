@@ -225,7 +225,7 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 		age: 'number',
 	}
 });
-//=> {age: 20, id: '01234', zipcode: '90210 }
+//=> {age: 20, id: '01234', zipcode: '90210'}
 ```
 
 - `'string[]'`:  Parse `items` as an array of strings (overriding the `parseNumbers` option):
@@ -265,7 +265,7 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 		age: (value) => value * 2,
 	}
 });
-//=> {age: 40, id: '01234', zipcode: '90210 }
+//=> {age: 40, id: '01234', zipcode: '90210'}
 ```
 
 NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none`.
@@ -291,7 +291,7 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 		age: (value) => value * 2,
 	}
 });
-//=> {age: 40, id: '01234', zipcode: '90210 }
+//=> {age: 40, id: '01234', zipcode: '90210'}
 ```
 
 Parse the value as a boolean type instead of string type if it's a boolean.
