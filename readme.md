@@ -207,14 +207,17 @@ Supported Types:
 - `'boolean'`: Parse `flagged` as a boolean (overriding the `parseBooleans` option):
 
 ```js
-queryString.parse('?isAdmin=true&flagged=true', {
-        parseBooleans: false,
-        types: {
-                flagged: 'boolean',
-        },
+queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
+		parseBooleans: false,
+		types: {
+				flagged: 'boolean',
+				isOkay: 'boolean',
+		},
 });
-//=> { isAdmin: 'true', flagged: true }
+//=> { isAdmin: 'true', flagged: true, isOkay: false }
 ```
+
+Note: The 'boolean' type will also convert "0" and "1" string values to booleans.
 
 - `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumbers` option):
 

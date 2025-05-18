@@ -579,3 +579,16 @@ test('types option: can parse boolean when parseboolean is false', t => {
 		a: true,
 	});
 });
+
+test('types option: boolean type accepts 1 and 0 as boolean values', t => {
+	t.deepEqual(queryString.parse('a=1&b=0', {
+		parsebooleans: false,
+		types: {
+			a: 'boolean',
+			b: 'boolean'
+		},
+	}), {
+		a: true,
+		b: false,
+	});
+});

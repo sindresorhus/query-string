@@ -276,15 +276,17 @@ export type ParseOptions = {
 
 	@example
 	Force `flagged` to be parsed as a boolean even when `parseBooleans` is false:
-	````
-	queryString.parse('?isAdmin=true&flagged=true', {
+	```
+	queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
 			parseBooleans: false,
 			types: {
 					flagged: 'boolean',
+					isOkay: 'boolean',
 			},
 	});
-	//=> { isAdmin: 'true', flagged: true }
-	````
+	//=> { isAdmin: 'true', flagged: true, isOkay: false }
+	```
+	Note: The 'boolean' type will also convert "0" and "1" string values to booleans.
 	*/
 	readonly types?: Record<
 	string,
