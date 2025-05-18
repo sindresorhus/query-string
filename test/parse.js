@@ -585,7 +585,7 @@ test('types option: boolean type accepts 1 and 0 as boolean values', t => {
 		parsebooleans: false,
 		types: {
 			a: 'boolean',
-			b: 'boolean'
+			b: 'boolean',
 		},
 	}), {
 		a: true,
