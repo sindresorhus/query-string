@@ -214,7 +214,7 @@ queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
 				isOkay: 'boolean',
 		},
 });
-//=> { isAdmin: 'true', flagged: true, isOkay: false }
+//=> {isAdmin: 'true', flagged: true, isOkay: false}
 ```
 
 Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
