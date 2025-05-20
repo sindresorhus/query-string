@@ -309,6 +309,14 @@ function parseValue(value, options, type) {
 		return type(value);
 	}
 
+	if (type === 'boolean' && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		return value.toLowerCase() === 'true';
+	}
+
+	if (type === 'boolean' && value !== null && (value.toLowerCase() === '1' || value.toLowerCase() === '0')) {
+		return value.toLowerCase() === '1';
+	}
+
 	if (type === 'string[]' && options.arrayFormat !== 'none' && typeof value === 'string') {
 		return [value];
 	}

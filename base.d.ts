@@ -178,13 +178,13 @@ export type ParseOptions = {
 	readonly parseFragmentIdentifier?: boolean;
 
 	/**
-	Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumber`, `parseBooleans`, and `arrayFormat`.
+	Specifies a schema for parsing query values with explicit type declarations. When defined, the types provided here take precedence over general parsing options such as `parseNumbers`, `parseBooleans`, and `arrayFormat`.
 
-	Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number (see example 1 and 2).
+	Use this option to explicitly define the type of a specific parameter—particularly useful in cases where the type might otherwise be ambiguous (e.g., phone numbers or IDs).
 
-	It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value (see example 4).
+	You can also provide a custom function to transform the value. The function will receive the raw string and should return the desired parsed result (see Example 4).
 
-	NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none` (see example 5).
+	NOTE: Array types (`string[]`, `number[]`) are ignored if `arrayFormat` is set to `'none'`. (See Example 5.)
 
 	@default {}
 
@@ -217,7 +217,7 @@ export type ParseOptions = {
 	```
 
 	@example
-	Parse `age` as a number, even when `parseNumber` is false:
+	Force `age` to be parsed as a number even when `parseNumbers` is false:
 	```
 	import queryString from 'query-string';
 
@@ -230,7 +230,7 @@ export type ParseOptions = {
 	```
 
 	@example
-	Parse `age` using a custom value parser:
+	Use a custom parser function to transform the value of `age`:
 	```
 	import queryString from 'query-string';
 
@@ -243,7 +243,7 @@ export type ParseOptions = {
 	```
 
 	@example
-	Array types will have no effect when `arrayFormat` is set to `none`
+	Array types are ignored when `arrayFormat` is set to `'none'`:
 	```
 	queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
 		arrayFormat: 'none',
@@ -256,7 +256,7 @@ export type ParseOptions = {
 	```
 
 	@example
-	Parse a query utilizing all types:
+	Parse a query using multiple type definitions:
 	```
 	import queryString from 'query-string';
 
@@ -273,10 +273,24 @@ export type ParseOptions = {
 	});
 	//=> {ids: '001,002,003', items: ['1', '2', '3'], price: '22.00', numbers: [1, 2, 3], double: 10, number: 20}
 	```
+
+	@example
+	Force `flagged` to be parsed as a boolean even when `parseBooleans` is false:
+	```
+	queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
+			parseBooleans: false,
+			types: {
+					flagged: 'boolean',
+					isOkay: 'boolean',
+			},
+	});
+	//=> {isAdmin: 'true', flagged: true, isOkay: false}
+	```
+	Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
 	*/
 	readonly types?: Record<
 	string,
-	'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
+	'boolean' | 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
 	>;
 };
 

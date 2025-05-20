@@ -193,13 +193,31 @@ Parse the value as a boolean type instead of string type if it's a boolean.
 Type: `object`\
 Default: `{}`
 
-Specify a pre-defined schema to be used when parsing values. The types specified will take precedence over options such as: `parseNumbers`, `parseBooleans`, and `arrayFormat`.
 
-Use this feature to override the type of a value. This can be useful when the type is ambiguous such as a phone number.
+Specifies a schema for parsing query values with explicit type declarations. When defined, the types provided here take precedence over general parsing options such as `parseNumbers`, `parseBooleans`, and `arrayFormat`.
 
-It is possible to provide a custom function as the parameter type. The parameter's value will equal the function's return value.
+Use this option to explicitly define the type of a specific parameter—particularly useful in cases where the type might otherwise be ambiguous (e.g., phone numbers or IDs).
+
+You can also provide a custom function to transform the value. The function will receive the raw string and should return the desired parsed result.
+
 
 Supported Types:
+
+
+- `'boolean'`: Parse `flagged` as a boolean (overriding the `parseBooleans` option):
+
+```js
+queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
+		parseBooleans: false,
+		types: {
+				flagged: 'boolean',
+				isOkay: 'boolean',
+		},
+});
+//=> {isAdmin: 'true', flagged: true, isOkay: false}
+```
+
+Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
 
 - `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumbers` option):
 
@@ -268,7 +286,7 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 //=> {age: 40, id: '01234', zipcode: '90210'}
 ```
 
-NOTE: Array types (`string[]` and `number[]`) will have no effect if `arrayFormat` is set to `none`.
+NOTE: Array types (`string[]`, `number[]`) are ignored if `arrayFormat` is set to `'none'`.
 
 ```js
 queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
