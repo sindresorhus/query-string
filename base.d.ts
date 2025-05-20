@@ -284,9 +284,9 @@ export type ParseOptions = {
 					isOkay: 'boolean',
 			},
 	});
-	//=> { isAdmin: 'true', flagged: true, isOkay: false }
+	//=> {isAdmin: 'true', flagged: true, isOkay: false}
 	```
-	Note: The 'boolean' type will also convert "0" and "1" string values to booleans.
+	Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
 	*/
 	readonly types?: Record<
 	string,
