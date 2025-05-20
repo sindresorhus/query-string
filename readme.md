@@ -217,7 +217,7 @@ queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
 //=> { isAdmin: 'true', flagged: true, isOkay: false }
 ```
 
-Note: The 'boolean' type will also convert "0" and "1" string values to booleans.
+Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
 
 - `'string'`: Parse `phoneNumber` as a string (overriding the `parseNumbers` option):
 
