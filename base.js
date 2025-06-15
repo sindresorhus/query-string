@@ -516,7 +516,7 @@ export function stringifyUrl(object, options) {
 	const queryFromUrl = extract(object.url);
 
 	const query = {
-		...parse(queryFromUrl, {sort: false}),
+		...parse(queryFromUrl, {sort: false, ...options}),
 		...object.query,
 	};
 

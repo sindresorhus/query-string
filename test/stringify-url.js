@@ -58,3 +58,26 @@ test('stringify URL from the result of `parseUrl` with query string that contain
 test('stringify URL without sorting existing query params', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?C=3&A=1', query: {D: 4, B: 2}}, {sort: false}), 'https://foo.bar?C=3&A=1&D=4&B=2');
 });
+
+test('stringifyUrl uses parsing options when parsing existing query from url', t => {
+	const currentUrl = 'https://localhost:3000/?array[]=item1';
+
+	const result = queryString.stringifyUrl(
+		{
+			url: currentUrl,
+			query: {
+				array: [
+					'item1',
+					'item2',
+				],
+			},
+		},
+		{
+			arrayFormat: 'bracket',
+			skipEmptyString: true,
+			skipNull: true,
+		},
+	);
+
+	t.is(result, 'https://localhost:3000/?array[]=item1&array[]=item2');
+});
