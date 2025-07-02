@@ -592,3 +592,19 @@ test('types option: boolean type accepts 1 and 0 as boolean values', t => {
 		b: false,
 	});
 });
+
+test('types option: boolean type accepts an empty string as true', t => {
+	t.deepEqual(
+		queryString.parse('a&b', {
+			parsebooleans: false,
+			types: {
+				a: 'boolean',
+				b: 'boolean',
+			},
+		}),
+		{
+			a: true,
+			b: true,
+		},
+	);
+});
