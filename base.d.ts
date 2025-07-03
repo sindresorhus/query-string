@@ -286,7 +286,8 @@ export type ParseOptions = {
 	});
 	//=> {isAdmin: 'true', flagged: true, isOkay: false}
 	```
-	Note: The `'boolean'` type will also convert `'0'` and `'1'` string values to booleans.
+
+	Note: The `'boolean'` type also converts `'0'` and `'1'` to booleans, and treats valueless keys (e.g. `?flag`) as `true`.
 	*/
 	readonly types?: Record<
 	string,
