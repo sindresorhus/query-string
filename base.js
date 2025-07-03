@@ -309,6 +309,10 @@ function parseValue(value, options, type) {
 		return type(value);
 	}
 
+	if (type === 'boolean' && value === null) {
+		return true;
+	}
+
 	if (type === 'boolean' && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 		return value.toLowerCase() === 'true';
 	}
