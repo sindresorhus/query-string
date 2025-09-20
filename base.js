@@ -147,6 +147,11 @@ function parserForArrayFormat(options) {
 
 				key = key.replace(/\[\d*]$/, '');
 
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
+
 				if (!result) {
 					accumulator[key] = value;
 					return;
@@ -164,6 +169,11 @@ function parserForArrayFormat(options) {
 			return (key, value, accumulator) => {
 				result = /(\[])$/.exec(key);
 				key = key.replace(/\[]$/, '');
+
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
 
 				if (!result) {
 					accumulator[key] = value;
@@ -184,6 +194,11 @@ function parserForArrayFormat(options) {
 				result = /(:list)$/.exec(key);
 				key = key.replace(/:list$/, '');
 
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
+
 				if (!result) {
 					accumulator[key] = value;
 					return;
@@ -201,6 +216,11 @@ function parserForArrayFormat(options) {
 		case 'comma':
 		case 'separator': {
 			return (key, value, accumulator) => {
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
+
 				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
 				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : (value === null ? value : decode(value, options));
 				accumulator[key] = newValue;
@@ -211,6 +231,11 @@ function parserForArrayFormat(options) {
 			return (key, value, accumulator) => {
 				const isArray = /(\[])$/.test(key);
 				key = key.replace(/\[]$/, '');
+
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
 
 				if (!isArray) {
 					accumulator[key] = value ? decode(value, options) : value;
@@ -232,6 +257,11 @@ function parserForArrayFormat(options) {
 
 		default: {
 			return (key, value, accumulator) => {
+				// Skip empty or whitespace-only keys
+				if (key.trim() === '') {
+					return;
+				}
+
 				if (accumulator[key] === undefined) {
 					accumulator[key] = value;
 					return;
@@ -464,6 +494,11 @@ export function stringify(object, options) {
 	}
 
 	return keys.map(key => {
+		// Skip empty or whitespace-only keys
+		if (key.trim() === '') {
+			return '';
+		}
+
 		let value = object[key];
 
 		// Apply replacer function if provided

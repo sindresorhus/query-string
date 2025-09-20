@@ -55,6 +55,9 @@ Parse a query string into an object. Leading `?` or `#` are ignored, so you can 
 
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
+> [!NOTE]
+> Keys that are empty or contain only whitespace are dropped from the result.
+
 ```js
 queryString.parse('?foo=bar');
 //=> {foo: 'bar'}
@@ -337,6 +340,9 @@ Parse the value as a boolean type instead of string type if it's a boolean.
 Stringify an object into a query string and sorting the keys.
 
 **Supported value types:** `string`, `number`, `bigint`, `boolean`, `null`, `undefined`, and arrays of these types. Other types like `Symbol`, functions, or objects (except arrays) will throw an error.
+
+> [!NOTE]
+> Keys that are empty or contain only whitespace are ignored and will not appear in the output.
 
 #### options
 

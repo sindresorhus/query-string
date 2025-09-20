@@ -316,9 +316,11 @@ export type ParsedQuery<T = string> = Record<string, T | null | Array<T | null>>
 /**
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
+@param query - The query string to parse.
+
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
-@param query - The query string to parse.
+Note: Keys that are empty or contain only whitespace are dropped from the result.
 */
 export function parse(query: string, options: {parseBooleans: true; parseNumbers: true} & ParseOptions): ParsedQuery<string | boolean | number>;
 export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQuery<string | boolean>;
@@ -624,6 +626,8 @@ import queryString from 'query-string';
 queryString.stringify({foo: 'bar', baz: 42, qux: true});
 //=> 'baz=42&foo=bar&qux=true'
 ```
+
+Note: Keys that are empty or contain only whitespace are ignored and will not appear in the output.
 */
 export function stringify(
 	// TODO: Use the below instead when the following TS issues are fixed:
