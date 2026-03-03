@@ -424,6 +424,7 @@ export function parse(query, options) {
 		const value = returnValue[key];
 		result[key] = Boolean(value) && typeof value === 'object' && !Array.isArray(value) ? keysSorter(value) : value;
 	}
+
 	return result;
 }
 
