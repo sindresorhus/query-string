@@ -418,13 +418,13 @@ export function parse(query, options) {
 		return returnValue;
 	}
 
-	// TODO: Remove the use of `reduce`.
-	// eslint-disable-next-line unicorn/no-array-reduce
-	return (options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort)).reduce((result, key) => {
+	const sortedKeys = options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort);
+	const result = Object.create(null);
+	for (const key of sortedKeys) {
 		const value = returnValue[key];
 		result[key] = Boolean(value) && typeof value === 'object' && !Array.isArray(value) ? keysSorter(value) : value;
-		return result;
-	}, Object.create(null));
+	}
+	return result;
 }
 
 export function stringify(object, options) {
