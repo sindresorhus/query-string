@@ -24,6 +24,25 @@ test('handles empty filter array', t => {
 	t.is(queryString.exclude('http://example.com/?a=1&b=2&c=3', []), 'http://example.com/?a=1&b=2&c=3');
 });
 
+test('handles large exclusion arrays without quadratic slowdown', t => {
+	const count = 20_000;
+	const query = Array.from({length: count}, (_, index) => `a${index}=1`).join('&');
+	const url = `https://example.com/?${query}`;
+	const filter = Array.from({length: count}, (_, index) => `b${index}`);
+	const filterSet = new Set(filter);
+
+	const predicateStartTime = performance.now();
+	queryString.exclude(url, key => filterSet.has(key));
+	const predicateElapsedTime = performance.now() - predicateStartTime;
+
+	const arrayStartTime = performance.now();
+	const result = queryString.exclude(url, filter);
+	const arrayElapsedTime = performance.now() - arrayStartTime;
+
+	t.true(result.startsWith('https://example.com/?a0=1&a1=1'));
+	t.true(arrayElapsedTime < (predicateElapsedTime * 5) + 50, `Expected exclusion array filtering to stay near the Set predicate baseline. Array: ${arrayElapsedTime}ms. Predicate: ${predicateElapsedTime}ms.`);
+});
+
 test('handles excluding non-existent parameters', t => {
 	t.is(queryString.exclude('http://example.com/?a=1&b=2', ['c', 'd']), 'http://example.com/?a=1&b=2');
 });

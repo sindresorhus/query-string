@@ -94,6 +94,85 @@ test('handle multiple of the same key', t => {
 	t.deepEqual(queryString.parse('foo=bar&foo=baz'), {foo: ['bar', 'baz']});
 });
 
+test('handles many duplicate keys without quadratic slowdown', t => {
+	const count = 20_000;
+	const duplicateQuery = Array.from({length: count}, () => 'a=1').join('&');
+	const uniqueQuery = Array.from({length: count}, (_, index) => `a${index}=1`).join('&');
+
+	const uniqueStartTime = performance.now();
+	queryString.parse(uniqueQuery);
+	const uniqueElapsedTime = performance.now() - uniqueStartTime;
+
+	const duplicateStartTime = performance.now();
+	const parsed = queryString.parse(duplicateQuery);
+	const duplicateElapsedTime = performance.now() - duplicateStartTime;
+
+	t.is(parsed.a.length, count);
+	t.true(parsed.a.every(value => value === '1'));
+	t.true(duplicateElapsedTime < (uniqueElapsedTime * 20) + 100, `Expected duplicate-key parsing to stay near the unique-key baseline. Duplicate: ${duplicateElapsedTime}ms. Unique: ${uniqueElapsedTime}ms.`);
+});
+
+test('handles many explicit array items without quadratic slowdown', t => {
+	const count = 20_000;
+	const cases = [
+		{
+			arrayFormat: 'bracket',
+			duplicateQuery: Array.from({length: count}, () => 'a[]=1').join('&'),
+			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}[]=1`).join('&'),
+		},
+		{
+			arrayFormat: 'colon-list-separator',
+			duplicateQuery: Array.from({length: count}, () => 'a:list=1').join('&'),
+			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}:list=1`).join('&'),
+		},
+		{
+			arrayFormat: 'bracket-separator',
+			duplicateQuery: Array.from({length: count}, () => 'a[]=1').join('&'),
+			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}[]=1`).join('&'),
+		},
+	];
+
+	for (const {arrayFormat, duplicateQuery, uniqueQuery} of cases) {
+		const uniqueStartTime = performance.now();
+		queryString.parse(uniqueQuery, {arrayFormat});
+		const uniqueElapsedTime = performance.now() - uniqueStartTime;
+
+		const duplicateStartTime = performance.now();
+		const parsed = queryString.parse(duplicateQuery, {arrayFormat});
+		const duplicateElapsedTime = performance.now() - duplicateStartTime;
+
+		t.is(parsed.a.length, count);
+		t.true(parsed.a.every(value => value === '1'));
+		t.true(duplicateElapsedTime < (uniqueElapsedTime * 10) + 100, `Expected ${arrayFormat} parsing to stay near the unique-key baseline. Duplicate: ${duplicateElapsedTime}ms. Unique: ${uniqueElapsedTime}ms.`);
+	}
+});
+
+test('handles large bracket-separator chunks without argument spread overflow', t => {
+	const count = 200_000;
+	const query = `a[]=0&a[]=${Array.from({length: count}, () => '1').join(',')}`;
+	const parsed = queryString.parse(query, {arrayFormat: 'bracket-separator'});
+
+	t.is(parsed.a.length, count + 1);
+	t.is(parsed.a[0], '0');
+	t.is(parsed.a.at(-1), '1');
+});
+
+test('handles scalar values before explicit array entries', t => {
+	t.deepEqual(queryString.parse('a=one&a[]=two', {arrayFormat: 'bracket'}), {a: ['one', 'two']});
+	t.deepEqual(queryString.parse('a=one&a:list=two', {arrayFormat: 'colon-list-separator'}), {a: ['one', 'two']});
+	t.deepEqual(queryString.parse('a=one&a[]=two,three', {arrayFormat: 'bracket-separator'}), {a: ['one', 'two', 'three']});
+});
+
+test('handles many empty parameters without allocating split results', t => {
+	const query = '&'.repeat(5_000_000);
+	const startTime = performance.now();
+	const parsed = queryString.parse(query, {sort: false});
+	const elapsedTime = performance.now() - startTime;
+
+	t.deepEqual(parsed, {});
+	t.true(elapsedTime < 50, `Expected empty parameter parsing to avoid split allocation. Took ${elapsedTime}ms.`);
+});
+
 test('handle multiple values and preserve appearence order', t => {
 	t.deepEqual(queryString.parse('a=value&a='), {a: ['value', '']});
 	t.deepEqual(queryString.parse('a=&a=value'), {a: ['', 'value']});

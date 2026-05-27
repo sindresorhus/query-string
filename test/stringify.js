@@ -37,6 +37,55 @@ test('handle array value', t => {
 	}), 'abc=abc&foo=bar&foo=baz');
 });
 
+test('stringifies large arrays without quadratic slowdown', t => {
+	const count = 20_000;
+	const array = Array.from({length: count}, () => '1');
+	const object = Object.fromEntries(Array.from({length: count}, (_, index) => [`a${index}`, '1']));
+	const arrayFormats = [
+		'none',
+		'bracket',
+		'index',
+		'colon-list-separator',
+	];
+
+	const objectStartTime = performance.now();
+	queryString.stringify(object);
+	const objectElapsedTime = performance.now() - objectStartTime;
+
+	for (const arrayFormat of arrayFormats) {
+		const arrayStartTime = performance.now();
+		const result = queryString.stringify({a: array}, {arrayFormat});
+		const arrayElapsedTime = performance.now() - arrayStartTime;
+
+		t.true(result.length > count);
+		t.true(arrayElapsedTime < (objectElapsedTime * 10) + 100, `Expected ${arrayFormat} stringify to stay near the scalar-object baseline. Array: ${arrayElapsedTime}ms. Object: ${objectElapsedTime}ms.`);
+	}
+});
+
+test('stringifies large separator arrays without quadratic slowdown', t => {
+	const count = 100_000;
+	const array = Array.from({length: count}, () => '1');
+	const object = Object.fromEntries(Array.from({length: count}, (_, index) => [`a${index}`, '1']));
+	const arrayFormats = [
+		'comma',
+		'separator',
+		'bracket-separator',
+	];
+
+	const objectStartTime = performance.now();
+	queryString.stringify(object);
+	const objectElapsedTime = performance.now() - objectStartTime;
+
+	for (const arrayFormat of arrayFormats) {
+		const arrayStartTime = performance.now();
+		const result = queryString.stringify({a: array}, {arrayFormat});
+		const arrayElapsedTime = performance.now() - arrayStartTime;
+
+		t.true(result.length > count);
+		t.true(arrayElapsedTime < (objectElapsedTime * 5) + 100, `Expected ${arrayFormat} stringify to stay near the scalar-object baseline. Array: ${arrayElapsedTime}ms. Object: ${objectElapsedTime}ms.`);
+	}
+});
+
 test('array order', t => {
 	t.is(queryString.stringify({
 		abc: 'abc',

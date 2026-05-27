@@ -24,15 +24,12 @@ function encoderForArrayFormat(options) {
 				}
 
 				if (value === null) {
-					return [
-						...result, [encode(key, options), '[', index, ']'].join(''),
-					];
+					result.push([encode(key, options), '[', index, ']'].join(''));
+					return result;
 				}
 
-				return [
-					...result,
-					[encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join(''),
-				];
+				result.push([encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join(''));
+				return result;
 			};
 		}
 
@@ -47,16 +44,12 @@ function encoderForArrayFormat(options) {
 				}
 
 				if (value === null) {
-					return [
-						...result,
-						[encode(key, options), '[]'].join(''),
-					];
+					result.push([encode(key, options), '[]'].join(''));
+					return result;
 				}
 
-				return [
-					...result,
-					[encode(key, options), '[]=', encode(value, options)].join(''),
-				];
+				result.push([encode(key, options), '[]=', encode(value, options)].join(''));
+				return result;
 			};
 		}
 
@@ -71,16 +64,12 @@ function encoderForArrayFormat(options) {
 				}
 
 				if (value === null) {
-					return [
-						...result,
-						[encode(key, options), ':list='].join(''),
-					];
+					result.push([encode(key, options), ':list='].join(''));
+					return result;
 				}
 
-				return [
-					...result,
-					[encode(key, options), ':list=', encode(value, options)].join(''),
-				];
+				result.push([encode(key, options), ':list=', encode(value, options)].join(''));
+				return result;
 			};
 		}
 
@@ -104,10 +93,12 @@ function encoderForArrayFormat(options) {
 				value = value === null ? '' : value;
 
 				if (result.length === 0) {
-					return [[encode(key, options), keyValueSeparator, encode(value, options)].join('')];
+					result.push([encode(key, options), keyValueSeparator, encode(value, options)].join(''));
+					return result;
 				}
 
-				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
+				result.push(encode(value, options));
+				return result;
 			};
 		}
 
@@ -122,16 +113,12 @@ function encoderForArrayFormat(options) {
 				}
 
 				if (value === null) {
-					return [
-						...result,
-						encode(key, options),
-					];
+					result.push(encode(key, options));
+					return result;
 				}
 
-				return [
-					...result,
-					[encode(key, options), '=', encode(value, options)].join(''),
-				];
+				result.push([encode(key, options), '=', encode(value, options)].join(''));
+				return result;
 			};
 		}
 	}
@@ -175,7 +162,12 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				accumulator[key] = [...accumulator[key], value];
+				if (!Array.isArray(accumulator[key])) {
+					accumulator[key] = [accumulator[key], value];
+					return;
+				}
+
+				accumulator[key].push(value);
 			};
 		}
 
@@ -194,7 +186,12 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				accumulator[key] = [...accumulator[key], value];
+				if (!Array.isArray(accumulator[key])) {
+					accumulator[key] = [accumulator[key], value];
+					return;
+				}
+
+				accumulator[key].push(value);
 			};
 		}
 
@@ -226,7 +223,13 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				accumulator[key] = [...accumulator[key], ...arrayValue];
+				if (!Array.isArray(accumulator[key])) {
+					accumulator[key] = [accumulator[key]];
+				}
+
+				for (const item of arrayValue) {
+					accumulator[key].push(item);
+				}
 			};
 		}
 
@@ -237,7 +240,12 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				accumulator[key] = [...[accumulator[key]].flat(), value];
+				if (Array.isArray(accumulator[key])) {
+					accumulator[key].push(value);
+					return;
+				}
+
+				accumulator[key] = [accumulator[key], value];
 			};
 		}
 	}
@@ -296,6 +304,12 @@ function getHash(url) {
 	}
 
 	return hash;
+}
+
+function getUrlWithoutQuery(url) {
+	// Avoid `split('?')` so query-heavy URLs don't allocate large arrays.
+	const queryStart = url.indexOf('?');
+	return queryStart === -1 ? url : url.slice(0, queryStart);
 }
 
 function parseValue(value, options, type) {
@@ -381,11 +395,21 @@ export function parse(query, options) {
 		return returnValue;
 	}
 
-	for (const parameter of query.split('&')) {
-		if (parameter === '') {
+	// Avoid `split('&')` so separator-heavy inputs don't allocate large arrays of empty strings.
+	let parameterStart = 0;
+
+	for (let index = 0; index <= query.length; index++) {
+		if (index < query.length && query[index] !== '&') {
 			continue;
 		}
 
+		if (index === parameterStart) {
+			parameterStart = index + 1;
+			continue;
+		}
+
+		const parameter = query.slice(parameterStart, index);
+		parameterStart = index + 1;
 		const parameter_ = options.decode ? parameter.replaceAll('+', ' ') : parameter;
 
 		let [key, value] = splitOnFirst(parameter_, '=');
@@ -498,9 +522,9 @@ export function stringify(object, options) {
 				).filter(item => item !== undefined);
 			}
 
-			return processedArray
-				.reduce(formatter(key), [])
-				.join('&');
+			const result = processedArray.reduce(formatter(key), []);
+			const arrayFormatSeparator = ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? options.arrayFormatSeparator : '&';
+			return result.join(arrayFormatSeparator);
 		}
 
 		return encode(key, options) + '=' + encode(value, options);
@@ -520,7 +544,7 @@ export function parseUrl(url, options) {
 	}
 
 	return {
-		url: url_?.split('?')?.[0] ?? '',
+		url: getUrlWithoutQuery(url_ ?? ''),
 		query: parse(extract(url), options),
 		...(options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}),
 	};
@@ -534,7 +558,7 @@ export function stringifyUrl(object, options) {
 		...options,
 	};
 
-	const url = removeHash(object.url).split('?')[0] || '';
+	const url = getUrlWithoutQuery(removeHash(object.url)) || '';
 	const queryFromUrl = extract(object.url);
 
 	const query = {
@@ -572,7 +596,10 @@ export function pick(input, filter, options) {
 }
 
 export function exclude(input, filter, options) {
-	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
+	if (Array.isArray(filter)) {
+		const filterSet = new Set(filter);
+		return pick(input, key => !filterSet.has(key), options);
+	}
 
-	return pick(input, exclusionFilter, options);
+	return pick(input, (key, value) => !filter(key, value), options);
 }

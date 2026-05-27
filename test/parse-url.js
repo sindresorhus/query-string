@@ -19,6 +19,17 @@ test('handles strings with query string that contain =', t => {
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar=&foo=baz='), {url: 'https://foo.bar', query: {foo: ['bar=', 'baz=']}});
 });
 
+test('handles query-heavy URLs without splitting the whole URL', t => {
+	const count = 10_000_000;
+	const url = `https://foo.bar?${'?'.repeat(count)}`;
+	const startTime = performance.now();
+	const parsed = queryString.parseUrl(url, {sort: false});
+	const elapsedTime = performance.now() - startTime;
+
+	t.is(parsed.url, 'https://foo.bar');
+	t.true(elapsedTime < 120, `Expected URL parsing to avoid splitting the whole URL. Took ${elapsedTime}ms.`);
+});
+
 test('handles strings with fragment identifier', t => {
 	t.deepEqual(queryString.parseUrl('https://foo.bar?top=foo#bar', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {top: 'foo'}, fragmentIdentifier: 'bar'});
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=bar&foo=baz#top', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {foo: ['bar', 'baz']}, fragmentIdentifier: 'top'});
