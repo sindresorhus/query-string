@@ -571,7 +571,7 @@ export function stringifyUrl(object, options) {
 
 	let hash = getHash(object.url);
 	if (typeof object.fragmentIdentifier === 'string') {
-		const urlObjectForFragmentEncode = new URL(url);
+		const urlObjectForFragmentEncode = new URL(url, 'https://query-string.invalid');
 		urlObjectForFragmentEncode.hash = object.fragmentIdentifier;
 		hash = options[encodeFragmentIdentifier] ? urlObjectForFragmentEncode.hash : `#${object.fragmentIdentifier}`;
 	}

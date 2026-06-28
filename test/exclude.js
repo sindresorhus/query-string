@@ -95,6 +95,10 @@ test('handles relative URLs', t => {
 	t.is(queryString.exclude('?a=1&b=2', ['b']), '?a=1');
 });
 
+test('handles relative URLs with fragment identifiers', t => {
+	t.is(queryString.exclude('/users?page=1&sort=name#section', ['sort']), '/users?page=1#section');
+});
+
 test('handles fragments with special characters', t => {
 	t.is(queryString.exclude('http://example.com/?a=1#section/subsection', ['a']), 'http://example.com/#section/subsection');
 });

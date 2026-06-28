@@ -19,3 +19,7 @@ test('picks elements in a URL with a filter predicate', t => {
 test('picks elements in a URL without encoding fragment identifiers', t => {
 	t.is(queryString.pick('https://example.com?a=b#/home', []), 'https://example.com#/home');
 });
+
+test('picks elements in a relative URL with a fragment identifier', t => {
+	t.is(queryString.pick('/users?page=1&sort=name#section', ['page']), '/users?page=1#section');
+});

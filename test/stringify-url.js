@@ -30,6 +30,17 @@ test('stringify URL with fragment identifier', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#foo', query: {}, fragmentIdentifier: ''}), 'https://foo.bar/');
 });
 
+test('stringify relative URL with fragment identifier', t => {
+	t.is(queryString.stringifyUrl({url: '/users', query: {page: 1}, fragmentIdentifier: 'section'}), '/users?page=1#section');
+});
+
+test('stringify relative URL from the result of `parseUrl` with fragment identifier', t => {
+	const url = '/users?page=1#section';
+	const parsedUrl = queryString.parseUrl(url, {parseFragmentIdentifier: true});
+
+	t.deepEqual(queryString.stringifyUrl(parsedUrl), url);
+});
+
 test('skipEmptyString:: stringify URL with a query string', t => {
 	const config = {skipEmptyString: true};
 
