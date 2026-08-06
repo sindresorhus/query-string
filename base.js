@@ -395,10 +395,17 @@ export function parse(query, options) {
 		return returnValue;
 	}
 
-	// Avoid `split('&')` so separator-heavy inputs don't allocate large arrays of empty strings.
-	let parameterStart = 0;
+	if (/^&+$/.test(query)) {
+		return returnValue;
+	}
 
-	for (let index = 0; index <= query.length; index++) {
+	let parameterStart = 0;
+	let firstSeparator = query.indexOf('&');
+	if (firstSeparator === -1) {
+		firstSeparator = query.length;
+	}
+
+	for (let index = firstSeparator; index <= query.length; index++) {
 		if (index < query.length && query[index] !== '&') {
 			continue;
 		}
@@ -409,7 +416,6 @@ export function parse(query, options) {
 		}
 
 		const parameter = query.slice(parameterStart, index);
-		parameterStart = index + 1;
 		const parameter_ = options.decode ? parameter.replaceAll('+', ' ') : parameter;
 
 		let [key, value] = splitOnFirst(parameter_, '=');
@@ -422,6 +428,8 @@ export function parse(query, options) {
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : (['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options));
 		formatter(decode(key, options), value, returnValue);
+
+		parameterStart = index + 1;
 	}
 
 	for (const [key, value] of Object.entries(returnValue)) {
