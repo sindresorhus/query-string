@@ -107,3 +107,11 @@ test('handles complex nested parameter names', t => {
 	const result = queryString.exclude('http://example.com/?user[name]=John&user[age]=30&id=1', ['user[name]']);
 	t.true(result === 'http://example.com/?user%5Bage%5D=30&id=1' || result === 'http://example.com/?id=1&user%5Bage%5D=30');
 });
+
+test('handles a URL with a fragment identifier that the WHATWG parser rejects', t => {
+	t.is(queryString.exclude('http://foo.com:99999/p?a=1&b=2#frag', ['b']), 'http://foo.com:99999/p?a=1#frag');
+});
+
+test('handles a fragment identifier that starts with `#`', t => {
+	t.is(queryString.exclude('https://foo.bar/?a=1&b=2#%23top', ['b']), 'https://foo.bar/?a=1##top');
+});

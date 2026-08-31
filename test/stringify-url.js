@@ -92,3 +92,29 @@ test('stringifyUrl uses parsing options when parsing existing query from url', t
 
 	t.is(result, 'https://localhost:3000/?array[]=item1&array[]=item2');
 });
+
+test('stringify URL with a fragment identifier that starts with `#`', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '#top'}), 'https://foo.bar/##top');
+});
+
+test('stringify URL from the result of `parseUrl` with a `#` in the fragment identifier', t => {
+	for (const url of ['https://foo.bar/?a=1#%23top', 'https://foo.bar/?a=1##top']) {
+		const parsedUrl = queryString.parseUrl(url, {parseFragmentIdentifier: true});
+
+		t.is(parsedUrl.fragmentIdentifier, '#top');
+		t.is(queryString.stringifyUrl(parsedUrl), 'https://foo.bar/?a=1##top');
+		t.is(queryString.parseUrl(queryString.stringifyUrl(parsedUrl), {parseFragmentIdentifier: true}).fragmentIdentifier, '#top');
+	}
+});
+
+test('stringify URL does not double-encode a fragment identifier', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%23top'}), 'https://foo.bar/#%23top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a%b'}), 'https://foo.bar/#a%b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a?b'}), 'https://foo.bar/#a?b');
+});
+
+test('stringify URL with a fragment identifier does not parse the URL', t => {
+	t.is(queryString.stringifyUrl({url: 'http://foo.com:99999/p', query: {a: 1}, fragmentIdentifier: 'frag'}), 'http://foo.com:99999/p?a=1#frag');
+	t.is(queryString.stringifyUrl({url: 'http://x.com%23/p', query: {a: 1}, fragmentIdentifier: 'frag'}), 'http://x.com%23/p?a=1#frag');
+	t.is(queryString.stringifyUrl({url: 'http://[bad/', query: {a: 1}, fragmentIdentifier: '#frag'}), 'http://[bad/?a=1##frag');
+});

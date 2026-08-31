@@ -23,3 +23,12 @@ test('picks elements in a URL without encoding fragment identifiers', t => {
 test('picks elements in a relative URL with a fragment identifier', t => {
 	t.is(queryString.pick('/users?page=1&sort=name#section', ['page']), '/users?page=1#section');
 });
+
+test('picks elements in a URL with a fragment identifier that the WHATWG parser rejects', t => {
+	t.is(queryString.pick('http://foo.com:99999/p?a=1&b=2#frag', ['a']), 'http://foo.com:99999/p?a=1#frag');
+	t.is(queryString.pick('http://[bad/?a=1&b=2#frag', ['a']), 'http://[bad/?a=1#frag');
+});
+
+test('picks elements in a URL with a fragment identifier that starts with `#`', t => {
+	t.is(queryString.pick('https://foo.bar/?a=1&b=2#%23top', ['a']), 'https://foo.bar/?a=1##top');
+});

@@ -579,9 +579,14 @@ export function stringifyUrl(object, options) {
 
 	let hash = getHash(object.url);
 	if (typeof object.fragmentIdentifier === 'string') {
-		const urlObjectForFragmentEncode = new URL(url, 'https://query-string.invalid');
-		urlObjectForFragmentEncode.hash = object.fragmentIdentifier;
-		hash = options[encodeFragmentIdentifier] ? urlObjectForFragmentEncode.hash : `#${object.fragmentIdentifier}`;
+		hash = `#${object.fragmentIdentifier}`;
+
+		if (options[encodeFragmentIdentifier]) {
+			// Percent-encode the fragment with a throwaway URL. The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
+			const throwawayUrl = new URL('https://query-string.invalid');
+			throwawayUrl.hash = hash;
+			hash = throwawayUrl.hash;
+		}
 	}
 
 	return `${url}${queryString}${hash}`;
