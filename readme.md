@@ -635,6 +635,8 @@ Returns a string with the URL and a query string.
 
 Query items in the `query` property overrides queries in the `url` property.
 
+With `encode: false`, array markers in existing parameter names must be literal, such as `a[]`, for those parameters to be overridden.
+
 The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
 
 ```js

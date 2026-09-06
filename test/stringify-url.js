@@ -126,3 +126,38 @@ test('stringify URL with sorting when sort is true', t => {
 test('stringify URL with index array format in the existing query', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo[0]=a&foo[1]=b', query: {bar: 'baz'}}, {arrayFormat: 'index'}), 'https://foo.bar?bar=baz&foo[0]=a&foo[1]=b');
 });
+
+test('stringify URL with `encode: false` keeps the existing query string as-is', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20&b=%2B&c=1+2', query: {d: 'x'}}, {encode: false}), 'https://foo.bar?a=%20&b=%2B&c=1+2&d=x');
+});
+
+test('stringify URL with `encode: false` lets the query override the existing query', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20&b=%2B', query: {a: 'x y'}}, {encode: false}), 'https://foo.bar?a=x y&b=%2B');
+});
+
+test('stringify URL with `encode: false` overrides equivalent encoded query keys', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?%61=1', query: {a: 2}}, {encode: false}), 'https://foo.bar?a=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a%20b=1', query: {'a b': 2}}, {encode: false}), 'https://foo.bar?a b=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?%61=1', query: {a: undefined}}, {encode: false}), 'https://foo.bar');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=1&%61=2&b=%26', query: {'%61': 3}}, {encode: false}), 'https://foo.bar?%61=3&b=%26');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a+b=1', query: {'a%20b': 2}}, {encode: false}), 'https://foo.bar?a%20b=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a%2Bb=1&a+b=2', query: {'a%20b': 3}}, {encode: false}), 'https://foo.bar?a%20b=3&a%2Bb=1');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?b=1&a=2', query: {b: 3}}, {encode: false, sort: false}), 'https://foo.bar?b=3&a=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?%61=1&b=2', query: {a: 3}}, {encode: false, sort: false}), 'https://foo.bar?a=3&b=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?%61=1&a=2&b=3', query: {a: 4}}, {encode: false, sort: false}), 'https://foo.bar?a=4&b=3');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=1&%61=2&b=3', query: {'%61': 4}}, {encode: false, sort: false}), 'https://foo.bar?%61=4&b=3');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a[]=1&b=%26', query: {a: [2]}}, {encode: false, arrayFormat: 'bracket'}), 'https://foo.bar?a[]=2&b=%26');
+});
+
+test('stringify URL with `encode: false` and array formats in the existing query', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a[]=%20&a[]=2', query: {b: 'x'}}, {encode: false, arrayFormat: 'bracket'}), 'https://foo.bar?a[]=%20&a[]=2&b=x');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%2C,2', query: {b: 'x'}}, {encode: false, arrayFormat: 'comma'}), 'https://foo.bar?a=%2C,2&b=x');
+});
+
+test('stringify URL with `encode: false` and a fragment identifier in the URL', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20#top%20', query: {}}, {encode: false}), 'https://foo.bar?a=%20#top%20');
+});
+
+test('stringify URL with default encoding still decodes and re-encodes the existing query', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20&b=1+2', query: {c: 'x'}}), 'https://foo.bar?a=%20&b=1%202&c=x');
+});

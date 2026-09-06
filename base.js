@@ -7,8 +7,6 @@ const isNullOrUndefined = value => value === null || value === undefined;
 // eslint-disable-next-line unicorn/prefer-code-point
 const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
-const encodeFragmentIdentifier = Symbol('encodeFragmentIdentifier');
-
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index': {
@@ -566,49 +564,63 @@ export function stringifyUrl(object, options) {
 	options = {
 		encode: true,
 		strict: true,
-		[encodeFragmentIdentifier]: true,
 		...options,
 	};
 
 	const url = getUrlWithoutQuery(removeHash(object.url)) || '';
 	const queryFromUrl = extract(object.url);
 
-	const query = {
-		...parse(queryFromUrl, {sort: false, ...options}),
-		...object.query,
-	};
+	// When the output is not encoded, keep the existing query as-is instead of decoding it. Decoding without re-encoding would corrupt it.
+	let query = parse(queryFromUrl, {sort: false, ...options, decode: options.encode});
 
-	let queryString = stringify(query, options);
+	const queryFromObject = Object.fromEntries(Object.entries(object.query ?? {}));
+
+	if (!options.encode) {
+		const overrides = new Map();
+
+		for (const [key, value] of Object.entries(queryFromObject)) {
+			const decodedKey = decodeComponent(key.replaceAll('+', ' '));
+			if (!overrides.has(decodedKey)) {
+				overrides.set(decodedKey, {key, value});
+			}
+		}
+
+		const mergedQuery = {};
+
+		for (const [key, value] of Object.entries(query)) {
+			const override = overrides.get(decodeComponent(key.replaceAll('+', ' ')));
+			if (override) {
+				mergedQuery[override.key] = override.value;
+			} else {
+				mergedQuery[key] = value;
+			}
+		}
+
+		query = mergedQuery;
+	}
+
+	let queryString = stringify({...query, ...queryFromObject}, options);
 	queryString &&= `?${queryString}`;
 
 	let hash = getHash(object.url);
 	if (typeof object.fragmentIdentifier === 'string') {
-		hash = `#${object.fragmentIdentifier}`;
-
-		if (options[encodeFragmentIdentifier]) {
-			// Percent-encode the fragment with a throwaway URL. The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
-			const throwawayUrl = new URL('https://query-string.invalid');
-			throwawayUrl.hash = hash;
-			hash = throwawayUrl.hash;
-		}
+		// Percent-encode the fragment with a throwaway URL. The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
+		const throwawayUrl = new URL('https://query-string.invalid');
+		throwawayUrl.hash = `#${object.fragmentIdentifier}`;
+		hash = throwawayUrl.hash;
 	}
 
 	return `${url}${queryString}${hash}`;
 }
 
 export function pick(input, filter, options) {
-	options = {
-		parseFragmentIdentifier: true,
-		[encodeFragmentIdentifier]: false,
-		...options,
-	};
+	// When the output is not encoded, do not decode the input either. Decoding without re-encoding would corrupt it.
+	const {url, query} = parseUrl(input, {decode: options?.encode ?? true, ...options});
 
-	const {url, query, fragmentIdentifier} = parseUrl(input, options);
-
+	// Keep the fragment identifier as-is. Decoding and re-encoding it could change it.
 	return stringifyUrl({
-		url,
+		url: url + getHash(input),
 		query: includeKeys(query, filter),
-		fragmentIdentifier,
 	}, options);
 }
 

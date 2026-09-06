@@ -113,9 +113,33 @@ test('handles a URL with a fragment identifier that the WHATWG parser rejects', 
 });
 
 test('handles a fragment identifier that starts with `#`', t => {
-	t.is(queryString.exclude('https://foo.bar/?a=1&b=2#%23top', ['b']), 'https://foo.bar/?a=1##top');
+	t.is(queryString.exclude('https://foo.bar/?a=1&b=2#%23top', ['b']), 'https://foo.bar/?a=1#%23top');
 });
 
 test('excludes elements in a URL with index array format', t => {
 	t.is(queryString.exclude('https://foo.bar?foo[1]=b&foo[0]=a&bar=x', ['bar'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=a&foo[1]=b');
+});
+
+test('excludes elements in a URL with a percent-encoded fragment identifier', t => {
+	t.is(queryString.exclude('https://foo.bar?foo=1&bar=2#hello%20world', ['foo']), 'https://foo.bar?bar=2#hello%20world');
+});
+
+test('excludes elements in a URL and keeps the fragment identifier as-is', t => {
+	t.is(queryString.exclude('https://foo.bar?a=1&b=2#a%2Fb/c:d', ['a']), 'https://foo.bar?b=2#a%2Fb/c:d');
+	t.is(queryString.exclude('https://foo.bar?a=1&b=2#', ['a']), 'https://foo.bar?b=2#');
+	t.is(queryString.exclude('https://foo.bar?a=1&b=2#hello%20world', (name, value) => value === '1'), 'https://foo.bar?b=2#hello%20world');
+	t.is(queryString.exclude('https://foo.bar?a=1#section?x=1', ['a']), 'https://foo.bar#section?x=1');
+});
+
+test('excludes elements in a URL with `encode: false` and keeps the values as-is', t => {
+	t.is(queryString.exclude('https://foo.bar?a=%20&b=1+2&c=3', ['c'], {encode: false}), 'https://foo.bar?a=%20&b=1+2');
+});
+
+test('excludes elements in a URL with `encode: false` and array formats', t => {
+	t.is(queryString.exclude('https://foo.bar?a[]=%20&a[]=2&b=1', ['b'], {encode: false, arrayFormat: 'bracket'}), 'https://foo.bar?a[]=%20&a[]=2');
+	t.is(queryString.exclude('https://foo.bar?a=%2C,2&b=1', ['b'], {encode: false, arrayFormat: 'comma'}), 'https://foo.bar?a=%2C,2');
+});
+
+test('excludes elements in a URL with default encoding and re-encodes the values', t => {
+	t.is(queryString.exclude('https://foo.bar?a=%20&b=1+2&c=3', ['c']), 'https://foo.bar?a=%20&b=1%202');
 });
