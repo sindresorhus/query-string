@@ -256,6 +256,11 @@ function validateArrayFormatSeparator(value) {
 }
 
 function encode(value, options) {
+	const type = typeof value;
+	if ((type === 'object' && value !== null) || type === 'function' || type === 'symbol') {
+		throw new TypeError(`Unsupported value type: ${type}. Supported types are string, number, bigint, boolean, null, and undefined. Use the \`replacer\` option to transform other types.`);
+	}
+
 	if (options.encode) {
 		return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
 	}
@@ -483,6 +488,7 @@ export function stringify(object, options) {
 
 	const formatter = encoderForArrayFormat(options);
 
+	// Copying into a plain object intentionally drops a key named `__proto__`, since assigning it sets the prototype instead of a property.
 	const objectCopy = {};
 
 	for (const [key, value] of Object.entries(object)) {

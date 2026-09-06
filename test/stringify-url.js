@@ -161,3 +161,12 @@ test('stringify URL with `encode: false` and a fragment identifier in the URL', 
 test('stringify URL with default encoding still decodes and re-encodes the existing query', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20&b=1+2', query: {c: 'x'}}), 'https://foo.bar?a=%20&b=1%202&c=x');
 });
+
+test('stringify URL throws a TypeError for unsupported query value types', t => {
+	t.throws(() => queryString.stringifyUrl({url: 'https://foo.bar', query: {a: {}}}), {instanceOf: TypeError});
+});
+
+test('stringify URL drops a query parameter named `__proto__`', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?__proto__=1&a=2', query: {b: 3}}), 'https://foo.bar?a=2&b=3');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {['__proto__']: 1}}), 'https://foo.bar');
+});

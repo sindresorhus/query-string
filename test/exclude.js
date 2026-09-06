@@ -143,3 +143,8 @@ test('excludes elements in a URL with `encode: false` and array formats', t => {
 test('excludes elements in a URL with default encoding and re-encodes the values', t => {
 	t.is(queryString.exclude('https://foo.bar?a=%20&b=1+2&c=3', ['c']), 'https://foo.bar?a=%20&b=1%202');
 });
+
+test('drops a query parameter named `__proto__` even when it is not excluded', t => {
+	t.is(queryString.exclude('https://foo.bar?__proto__=1&a=2', ['a']), 'https://foo.bar');
+	t.is(queryString.exclude('https://foo.bar?__proto__=1&a=2', ['__proto__']), 'https://foo.bar?a=2');
+});

@@ -68,3 +68,8 @@ test('picks elements in a URL with `encode: false` and an explicit `decode: true
 test('picks elements in a URL with `encode: false` and a filter predicate that sees the raw values', t => {
 	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === '%20', {encode: false}), 'https://foo.bar?a=%20');
 });
+
+test('drops a query parameter named `__proto__`', t => {
+	t.is(queryString.pick('https://foo.bar?__proto__=1&a=2', ['__proto__']), 'https://foo.bar');
+	t.is(queryString.pick('https://foo.bar?__proto__=1&a=2', (name, value) => value === '1'), 'https://foo.bar');
+});

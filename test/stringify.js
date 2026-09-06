@@ -662,3 +662,64 @@ test('should sort keys when sort is true and the object has one key', t => {
 	t.is(queryString.stringify({a: 1}, {sort: true}), 'a=1');
 	t.is(queryString.stringify({}, {sort: true}), '');
 });
+
+test('throws a TypeError for unsupported value types', t => {
+	const expectation = {instanceOf: TypeError, message: /Unsupported value type/};
+
+	t.throws(() => queryString.stringify({a: {}}), expectation);
+	t.throws(() => queryString.stringify({a: new Date()}), expectation);
+	t.throws(() => queryString.stringify({a: new Map()}), expectation);
+	t.throws(() => queryString.stringify({a() {}}), expectation);
+	t.throws(() => queryString.stringify({a: Symbol('a')}), expectation);
+	t.throws(() => queryString.stringify({a: {}}, {encode: false}), expectation);
+	t.throws(() => queryString.stringify({a: {}}, {strict: false}), expectation);
+});
+
+test('throws a TypeError for unsupported value types inside arrays', t => {
+	const expectation = {instanceOf: TypeError, message: /Unsupported value type/};
+
+	for (const arrayFormat of ['none', 'bracket', 'index', 'comma', 'separator', 'bracket-separator', 'colon-list-separator']) {
+		t.throws(() => queryString.stringify({a: [1, {}]}, {arrayFormat}), expectation, `${arrayFormat}: object`);
+		t.throws(() => queryString.stringify({a: [[1, 2]]}, {arrayFormat}), expectation, `${arrayFormat}: nested array`);
+		t.throws(() => queryString.stringify({a: [new Date()]}, {arrayFormat, encode: false}), expectation, `${arrayFormat}: encode false`);
+	}
+});
+
+test('does not throw for unsupported value types that the replacer transforms', t => {
+	t.is(queryString.stringify({a: {b: 1}, c: [new Date(0)]}, {
+		replacer(key, value) {
+			if (value instanceof Date) {
+				return value.getTime();
+			}
+
+			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+				return JSON.stringify(value);
+			}
+
+			return value;
+		},
+	}), 'a=%7B%22b%22%3A1%7D&c=0');
+});
+
+test('does not throw for supported value types', t => {
+	t.is(queryString.stringify({
+		a: 'a',
+		b: 1,
+		c: 1n,
+		d: true,
+		e: null,
+		f: undefined,
+		g: ['a', 1, 1n, true, null, undefined],
+	}), 'a=a&b=1&c=1&d=true&e&g=a&g=1&g=1&g=true&g');
+});
+
+test('drops a key named `__proto__`', t => {
+	// Intentional: the keys are copied into a plain object, where assigning `__proto__` sets the prototype instead of a property.
+	t.is(queryString.stringify({['__proto__']: 'a', b: 'c'}), 'b=c');
+	t.is(queryString.stringify(queryString.parse('__proto__=a&b=c')), 'b=c');
+	t.is(queryString.stringify({['__proto__']: ['a', 'b']}, {arrayFormat: 'bracket'}), '');
+	t.is(queryString.stringify({['__proto__']: null}), '');
+	t.is(queryString.stringify({['__proto__']: null, a: 1}, {skipNull: true}), 'a=1');
+	t.is(queryString.stringify({['__proto__']: '', a: 1}, {skipEmptyString: true}), 'a=1');
+	t.deepEqual(Object.keys(queryString.parse('__proto__=a&b=c')), ['__proto__', 'b']);
+});
