@@ -2,8 +2,6 @@ import decodeComponent from 'decode-uri-component';
 import {includeKeys} from 'filter-obj';
 import splitOnFirst from 'split-on-first';
 
-const isNullOrUndefined = value => value === null || value === undefined;
-
 // eslint-disable-next-line unicorn/prefer-code-point
 const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
@@ -489,20 +487,13 @@ export function stringify(object, options) {
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
-	const shouldFilter = key => (
-		(options.skipNull && isNullOrUndefined(object[key]))
-		|| (options.skipEmptyString && object[key] === '')
-	);
-
 	const formatter = encoderForArrayFormat(options);
 
 	// Copying into a plain object intentionally drops a key named `__proto__`, since assigning it sets the prototype instead of a property.
 	const objectCopy = {};
 
 	for (const [key, value] of Object.entries(object)) {
-		if (!shouldFilter(key)) {
-			objectCopy[key] = value;
-		}
+		objectCopy[key] = value;
 	}
 
 	const keys = Object.keys(objectCopy);
@@ -517,14 +508,14 @@ export function stringify(object, options) {
 		// Apply replacer function if provided
 		if (options.replacer) {
 			value = options.replacer(key, value);
-
-			// If replacer returns undefined, skip this key
-			if (value === undefined) {
-				return '';
-			}
 		}
 
-		if (value === undefined) {
+		// `skipNull` and `skipEmptyString` look at the replaced value, like they do for array items. A replacer that returns `undefined` skips the key.
+		if (
+			value === undefined
+			|| (options.skipNull && value === null)
+			|| (options.skipEmptyString && value === '')
+		) {
 			return '';
 		}
 

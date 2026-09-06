@@ -744,3 +744,28 @@ test('drops a key named `__proto__`', t => {
 	t.is(queryString.stringify({['__proto__']: '', a: 1}, {skipEmptyString: true}), 'a=1');
 	t.deepEqual(Object.keys(queryString.parse('__proto__=a&b=c')), ['__proto__', 'b']);
 });
+
+test('skipNull and skipEmptyString apply to the value returned by the replacer', t => {
+	t.is(queryString.stringify({a: 1, b: 2}, {skipNull: true, replacer: (key, value) => key === 'a' ? null : value}), 'b=2');
+	t.is(queryString.stringify({a: 1, b: 2}, {skipEmptyString: true, replacer: (key, value) => key === 'a' ? '' : value}), 'b=2');
+	t.is(queryString.stringify({a: null, b: ''}, {skipNull: true, skipEmptyString: true, replacer: (key, value) => value === null ? 'was-null' : (value === '' ? 'was-empty' : value)}), 'a=was-null&b=was-empty');
+	t.is(queryString.stringify({a: undefined}, {skipNull: true, replacer: () => 'x'}), 'a=x');
+	t.is(queryString.stringify({a: [1, 2]}, {skipNull: true, replacer: (key, value) => Array.isArray(value) ? value : (value === 1 ? null : value)}), 'a=2');
+	t.is(queryString.stringify({a: [1, 2]}, {arrayFormat: 'bracket', skipEmptyString: true, replacer: (key, value) => Array.isArray(value) ? value : (value === 1 ? '' : value)}), 'a[]=2');
+});
+
+test('skipNull and skipEmptyString still apply without a replacer', t => {
+	t.is(queryString.stringify({
+		a: null,
+		b: '',
+		c: undefined,
+		d: 1,
+	}, {skipNull: true, skipEmptyString: true}), 'd=1');
+	t.is(queryString.stringify({a: null, b: '', d: 1}, {skipNull: true}), 'b=&d=1');
+	t.is(queryString.stringify({a: null, b: '', d: 1}, {skipEmptyString: true}), 'a&d=1');
+	t.is(queryString.stringify({a: null, b: ''}, {
+		skipNull: true,
+		skipEmptyString: true,
+		sort: false,
+	}), '');
+});

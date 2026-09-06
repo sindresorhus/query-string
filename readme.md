@@ -551,7 +551,7 @@ A function that transforms key-value pairs before stringification.
 Type: `function`\
 Default: `undefined`
 
-Similar to the `replacer` parameter of `JSON.stringify()`, this function is called for each key-value pair and can be used to transform values before they are stringified. The function receives the key and value, and should return the transformed value. Returning `undefined` will omit the key-value pair from the resulting query string.
+Similar to the `replacer` parameter of `JSON.stringify()`, this function is called for each key-value pair and can be used to transform values before they are stringified. The function receives the key and value, and should return the transformed value. Returning `undefined` will omit the key-value pair from the resulting query string. The `skipNull` and `skipEmptyString` options apply to the returned value.
 
 This is useful for custom serialization of non-primitive types like `Date`:
 
