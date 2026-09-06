@@ -374,8 +374,8 @@ export function parse(query, options) {
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false,
-		types: Object.create(null),
 		...options,
+		types: {__proto__: null, ...options?.types},
 	};
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);

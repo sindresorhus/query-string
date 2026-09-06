@@ -758,3 +758,11 @@ test('types option: function types with arrays apply to each element', t => {
 		single: 20,
 	});
 });
+
+test('types option: does not treat `Object.prototype` keys as custom types', t => {
+	t.deepEqual(queryString.parse('toString=1&a=2', {types: {}}), {a: '2', toString: '1'});
+	t.deepEqual(queryString.parse('valueOf=hello', {types: {}}), {valueOf: 'hello'});
+	t.deepEqual(queryString.parse('hasOwnProperty=x', {types: {}}), {hasOwnProperty: 'x'});
+	t.deepEqual(queryString.parse('constructor=1', {types: {}}), {constructor: '1'});
+	t.deepEqual(queryString.parse('toString[]=1&toString[]=2', {arrayFormat: 'bracket', types: {}}), {toString: ['1', '2']});
+});
