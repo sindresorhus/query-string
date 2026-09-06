@@ -200,7 +200,14 @@ function parserForArrayFormat(options) {
 				// Split the raw value before decoding. A percent-encoded separator (`%2C`) is part of an item, only a literal separator delimits items. This follows RFC 6570 §3.2.8, where list members are percent-encoded and joined with a literal `,`, and matches `stringify()`, `qs`, and OpenAPI clients such as swagger-js and openapi-fetch.
 				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
 				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : (value === null ? value : decode(value, options));
-				accumulator[key] = newValue;
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = newValue;
+					return;
+				}
+
+				// A repeated key adds its items, like in the other array formats.
+				accumulator[key] = [accumulator[key], newValue].flat();
 			};
 		}
 

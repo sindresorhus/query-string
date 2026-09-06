@@ -875,3 +875,23 @@ test('types option: `number[]` wraps a single value that is not a number in an a
 	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'none', types: {ids: 'number[]'}}), {ids: 'abc'});
 	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: null});
 });
+
+test('comma and separator array formats keep the values of a repeated key', t => {
+	t.deepEqual(queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'comma'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2,3&foo=4,5', {arrayFormat: 'comma'}), {foo: ['1', '2', '3', '4', '5']});
+	t.deepEqual(queryString.parse('foo&foo=1', {arrayFormat: 'comma'}), {foo: [null, '1']});
+	t.deepEqual(queryString.parse('foo=1&foo', {arrayFormat: 'comma'}), {foo: ['1', null]});
+	t.deepEqual(queryString.parse('foo=a%2Cb&foo=c', {arrayFormat: 'comma'}), {foo: ['a,b', 'c']});
+	t.deepEqual(queryString.parse('foo=1|2&foo=3', {arrayFormat: 'separator', arrayFormatSeparator: '|'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo=1,2&foo=3&bar=4', {arrayFormat: 'comma', parseNumbers: true}), {foo: [1, 2, 3], bar: 4});
+	t.deepEqual(queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma', types: {foo: 'string'}}), {foo: '1,2,3'});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'comma', sort: false}), {foo: ['1', '2']});
+});
+
+test('comma and separator array formats still parse a single key', t => {
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'comma'}), {foo: '1'});
+	t.deepEqual(queryString.parse('foo=1,2', {arrayFormat: 'comma'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma'}), {foo: null});
+	t.deepEqual(queryString.parse('foo=', {arrayFormat: 'comma'}), {foo: ''});
+});

@@ -104,6 +104,9 @@ import queryString from 'query-string';
 
 queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 //=> {foo: ['1', '2', '3']}
+
+queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma'});
+//=> {foo: ['1', '2', '3']}
 ```
 
 - `'separator'`: Parse arrays with elements separated by a custom character:
