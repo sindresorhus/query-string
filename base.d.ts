@@ -207,7 +207,8 @@ export type ParseOptions = {
 	```
 	import queryString from 'query-string';
 
-	queryString.parse('?age=20&items=1%2C2%2C3', {
+	queryString.parse('?age=20&items=1,2,3', {
+		arrayFormat: 'comma',
 		parseNumbers: true,
 		types: {
 			items: 'string[]',
@@ -260,14 +261,14 @@ export type ParseOptions = {
 	@example
 	Array types are ignored when `arrayFormat` is set to `'none'`:
 	```
-	queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+	queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
 		arrayFormat: 'none',
 		types: {
 			ids: 'number[]',
 			foods: 'string[]',
 		},
-	}
-	//=> {ids:'001,002,003', foods:'apple,orange,mango'}
+	});
+	//=> {ids: '001,002,003', foods: 'apple,orange,mango'}
 	```
 
 	@example
@@ -275,7 +276,7 @@ export type ParseOptions = {
 	```
 	import queryString from 'query-string';
 
-	queryString.parse('?ids=001%2C002%2C003&items=1%2C2%2C3&price=22%2E00&numbers=1%2C2%2C3&double=5&number=20', {
+	queryString.parse('?ids=001,002,003&items=1,2,3&price=22.00&numbers=1,2,3&double=5&number=20', {
 		arrayFormat: 'comma',
 		types: {
 			ids: 'string',
@@ -723,18 +724,23 @@ export function pick(
 ): string;
 export function pick(
 	url: string,
-	filter: (key: string, value: string | boolean | number) => boolean,
-	options?: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | boolean | number>[string]) => boolean,
+	options: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
 ): string;
 export function pick(
 	url: string,
-	filter: (key: string, value: string | boolean) => boolean,
-	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | boolean>[string]) => boolean,
+	options: {parseBooleans: true} & ParseOptions & StringifyOptions
 ): string;
 export function pick(
 	url: string,
-	filter: (key: string, value: string | number) => boolean,
-	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | number>[string]) => boolean,
+	options: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string;
+export function pick(
+	url: string,
+	filter: (key: string, value: ParsedQuery[string]) => boolean,
+	options?: ParseOptions & StringifyOptions
 ): string;
 
 /**
@@ -762,16 +768,21 @@ export function exclude(
 ): string;
 export function exclude(
 	url: string,
-	filter: (key: string, value: string | boolean | number) => boolean,
-	options?: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | boolean | number>[string]) => boolean,
+	options: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
 ): string;
 export function exclude(
 	url: string,
-	filter: (key: string, value: string | boolean) => boolean,
-	options?: {parseBooleans: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | boolean>[string]) => boolean,
+	options: {parseBooleans: true} & ParseOptions & StringifyOptions
 ): string;
 export function exclude(
 	url: string,
-	filter: (key: string, value: string | number) => boolean,
-	options?: {parseNumbers: true} & ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<string | number>[string]) => boolean,
+	options: {parseNumbers: true} & ParseOptions & StringifyOptions
+): string;
+export function exclude(
+	url: string,
+	filter: (key: string, value: ParsedQuery[string]) => boolean,
+	options?: ParseOptions & StringifyOptions
 ): string;

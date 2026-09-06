@@ -1,5 +1,5 @@
 import {expectType} from 'tsd';
-import queryString from './index.js';
+import queryString, {type ParsedQuery} from './index.js';
 
 // Stringify
 expectType<string>(
@@ -131,3 +131,38 @@ expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']))
 
 // Exclude
 expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']));
+
+queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<string>(key);
+	expectType<ParsedQuery[string]>(value);
+	return true;
+});
+queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | number>[string]>(value);
+	return true;
+}, {parseNumbers: true});
+queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | boolean>[string]>(value);
+	return true;
+}, {parseBooleans: true});
+queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | boolean | number>[string]>(value);
+	return true;
+}, {parseBooleans: true, parseNumbers: true});
+queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<string>(key);
+	expectType<ParsedQuery[string]>(value);
+	return true;
+});
+queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | number>[string]>(value);
+	return true;
+}, {parseNumbers: true});
+queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | boolean>[string]>(value);
+	return true;
+}, {parseBooleans: true});
+queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+	expectType<ParsedQuery<string | boolean | number>[string]>(value);
+	return true;
+}, {parseBooleans: true, parseNumbers: true});

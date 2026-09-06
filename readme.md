@@ -133,7 +133,7 @@ queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatS
 //=> {foo: ['1', '2', '3']}
 
 queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> {foo: ['1', '', 3, '', '', '6']}
+//=> {foo: ['1', '', '3', '', '', '6']}
 
 queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 //=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
@@ -260,7 +260,8 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 ```js
 import queryString from 'query-string';
 
-queryString.parse('?age=20&items=1%2C2%2C3', {
+queryString.parse('?age=20&items=1,2,3', {
+	arrayFormat: 'comma',
 	parseNumbers: true,
 	types: {
 		items: 'string[]',
@@ -274,7 +275,8 @@ queryString.parse('?age=20&items=1%2C2%2C3', {
 ```js
 import queryString from 'query-string';
 
-queryString.parse('?age=20&items=1%2C2%2C3', {
+queryString.parse('?age=20&items=1,2,3', {
+	arrayFormat: 'comma',
 	types: {
 		items: 'number[]',
 	}
@@ -307,14 +309,14 @@ queryString.parse('?scores=10,20,30', {
 NOTE: Array types (`string[]`, `number[]`) are ignored if `arrayFormat` is set to `'none'`.
 
 ```js
-queryString.parse('ids=001%2C002%2C003&foods=apple%2Corange%2Cmango', {
+queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
 	arrayFormat: 'none',
 	types: {
 		ids: 'number[]',
 		foods: 'string[]',
 	},
-}
-//=> {ids:'001,002,003', foods:'apple,orange,mango'}
+});
+//=> {ids: '001,002,003', foods: 'apple,orange,mango'}
 ```
 
 ###### Function
@@ -329,8 +331,6 @@ queryString.parse('?age=20&id=01234&zipcode=90210', {
 });
 //=> {age: 40, id: '01234', zipcode: '90210'}
 ```
-
-Parse the value as a boolean type instead of string type if it's a boolean.
 
 ### .stringify(object, options?)
 
@@ -426,7 +426,7 @@ queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-s
 //=> 'foo[]=1||3|6'
 
 queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
+//=> 'bar=fluffy&baz[]=4&foo[]=1|2|3'
 ```
 
 - `'colon-list-separator'`: Serialize arrays with parameter names that are explicitly marked with `:list`:
