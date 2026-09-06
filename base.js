@@ -341,16 +341,18 @@ function parseValue(value, options, type) {
 		return value.toLowerCase() === '1';
 	}
 
-	if (type === 'string[]' && options.arrayFormat !== 'none' && typeof value === 'string') {
-		return [value];
-	}
-
-	if (type === 'number[]' && options.arrayFormat !== 'none' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		return [Number(value)];
+	if ((type === 'string[]' || type === 'number[]') && options.arrayFormat !== 'none' && typeof value === 'string') {
+		// A single value is still an array. The item is parsed with the element type, so a value that is not a number stays a string.
+		return [parseValue(value, options, type.slice(0, -2))];
 	}
 
 	if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
 		return Number(value);
+	}
+
+	// An explicit type takes precedence over `parseNumbers` and `parseBooleans`. A value that does not match its type stays a string.
+	if (type === 'boolean' || type === 'number') {
+		return value;
 	}
 
 	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {

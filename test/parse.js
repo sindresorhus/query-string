@@ -831,3 +831,47 @@ test('index array format lets a later scalar override the indexed entries', t =>
 	t.deepEqual(queryString.parse('foo[0]=1&foo=2', {arrayFormat: 'index'}), {foo: '2'});
 	t.deepEqual(queryString.parse('foo[0]=1&foo=2&foo[0]=3', {arrayFormat: 'index'}), {foo: ['2', '3']});
 });
+
+test('types option: an explicit type takes precedence over `parseNumbers` and `parseBooleans` when the value does not match the type', t => {
+	t.deepEqual(queryString.parse('id=true', {types: {id: 'number'}, parseBooleans: true}), {id: 'true'});
+	t.deepEqual(queryString.parse('id=abc', {types: {id: 'number'}, parseBooleans: true, parseNumbers: true}), {id: 'abc'});
+	t.deepEqual(queryString.parse('flag=2', {types: {flag: 'boolean'}, parseNumbers: true}), {flag: '2'});
+	t.deepEqual(queryString.parse('flag=yes', {types: {flag: 'boolean'}, parseNumbers: true, parseBooleans: true}), {flag: 'yes'});
+	t.deepEqual(queryString.parse('ids=1,true', {arrayFormat: 'comma', types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, 'true']});
+	t.deepEqual(queryString.parse('ids=1&ids=true', {types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, 'true']});
+	t.deepEqual(queryString.parse('flags=true&flags=2', {types: {flags: 'boolean'}, parseNumbers: true}), {flags: [true, '2']});
+	t.deepEqual(queryString.parse('id[]=true', {arrayFormat: 'bracket', types: {id: 'number[]'}, parseBooleans: true}), {id: ['true']});
+});
+
+test('types option: matching values are still parsed with an explicit type alongside `parseNumbers` and `parseBooleans`', t => {
+	t.deepEqual(queryString.parse('id=1&flag=true&other=2&text=3', {
+		types: {
+			id: 'number',
+			flag: 'boolean',
+			text: 'string',
+		},
+		parseNumbers: true,
+		parseBooleans: true,
+	}), {
+		id: 1,
+		flag: true,
+		other: 2,
+		text: '3',
+	});
+	t.deepEqual(queryString.parse('flag', {types: {flag: 'boolean'}, parseNumbers: true}), {flag: true});
+	t.deepEqual(queryString.parse('id', {types: {id: 'number'}, parseBooleans: true}), {id: null});
+});
+
+test('types option: `number[]` wraps a single value that is not a number in an array', t => {
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'separator', arrayFormatSeparator: '|', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'bracket', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'index', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'bracket-separator', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'colon-list-separator', types: {ids: 'number[]'}}), {ids: ['abc']});
+	t.deepEqual(queryString.parse('ids=', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: ['']});
+	t.deepEqual(queryString.parse('ids=true', {arrayFormat: 'comma', types: {ids: 'number[]'}, parseBooleans: true}), {ids: ['true']});
+	t.deepEqual(queryString.parse('ids=1', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1]});
+	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'none', types: {ids: 'number[]'}}), {ids: 'abc'});
+	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: null});
+});
