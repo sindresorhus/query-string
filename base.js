@@ -76,6 +76,20 @@ function encoderForArrayFormat(options) {
 				? '[]='
 				: '=';
 
+			// `parse()` only splits on a literal separator, so a separator inside an item is percent-encoded. `encodeURIComponent` leaves some ASCII characters as-is, like `-`, `.`, `_`, and `~`, so the pieces of the item between the separators are encoded separately and joined with the percent-encoded separator. The encoded item is not searched for the separator, since a separator that is a hex digit would clash with the `%XX` escapes.
+			const {arrayFormatSeparator} = options;
+			const encodedSeparator = encodeURIComponent(arrayFormatSeparator) === arrayFormatSeparator ? `%${arrayFormatSeparator.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}` : encodeURIComponent(arrayFormatSeparator);
+			const encodeItem = value => {
+				// `encode()` validates the value type first, since `String()` would hide an unsupported type.
+				const encodedValue = encode(value, options);
+				const stringValue = String(value);
+				if (!options.encode || !stringValue.includes(arrayFormatSeparator)) {
+					return encodedValue;
+				}
+
+				return stringValue.split(arrayFormatSeparator).map(piece => encode(piece, options)).join(encodedSeparator);
+			};
+
 			return key => (result, value) => {
 				if (
 					value === undefined
@@ -89,11 +103,11 @@ function encoderForArrayFormat(options) {
 				value = value === null ? '' : value;
 
 				if (result.length === 0) {
-					result.push([encode(key, options), keyValueSeparator, encode(value, options)].join(''));
+					result.push([encode(key, options), keyValueSeparator, encodeItem(value)].join(''));
 					return result;
 				}
 
-				result.push(encode(value, options));
+				result.push(encodeItem(value));
 				return result;
 			};
 		}
@@ -531,10 +545,6 @@ export function stringify(object, options) {
 		}
 
 		if (Array.isArray(value)) {
-			if (value.length === 0 && options.arrayFormat === 'bracket-separator') {
-				return encode(key, options) + '[]';
-			}
-
 			// Apply replacer to array elements if provided
 			// Note: We don't re-apply replacer to the array itself, only to elements
 			let processedArray = value;
@@ -545,6 +555,12 @@ export function stringify(object, options) {
 			}
 
 			const result = processedArray.reduce(formatter(key), []);
+
+			// An array with no items left after skipping is empty. `bracket-separator` writes an empty array as `foo[]`, which `parse()` reads back as `[]`. The other formats have no representation for an empty array, so the key is dropped.
+			if (result.length === 0) {
+				return options.arrayFormat === 'bracket-separator' ? encode(key, options) + '[]' : '';
+			}
+
 			const arrayFormatSeparator = ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? options.arrayFormatSeparator : '&';
 			return result.join(arrayFormatSeparator);
 		}

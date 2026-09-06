@@ -293,6 +293,81 @@ test('array stringify representation with brackets and separators with dropped n
 	}), 'bar[]=one,three,,six');
 });
 
+test('array stringify representation with brackets and separators when every item is skipped', t => {
+	// After the items are skipped, the array is empty. An empty array is written as `bar[]`, like an empty array in the input, so the key is not lost.
+	t.is(queryString.stringify({bar: [null]}, {arrayFormat: 'bracket-separator', skipNull: true}), 'bar[]');
+	t.is(queryString.stringify({bar: [null, null]}, {arrayFormat: 'bracket-separator', skipNull: true}), 'bar[]');
+	t.is(queryString.stringify({bar: ['']}, {arrayFormat: 'bracket-separator', skipEmptyString: true}), 'bar[]');
+	t.is(queryString.stringify({bar: [null, '']}, {arrayFormat: 'bracket-separator', skipNull: true, skipEmptyString: true}), 'bar[]');
+	t.is(queryString.stringify({bar: [undefined]}, {arrayFormat: 'bracket-separator'}), 'bar[]');
+	t.is(queryString.stringify({bar: [undefined, undefined]}, {arrayFormat: 'bracket-separator'}), 'bar[]');
+	t.is(queryString.stringify({bar: [1]}, {arrayFormat: 'bracket-separator', replacer: (key, value) => value === 1 ? undefined : value}), 'bar[]');
+	t.is(queryString.stringify({bar: [null], foo: 'x'}, {arrayFormat: 'bracket-separator', skipNull: true}), 'bar[]&foo=x');
+	t.is(queryString.stringify({bar: [null]}, {arrayFormat: 'bracket-separator', skipNull: true, encode: false}), 'bar[]');
+	t.is(queryString.stringify({'a b': [null]}, {arrayFormat: 'bracket-separator', skipNull: true}), 'a%20b[]');
+
+	// The result round-trips to an empty array.
+	t.deepEqual(queryString.parse(queryString.stringify({bar: [null]}, {arrayFormat: 'bracket-separator', skipNull: true}), {arrayFormat: 'bracket-separator'}), {bar: []});
+
+	// The other array formats have no representation for an empty array, so the key is dropped there, like for an empty array in the input.
+	for (const arrayFormat of ['none', 'bracket', 'index', 'comma', 'separator', 'colon-list-separator']) {
+		t.is(queryString.stringify({bar: [null]}, {arrayFormat, skipNull: true}), '', `${arrayFormat}: skipNull`);
+		t.is(queryString.stringify({bar: [undefined]}, {arrayFormat}), '', `${arrayFormat}: undefined item`);
+		t.is(queryString.stringify({bar: []}, {arrayFormat}), '', `${arrayFormat}: empty array`);
+	}
+});
+
+test('array stringify representation with separators percent-encodes a separator inside an item', t => {
+	// `parse()` only splits on a literal separator, so a separator inside an item must be percent-encoded, also when `encodeURIComponent` leaves it as-is, like `-`, `.`, `_`, and `~`.
+	t.is(queryString.stringify({foo: ['a,b', 'c']}, {arrayFormat: 'comma'}), 'foo=a%2Cb,c');
+	t.is(queryString.stringify({foo: ['a|b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '|'}), 'foo=a%7Cb|c');
+	t.is(queryString.stringify({foo: ['a-b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=a%2Db-c');
+	t.is(queryString.stringify({foo: ['a.b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '.'}), 'foo=a%2Eb.c');
+	t.is(queryString.stringify({foo: ['a_b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '_'}), 'foo=a%5Fb_c');
+	t.is(queryString.stringify({foo: ['a~b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '~'}), 'foo=a%7Eb~c');
+	t.is(queryString.stringify({foo: ['a-b', 'c']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '-'}), 'foo[]=a%2Db-c');
+	t.is(queryString.stringify({foo: ['a.b', 'c']}, {arrayFormat: 'comma', arrayFormatSeparator: '.'}), 'foo=a%2Eb.c');
+
+	// Every occurrence is encoded, also at the start and the end of an item, and in a single-item array.
+	t.is(queryString.stringify({foo: ['-a--b-']}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=%2Da%2D%2Db%2D');
+	t.is(queryString.stringify({foo: ['-', '-']}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=%2D-%2D');
+	t.is(queryString.stringify({foo: [1.5, 2]}, {arrayFormat: 'separator', arrayFormatSeparator: '.'}), 'foo=1%2E5.2');
+
+	// `!`, `'`, `(`, `)`, and `*` are only encoded by the strict encoding. As a separator, they are encoded in both modes.
+	t.is(queryString.stringify({foo: ['a!b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '!', strict: false}), 'foo=a%21b!c');
+	t.is(queryString.stringify({foo: ['a*b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '*', strict: false}), 'foo=a%2Ab*c');
+	t.is(queryString.stringify({foo: ['a!b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '!'}), 'foo=a%21b!c');
+
+	// The key is not an item, so the separator in the key follows the normal encoding.
+	t.is(queryString.stringify({'a-b': ['c', 'd']}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'a-b=c-d');
+
+	// A scalar is not an item, so the separator is not encoded there.
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=a-b');
+
+	// Without encoding, the item is written as-is.
+	t.is(queryString.stringify({foo: ['a-b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '-', encode: false}), 'foo=a-b-c');
+
+	// A separator outside ASCII is always percent-encoded inside an item, so it is already distinct from the literal separator.
+	t.is(queryString.stringify({foo: ['aåb', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: 'å'}), 'foo=a%C3%A5båc');
+
+	// A separator that is a hex digit must not be confused with the same character inside a `%XX` escape of another character.
+	t.is(queryString.stringify({foo: ['a,b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: 'C'}), 'foo=a%2CbCc');
+	t.is(queryString.stringify({foo: ['a b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '2'}), 'foo=a%20b2c');
+	t.is(queryString.stringify({foo: ['a2b', 'c d']}, {arrayFormat: 'separator', arrayFormatSeparator: '2'}), 'foo=a%32b2c%20d');
+	t.is(queryString.stringify({foo: ['*', 'b']}, {arrayFormat: 'separator', arrayFormatSeparator: 'A'}), 'foo=%2AAb');
+	t.is(queryString.stringify({foo: ['a%b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '%'}), 'foo=a%25b%c');
+
+	// The result round-trips.
+	for (const arrayFormatSeparator of ['-', '.', '_', '~', '!', '*', 'x', 'å', ',', '|']) {
+		for (const arrayFormat of ['separator', 'bracket-separator']) {
+			const value = [`a${arrayFormatSeparator}b`, 'c', `${arrayFormatSeparator}`];
+			const options = {arrayFormat, arrayFormatSeparator};
+			t.deepEqual(queryString.parse(queryString.stringify({foo: value}, options), options), {foo: value}, `${arrayFormat} with ${arrayFormatSeparator}`);
+			t.deepEqual(queryString.parse(queryString.stringify({foo: value}, {...options, strict: false}), options), {foo: value}, `${arrayFormat} with ${arrayFormatSeparator} and strict false`);
+		}
+	}
+});
+
 test('should sort keys in given order', t => {
 	const fixture = ['c', 'a', 'b'];
 	const sort = (key1, key2) => fixture.indexOf(key1) - fixture.indexOf(key2);

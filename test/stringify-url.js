@@ -154,6 +154,13 @@ test('stringify URL with `encode: false` and array formats in the existing query
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%2C,2', query: {b: 'x'}}, {encode: false, arrayFormat: 'comma'}), 'https://foo.bar?a=%2C,2&b=x');
 });
 
+test('stringify URL with a separator that `encodeURIComponent` leaves as-is', t => {
+	// The percent-encoded separator inside an item of the existing query survives the decode and re-encode.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=a%2Db-c', query: {}}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'https://foo.bar?foo=a%2Db-c');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: ['a-b', 'c']}}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'https://foo.bar?foo=a%2Db-c');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {bar: [null]}}, {arrayFormat: 'bracket-separator', skipNull: true}), 'https://foo.bar?bar[]');
+});
+
 test('stringify URL with `encode: false` and a fragment identifier in the URL', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=%20#top%20', query: {}}, {encode: false}), 'https://foo.bar?a=%20#top%20');
 });

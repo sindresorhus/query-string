@@ -57,6 +57,13 @@ test('picks elements in a URL with a fragment identifier that contains a questio
 	t.is(queryString.pick('https://foo.bar#section?x=1', ['x']), 'https://foo.bar#section?x=1');
 });
 
+test('picks elements in a URL with a separator that `encodeURIComponent` leaves as-is', t => {
+	// The percent-encoded separator inside an item survives the decode and re-encode.
+	t.is(queryString.pick('https://foo.bar?foo=a%2Db-c&bar=1', ['foo'], {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'https://foo.bar?foo=a%2Db-c');
+	t.is(queryString.pick('https://foo.bar?foo[]=a%2Eb.c&bar=1', ['foo'], {arrayFormat: 'bracket-separator', arrayFormatSeparator: '.'}), 'https://foo.bar?foo[]=a%2Eb.c');
+	t.is(queryString.exclude('https://foo.bar?foo=a%2Db-c&bar=1', ['bar'], {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'https://foo.bar?foo=a%2Db-c');
+});
+
 test('picks elements in a URL with `encode: false` and keeps the values as-is', t => {
 	t.is(queryString.pick('https://foo.bar?a=%20&b=1+2&c=3', ['a', 'b'], {encode: false}), 'https://foo.bar?a=%20&b=1+2');
 });

@@ -167,7 +167,7 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator.
+Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
 
 ```js
 import queryString from 'query-string';
@@ -468,6 +468,8 @@ Type: `string`\
 Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
+
+A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
 
 ##### sort
 

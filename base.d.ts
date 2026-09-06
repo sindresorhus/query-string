@@ -102,7 +102,7 @@ export type ParseOptions = {
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-	Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how `.stringify()` encodes elements that contain the separator.
+	Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how `.stringify()` encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
 
 	@example
 	```
@@ -483,6 +483,8 @@ export type StringifyOptions = {
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
+
+	A separator inside an element is percent-encoded, so `.parse()` can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
 
 	@default ,
 	*/
