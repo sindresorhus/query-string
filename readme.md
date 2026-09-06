@@ -164,6 +164,18 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
+Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator.
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('foo=a%2Cb,c', {arrayFormat: 'comma'});
+//=> {foo: ['a,b', 'c']}
+
+queryString.parse('foo[]=a%2Cb,c', {arrayFormat: 'bracket-separator'});
+//=> {foo: ['a,b', 'c']}
+```
+
 ##### sort
 
 Type: `Function | boolean`\

@@ -478,7 +478,28 @@ test('array stringify representation with (:list) colon-list-separator with null
 		bar: ['one', null],
 	}, {
 		arrayFormat: 'colon-list-separator',
-	}), 'bar:list=one&bar:list=&foo');
+	}), 'bar:list=one&bar:list&foo');
+});
+
+test('array stringify representation with (:list) colon-list-separator keeps null values distinct from empty strings', t => {
+	const options = {arrayFormat: 'colon-list-separator'};
+
+	t.is(queryString.stringify({foo: [null]}, options), 'foo:list');
+	t.is(queryString.stringify({foo: [null, null]}, options), 'foo:list&foo:list');
+	t.is(queryString.stringify({foo: [null, '', 'a']}, options), 'foo:list&foo:list=&foo:list=a');
+	t.is(queryString.stringify({foo: ['a b', null]}, {...options, encode: false}), 'foo:list=a b&foo:list');
+	t.is(queryString.stringify({foo: [null, 'a']}, {...options, skipNull: true}), 'foo:list=a');
+	t.is(queryString.stringify({foo: [null, '', 'a']}, {...options, skipEmptyString: true}), 'foo:list&foo:list=a');
+	t.is(queryString.stringify({foo: [undefined, null]}, options), 'foo:list');
+});
+
+test('array stringify representation with (:list) colon-list-separator round-trips null values', t => {
+	const options = {arrayFormat: 'colon-list-separator'};
+	const object = {foo: [null, '', 'a'], bar: null};
+	const stringified = queryString.stringify(object, options);
+
+	t.is(stringified, 'bar&foo:list&foo:list=&foo:list=a');
+	t.deepEqual(queryString.parse(stringified, options), object);
 });
 
 test('replacer option transforms Date objects to ISO strings', t => {

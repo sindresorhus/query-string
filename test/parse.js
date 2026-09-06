@@ -313,13 +313,40 @@ test('query strings having a brackets+separator array and format option as `brac
 });
 
 test('query strings having a brackets+separator array and format option as `bracket-separator` with a URL encoded value', t => {
+	// A percent-encoded separator is part of the item, not a separator. See https://github.com/sindresorhus/query-string/issues/398
 	const key = 'foo[]';
 	const value = 'a,b,c,d,e,f';
 	t.deepEqual(queryString.parse(`?${encodeURIComponent(key)}=${encodeURIComponent(value)}`, {
 		arrayFormat: 'bracket-separator',
 	}), {
-		foo: ['a', 'b', 'c', 'd', 'e', 'f'],
+		foo: ['a,b,c,d,e,f'],
 	});
+});
+
+test('query strings having a brackets+separator array and format option as `bracket-separator` with an encoded separator inside an item', t => {
+	t.deepEqual(queryString.parse('foo[]=a%2Cb,c', {arrayFormat: 'bracket-separator'}), {foo: ['a,b', 'c']});
+	t.deepEqual(queryString.parse('foo[]=%2C', {arrayFormat: 'bracket-separator'}), {foo: [',']});
+	t.deepEqual(queryString.parse('foo[]=a%7Cb|c', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'}), {foo: ['a|b', 'c']});
+	t.deepEqual(queryString.parse('foo[]=a%2Cb,c', {arrayFormat: 'bracket-separator', decode: false}), {foo: ['a%2Cb', 'c']});
+	t.deepEqual(queryString.parse('foo[]=a%2Cb,c&foo[]=d%2Ce', {arrayFormat: 'bracket-separator'}), {foo: ['a,b', 'c', 'd,e']});
+	t.deepEqual(queryString.parse('foo[]=1%2C2,3', {arrayFormat: 'bracket-separator', parseNumbers: true}), {foo: ['1,2', 3]});
+});
+
+test('`bracket-separator` round-trips items containing the separator', t => {
+	for (const arrayFormatSeparator of [',', '|', ';']) {
+		const options = {arrayFormat: 'bracket-separator', arrayFormatSeparator};
+		const object = {foo: [`a${arrayFormatSeparator}b`, 'c', arrayFormatSeparator, ''], bar: [arrayFormatSeparator]};
+		t.deepEqual(queryString.parse(queryString.stringify(object, options), options), object, `separator: ${arrayFormatSeparator}`);
+	}
+});
+
+test('`bracket-separator` handles encoded separators the same way as `comma` and `separator`', t => {
+	const separator = queryString.parse('foo=a%2Cb,c', {arrayFormat: 'separator'});
+	const comma = queryString.parse('foo=a%2Cb,c', {arrayFormat: 'comma'});
+	const bracketSeparator = queryString.parse('foo[]=a%2Cb,c', {arrayFormat: 'bracket-separator'});
+	t.deepEqual(separator, {foo: ['a,b', 'c']});
+	t.deepEqual(comma, separator);
+	t.deepEqual(bracketSeparator, separator);
 });
 
 test('query strings having = within parameters (i.e. GraphQL IDs)', t => {

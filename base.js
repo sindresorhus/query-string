@@ -62,7 +62,7 @@ function encoderForArrayFormat(options) {
 				}
 
 				if (value === null) {
-					result.push([encode(key, options), ':list='].join(''));
+					result.push([encode(key, options), ':list'].join(''));
 					return result;
 				}
 
@@ -199,6 +199,7 @@ function parserForArrayFormat(options) {
 		case 'comma':
 		case 'separator': {
 			return (key, value, accumulator) => {
+				// Split the raw value before decoding. A percent-encoded separator (`%2C`) is part of an item, only a literal separator delimits items. This follows RFC 6570 §3.2.8, where list members are percent-encoded and joined with a literal `,`, and matches `stringify()`, `qs`, and OpenAPI clients such as swagger-js and openapi-fetch.
 				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
 				const newValue = isArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : (value === null ? value : decode(value, options));
 				accumulator[key] = newValue;
@@ -215,9 +216,10 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
+				// Split the raw value before decoding, like `comma` and `separator`, so an item that contains the separator round-trips: `stringify({foo: ['a,b', 'c']})` gives `foo[]=a%2Cb,c`, which must parse back to `['a,b', 'c']`. Decoding first would make the separator ambiguous, which is also why swagger-js rejected encoding the separator (swagger-api/swagger-ui#9289). A value where the client percent-encoded everything, including the separators, is therefore a single item. See https://github.com/sindresorhus/query-string/issues/398
 				const arrayValue = value === null
 					? []
-					: decode(value, options).split(options.arrayFormatSeparator);
+					: value.split(options.arrayFormatSeparator).map(item => decode(item, options));
 
 				if (accumulator[key] === undefined) {
 					accumulator[key] = arrayValue;

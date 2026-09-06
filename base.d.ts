@@ -99,6 +99,19 @@ export type ParseOptions = {
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
+	Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how `.stringify()` encodes elements that contain the separator.
+
+	@example
+	```
+	import queryString from 'query-string';
+
+	queryString.parse('foo=a%2Cb,c', {arrayFormat: 'comma'});
+	//=> {foo: ['a,b', 'c']}
+
+	queryString.parse('foo[]=a%2Cb,c', {arrayFormat: 'bracket-separator'});
+	//=> {foo: ['a,b', 'c']}
+	```
+
 	@default ,
 	*/
 	readonly arrayFormatSeparator?: string;
