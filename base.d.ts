@@ -130,7 +130,7 @@ export type ParseOptions = {
 	//=> {a: 'one', c: 'three', b: 'two'}
 	```
 	*/
-	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+	readonly sort?: ((itemLeft: string, itemRight: string) => number) | boolean;
 
 	/**
 	Parse the value as a number type instead of string type if it's a number.
@@ -498,7 +498,7 @@ export type StringifyOptions = {
 	//=> 'b=1&c=2&a=3'
 	```
 	*/
-	readonly sort?: ((itemLeft: string, itemRight: string) => number) | false;
+	readonly sort?: ((itemLeft: string, itemRight: string) => number) | boolean;
 
 	/**
 	Skip keys with `null` as the value.

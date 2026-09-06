@@ -115,3 +115,7 @@ test('handles a URL with a fragment identifier that the WHATWG parser rejects', 
 test('handles a fragment identifier that starts with `#`', t => {
 	t.is(queryString.exclude('https://foo.bar/?a=1&b=2#%23top', ['b']), 'https://foo.bar/?a=1##top');
 });
+
+test('excludes elements in a URL with index array format', t => {
+	t.is(queryString.exclude('https://foo.bar?foo[1]=b&foo[0]=a&bar=x', ['bar'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=a&foo[1]=b');
+});

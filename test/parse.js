@@ -766,3 +766,25 @@ test('types option: does not treat `Object.prototype` keys as custom types', t =
 	t.deepEqual(queryString.parse('constructor=1', {types: {}}), {constructor: '1'});
 	t.deepEqual(queryString.parse('toString[]=1&toString[]=2', {arrayFormat: 'bracket', types: {}}), {toString: ['1', '2']});
 });
+
+test('parse index array format when sort is false', t => {
+	t.deepEqual(queryString.parse('foo[1]=b&foo[0]=a&bar=baz', {arrayFormat: 'index', sort: false}), {foo: ['a', 'b'], bar: 'baz'});
+	t.deepEqual(queryString.parse('foo[0]=a', {arrayFormat: 'index', sort: false}), {foo: ['a']});
+});
+
+test('parse index array format when sort is false with types', t => {
+	t.deepEqual(queryString.parse('foo[1]=2&foo[0]=1', {arrayFormat: 'index', sort: false, types: {foo: 'number[]'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo[1]=2&foo[0]=1', {arrayFormat: 'index', sort: false, types: {foo: value => `${value}!`}}), {foo: ['1!', '2!']});
+	t.deepEqual(queryString.parse('foo[1]=2&foo[0]=1', {arrayFormat: 'index', sort: false, parseNumbers: true}), {foo: [1, 2]});
+});
+
+test('parse index array format when sort is false with null and empty values', t => {
+	t.deepEqual(queryString.parse('foo[2]&foo[0]=&foo[1]=one', {arrayFormat: 'index', sort: false}), {foo: ['', 'one', null]});
+});
+
+test('parse index array format with a custom sort function', t => {
+	const sort = (key1, key2) => key2.localeCompare(key1);
+	const parsed = queryString.parse('bar=x&foo[1]=b&foo[0]=a', {arrayFormat: 'index', sort});
+	t.deepEqual(parsed, {foo: ['a', 'b'], bar: 'x'});
+	t.deepEqual(Object.keys(parsed), ['foo', 'bar']);
+});

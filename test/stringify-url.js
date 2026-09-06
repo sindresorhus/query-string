@@ -118,3 +118,11 @@ test('stringify URL with a fragment identifier does not parse the URL', t => {
 	t.is(queryString.stringifyUrl({url: 'http://x.com%23/p', query: {a: 1}, fragmentIdentifier: 'frag'}), 'http://x.com%23/p?a=1#frag');
 	t.is(queryString.stringifyUrl({url: 'http://[bad/', query: {a: 1}, fragmentIdentifier: '#frag'}), 'http://[bad/?a=1##frag');
 });
+
+test('stringify URL with sorting when sort is true', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?C=3&A=1', query: {D: 4, B: 2}}, {sort: true}), 'https://foo.bar?A=1&B=2&C=3&D=4');
+});
+
+test('stringify URL with index array format in the existing query', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo[0]=a&foo[1]=b', query: {bar: 'baz'}}, {arrayFormat: 'index'}), 'https://foo.bar?bar=baz&foo[0]=a&foo[1]=b');
+});

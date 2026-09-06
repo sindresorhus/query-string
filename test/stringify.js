@@ -644,3 +644,21 @@ test('replacer option can transform objects to JSON strings', t => {
 		},
 	}), 'data=%7B%22nested%22%3A%22value%22%7D');
 });
+
+test('should sort keys when sort is true', t => {
+	t.is(queryString.stringify({b: 1, c: 2, a: 3}, {sort: true}), 'a=3&b=1&c=2');
+});
+
+test('should sort keys when sort is true and values are arrays', t => {
+	t.is(queryString.stringify({b: [2, 1], a: 'x'}, {sort: true, arrayFormat: 'bracket'}), 'a=x&b[]=2&b[]=1');
+});
+
+test('should sort keys when sort is true with skipNull and skipEmptyString', t => {
+	t.is(queryString.stringify({c: '', b: null, a: 1}, {sort: true, skipNull: true, skipEmptyString: true}), 'a=1');
+	t.is(queryString.stringify({c: '', b: null, a: 1}, {sort: true}), 'a=1&b&c=');
+});
+
+test('should sort keys when sort is true and the object has one key', t => {
+	t.is(queryString.stringify({a: 1}, {sort: true}), 'a=1');
+	t.is(queryString.stringify({}, {sort: true}), '');
+});

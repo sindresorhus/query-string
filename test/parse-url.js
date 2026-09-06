@@ -50,3 +50,7 @@ test('throws for invalid values', t => {
 		instanceOf: TypeError,
 	});
 });
+
+test('handles index array format without sorting', t => {
+	t.deepEqual(queryString.parseUrl('https://foo.bar?foo[1]=b&foo[0]=a', {arrayFormat: 'index', sort: false}), {url: 'https://foo.bar', query: {foo: ['a', 'b']}});
+});

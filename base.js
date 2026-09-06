@@ -439,6 +439,11 @@ export function parse(query, options) {
 				const type = typeof typeOption === 'function' ? typeOption : (typeOption ? typeOption.replace('[]', '') : undefined);
 				value[key2] = parseValue(value2, options, type);
 			}
+
+			// The `index` array format collects the items in an object keyed by index. Turn it into an array ordered by index.
+			if (!Array.isArray(value)) {
+				returnValue[key] = keysSorter(value);
+			}
 		} else if (typeof value === 'object' && value !== null && options.types[key] === 'string') {
 			returnValue[key] = Object.values(value).join(options.arrayFormatSeparator);
 		} else {
@@ -453,8 +458,7 @@ export function parse(query, options) {
 	// TODO: Remove the use of `reduce`.
 	// eslint-disable-next-line unicorn/no-array-reduce
 	return (options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort)).reduce((result, key) => {
-		const value = returnValue[key];
-		result[key] = Boolean(value) && typeof value === 'object' && !Array.isArray(value) ? keysSorter(value) : value;
+		result[key] = returnValue[key];
 		return result;
 	}, Object.create(null));
 }
@@ -492,7 +496,7 @@ export function stringify(object, options) {
 	const keys = Object.keys(objectCopy);
 
 	if (options.sort !== false) {
-		keys.sort(options.sort);
+		keys.sort(typeof options.sort === 'function' ? options.sort : undefined);
 	}
 
 	return keys.map(key => {
