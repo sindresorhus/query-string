@@ -139,6 +139,9 @@ function parserForArrayFormat(options) {
 
 				if (accumulator[key] === undefined) {
 					accumulator[key] = {};
+				} else if (typeof accumulator[key] !== 'object' || accumulator[key] === null) {
+					// A scalar seen before the indexed entries becomes the first item, like in the other array formats. The empty key sorts before any index.
+					accumulator[key] = {'': accumulator[key]};
 				}
 
 				accumulator[key][result[1]] = value;
@@ -435,20 +438,21 @@ export function parse(query, options) {
 		parameterStart = index + 1;
 	}
 
-	for (const [key, value] of Object.entries(returnValue)) {
-		if (typeof value === 'object' && value !== null && options.types[key] !== 'string') {
-			for (const [key2, value2] of Object.entries(value)) {
+	for (let [key, value] of Object.entries(returnValue)) {
+		// The `index` array format collects the items in an object keyed by index. Turn it into an array ordered by index.
+		if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+			value = keysSorter(value);
+			returnValue[key] = value;
+		}
+
+		if (Array.isArray(value) && options.types[key] !== 'string') {
+			for (const [index, item] of value.entries()) {
 				const typeOption = options.types[key];
 				const type = typeof typeOption === 'function' ? typeOption : (typeOption ? typeOption.replace('[]', '') : undefined);
-				value[key2] = parseValue(value2, options, type);
+				value[index] = parseValue(item, options, type);
 			}
-
-			// The `index` array format collects the items in an object keyed by index. Turn it into an array ordered by index.
-			if (!Array.isArray(value)) {
-				returnValue[key] = keysSorter(value);
-			}
-		} else if (typeof value === 'object' && value !== null && options.types[key] === 'string') {
-			returnValue[key] = Object.values(value).join(options.arrayFormatSeparator);
+		} else if (Array.isArray(value) && options.types[key] === 'string') {
+			returnValue[key] = value.join(options.arrayFormatSeparator);
 		} else {
 			returnValue[key] = parseValue(value, options, options.types[key]);
 		}

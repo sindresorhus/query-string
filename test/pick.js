@@ -73,3 +73,7 @@ test('drops a query parameter named `__proto__`', t => {
 	t.is(queryString.pick('https://foo.bar?__proto__=1&a=2', ['__proto__']), 'https://foo.bar');
 	t.is(queryString.pick('https://foo.bar?__proto__=1&a=2', (name, value) => value === '1'), 'https://foo.bar');
 });
+
+test('picks elements in a URL with index array format when a scalar precedes the indexed entries', t => {
+	t.is(queryString.pick('https://foo.bar?foo=1&foo[0]=2&bar=x', ['foo'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
+});

@@ -788,3 +788,19 @@ test('parse index array format with a custom sort function', t => {
 	t.deepEqual(parsed, {foo: ['a', 'b'], bar: 'x'});
 	t.deepEqual(Object.keys(parsed), ['foo', 'bar']);
 });
+
+test('index array format does not throw when a scalar precedes the indexed entries', t => {
+	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo&foo[0]=2', {arrayFormat: 'index'}), {foo: [null, '2']});
+	t.deepEqual(queryString.parse('foo=&foo[0]=2', {arrayFormat: 'index'}), {foo: ['', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo[1]=3&foo[0]=2&bar=x', {arrayFormat: 'index'}), {foo: ['1', '2', '3'], bar: 'x'});
+	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index', sort: false}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index', types: {foo: 'number[]'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index', types: {foo: 'string'}}), {foo: '1,2'});
+	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index', parseNumbers: true}), {foo: [1, 2]});
+});
+
+test('index array format lets a later scalar override the indexed entries', t => {
+	t.deepEqual(queryString.parse('foo[0]=1&foo=2', {arrayFormat: 'index'}), {foo: '2'});
+	t.deepEqual(queryString.parse('foo[0]=1&foo=2&foo[0]=3', {arrayFormat: 'index'}), {foo: ['2', '3']});
+});
