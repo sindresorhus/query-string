@@ -538,7 +538,7 @@ export function stringify(object, options) {
 	}
 
 	return keys.map(key => {
-		let value = object[key];
+		let value = objectCopy[key];
 
 		// Apply replacer function if provided
 		if (options.replacer) {

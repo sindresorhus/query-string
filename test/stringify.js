@@ -930,3 +930,43 @@ test('an option that is explicitly `undefined` uses its default', t => {
 	t.is(queryString.stringify({foo: [1, 2]}, {arrayFormat: 'comma', arrayFormatSeparator: undefined}), 'foo=1,2');
 	t.is(queryString.stringify({foo: null, bar: ''}, {skipNull: undefined, skipEmptyString: undefined, replacer: undefined}), 'bar=&foo');
 });
+
+test('reads each value once', t => {
+	// A getter or a `Proxy` trap runs once per key, so a value that changes on every read, like a counter, is written from the one read, and a costly getter is not called twice.
+	let reads = 0;
+	t.is(queryString.stringify({
+		get foo() {
+			reads++;
+			return reads;
+		},
+	}), 'foo=1');
+	t.is(reads, 1);
+
+	reads = 0;
+	t.is(queryString.stringify({
+		get foo() {
+			reads++;
+			return [reads, 'x'];
+		},
+	}, {arrayFormat: 'comma'}), 'foo=1,x');
+	t.is(reads, 1);
+
+	reads = 0;
+	t.is(queryString.stringify({
+		get foo() {
+			reads++;
+			return reads;
+		},
+	}, {replacer: (key, value) => value * 10}), 'foo=10');
+	t.is(reads, 1);
+
+	const trapped = [];
+	const proxy = new Proxy({b: 1, a: 2}, {
+		get(target, key) {
+			trapped.push(key);
+			return target[key];
+		},
+	});
+	t.is(queryString.stringify(proxy, {sort: false}), 'b=1&a=2');
+	t.deepEqual(trapped, ['b', 'a']);
+});
