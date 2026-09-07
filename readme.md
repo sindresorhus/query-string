@@ -713,7 +713,7 @@ queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '/users?id
 
 Pick query parameters from a URL.
 
-Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order.
+Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
 ```js
 import queryString from 'query-string';
@@ -730,7 +730,7 @@ queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value ===
 
 Exclude query parameters from a URL.
 
-Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order.
+Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
 ```js
 import queryString from 'query-string';

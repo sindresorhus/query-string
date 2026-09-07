@@ -649,6 +649,12 @@ export function stringifyUrl(object, options) {
 }
 
 export function pick(input, filter, options) {
+	// The keys array is a filter, not an order. Filtering with a predicate keeps the parsed object's key order, which matters with `sort: false`. Integer-index keys are enumerated first in numeric order, and repeated keys are grouped together.
+	if (Array.isArray(filter)) {
+		const filterSet = new Set(filter);
+		return pick(input, key => filterSet.has(key), options);
+	}
+
 	// When the output is not encoded, do not decode the input either. Decoding without re-encoding would corrupt it.
 	const {url, query} = parseUrl(input, {decode: options?.encode ?? true, ...options});
 

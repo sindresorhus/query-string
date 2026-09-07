@@ -756,7 +756,7 @@ Pick query parameters from a URL.
 @param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
-@returns The URL with the picked query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order.
+@returns The URL with the picked query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
 @example
 ```
@@ -800,7 +800,7 @@ Exclude query parameters from a URL. Like `.pick()` but reversed.
 @param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
-@returns The URL without the excluded query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order.
+@returns The URL without the excluded query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
 @example
 ```

@@ -93,3 +93,35 @@ test('drops a query parameter named `__proto__`', t => {
 test('picks elements in a URL with index array format when a scalar precedes the indexed entries', t => {
 	t.is(queryString.pick('https://foo.bar?foo=1&foo[0]=2&bar=x', ['foo'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
 });
+
+test('keeps the order of the URL with sort false, not the order of the keys array', t => {
+	// The keys array is a filter, not an order. With `sort: false` the query parameters keep the parsed object's key order, like the docs say.
+	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['a', 'c', 'b'], {sort: false}), 'http://example.com/?b=1&a=2&c=3');
+	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['c', 'a'], {sort: false}), 'http://example.com/?a=2&c=3');
+	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['c', 'b'], {sort: false}), 'http://example.com/?b=1&c=3');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', ['a', 'b', 'c'], {sort: false}), 'http://example.com/?c=3&b=2&a=1');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1#hash', ['a', 'c'], {sort: false}), 'http://example.com/?c=3&a=1#hash');
+	t.is(queryString.pick('/path?z=1&y=2&x=3', ['x', 'y', 'z'], {sort: false}), '/path?z=1&y=2&x=3');
+	t.is(queryString.pick('?b=1&a=2', ['a', 'b'], {sort: false}), '?b=1&a=2');
+
+	// Keys that are not in the URL, and repeated keys, do not change the order.
+	t.is(queryString.pick('http://example.com/?b=1&a=2', ['x', 'a', 'y', 'b'], {sort: false}), 'http://example.com/?b=1&a=2');
+	t.is(queryString.pick('http://example.com/?b=1&a=2', ['a', 'b', 'a'], {sort: false}), 'http://example.com/?b=1&a=2');
+
+	// Array values and the other options keep the order too.
+	t.is(queryString.pick('http://example.com/?b=1&a=2&b=3', ['a', 'b'], {sort: false}), 'http://example.com/?b=1&b=3&a=2');
+	t.is(queryString.pick('http://example.com/?b[]=1&a[]=2', ['a', 'b'], {arrayFormat: 'bracket', sort: false}), 'http://example.com/?b[]=1&a[]=2');
+	t.is(queryString.pick('http://example.com/?b[0]=1&a[0]=2', ['a', 'b'], {arrayFormat: 'index', sort: false}), 'http://example.com/?b[0]=1&a[0]=2');
+	t.is(queryString.pick('http://example.com/?b=1,2&a=3', ['a', 'b'], {arrayFormat: 'comma', sort: false}), 'http://example.com/?b=1,2&a=3');
+	t.is(queryString.pick('http://example.com/?b=1&a=2', ['a', 'b'], {sort: false, parseNumbers: true}), 'http://example.com/?b=1&a=2');
+	t.is(queryString.pick('http://example.com/?b=a%20b&a=2', ['a', 'b'], {sort: false, encode: false}), 'http://example.com/?b=a%20b&a=2');
+	t.is(queryString.pick('http://example.com/?b&a=2', ['a', 'b'], {sort: false}), 'http://example.com/?b&a=2');
+
+	// Integer-index keys are enumerated first in numeric order, even when sorting is disabled.
+	t.is(queryString.pick('https://foo.bar?x=c&2=b&1=a', ['x', '2', '1'], {sort: false}), 'https://foo.bar?1=a&2=b&x=c');
+	t.is(queryString.exclude('https://foo.bar?x=c&2=b&1=a', [], {sort: false}), 'https://foo.bar?1=a&2=b&x=c');
+
+	// The default and a custom sort still apply.
+	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['c', 'b', 'a']), 'http://example.com/?a=2&b=1&c=3');
+	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['a', 'b', 'c'], {sort: (left, right) => right.localeCompare(left)}), 'http://example.com/?c=3&b=1&a=2');
+});
