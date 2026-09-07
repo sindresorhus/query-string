@@ -278,7 +278,12 @@ function encode(value, options) {
 	}
 
 	if (options.encode) {
-		return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
+		try {
+			return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
+		} catch {
+			// A lone surrogate cannot be encoded as UTF-8, so `encodeURIComponent` throws for it. It is replaced with U+FFFD, like `URLSearchParams` and the `URL` hash setter do. With the `u` flag, `\p{Surrogate}` only matches a surrogate that is not part of a pair.
+			return encode(String(value).replaceAll(/\p{Surrogate}/gu, '\uFFFD'), options);
+		}
 	}
 
 	return value;

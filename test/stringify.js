@@ -970,3 +970,19 @@ test('reads each value once', t => {
 	t.is(queryString.stringify(proxy, {sort: false}), 'b=1&a=2');
 	t.deepEqual(trapped, ['b', 'a']);
 });
+
+test('replaces a lone surrogate with the replacement character instead of throwing', t => {
+	// `encodeURIComponent` throws `URIError` for a lone surrogate, since it cannot be encoded as UTF-8. `URLSearchParams`, the `URL` hash setter, and `stringifyUrl()` for the fragment identifier write U+FFFD instead, so the query does the same.
+	t.is(queryString.stringify({foo: 'x\uD800y'}), 'foo=x%EF%BF%BDy');
+	t.is(queryString.stringify({foo: '\uDC00'}, {strict: false}), 'foo=%EF%BF%BD');
+	t.is(queryString.stringify({'k\uDC00': 1}), 'k%EF%BF%BD=1');
+	t.is(queryString.stringify({foo: ['x\uD800', 'y']}, {arrayFormat: 'comma'}), 'foo=x%EF%BF%BD,y');
+	t.is(queryString.stringify({foo: ['a,\uD800']}, {arrayFormat: 'bracket-separator'}), 'foo[]=a%2C%EF%BF%BD');
+	t.is(queryString.stringify({foo: ['\uD800']}, {arrayFormat: 'index'}), 'foo[0]=%EF%BF%BD');
+	t.is(queryString.stringify({foo: 'x\uD800y'}, {replacer: (key, value) => value}), 'foo=x%EF%BF%BDy');
+	// A surrogate pair is a valid character and is encoded as-is.
+	t.is(queryString.stringify({foo: '😀'}), 'foo=%F0%9F%98%80');
+	t.is(queryString.stringify({foo: ['😀', '😀']}, {arrayFormat: 'comma'}), 'foo=%F0%9F%98%80,%F0%9F%98%80');
+	// With `encode: false`, the value is written as-is.
+	t.is(queryString.stringify({foo: 'x\uD800y'}, {encode: false}), 'foo=x\uD800y');
+});

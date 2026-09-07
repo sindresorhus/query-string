@@ -421,6 +421,8 @@ export type StringifyOptions = {
 	/**
 	[URL encode](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) the keys and values.
 
+	A lone surrogate, which cannot be percent-encoded, is replaced with the replacement character U+FFFD, like `URLSearchParams` does.
+
 	@default true
 	*/
 	readonly encode?: boolean;

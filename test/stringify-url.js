@@ -282,3 +282,8 @@ test('an option that is explicitly `undefined` uses its default', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?b=1', query: {a: 2}}, {sort: undefined}), 'https://foo.bar?a=2&b=1');
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '100%'}, {encode: undefined}), 'https://foo.bar#100%25');
 });
+
+test('stringify URL replaces a lone surrogate in the query with the replacement character, like in the fragment identifier', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'x\uD800y'}, fragmentIdentifier: 'x\uD800y'}), 'https://foo.bar?foo=x%EF%BF%BDy#x%EF%BF%BDy');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=1', query: {'\uDC00': 'b'}}), 'https://foo.bar?a=1&%EF%BF%BD=b');
+});
