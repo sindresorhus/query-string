@@ -344,6 +344,30 @@ export type ParseOptions = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type ParsedQuery<T = string> = Record<string, T | null | Array<T | null>>;
 
+type ParsedTypeValue<Type> =
+	Type extends 'number' | 'number[]' ? number
+		: Type extends 'boolean' ? boolean
+			: Type extends (value: string) => infer Result ? Result
+				: never;
+
+/**
+The type of a parsed value, from the `parseNumbers`, `parseBooleans`, and `types` options. A value that does not match its type stays a string.
+
+When `types` is a non-literal value, like a variable typed as `Record<string, ...>`, the value type widens to `unknown` because the specific keys are not known. Pass an object literal to get precise types.
+*/
+type ParsedValue<Options extends ParseOptions> =
+	| string
+	| (Options extends {parseNumbers: true} ? number : never)
+	| (Options extends {parseBooleans: true} ? boolean : never)
+	| (Options extends {types: infer Types} ? ParsedTypeValue<Types[keyof Types]> : never);
+
+/**
+Rejects a property that is not a parse or stringify option. A generic parameter is not checked for excess properties, so without this, a typo like `sortt` in an object literal would compile. Stringify options are allowed, since one options object is often shared by `parse()` and `stringify()`.
+
+It is a mapped type instead of an intersection, so a generic wrapper that forwards its options still compiles. The wrapper gets the plain `string` value type, since its options are not known.
+*/
+type KnownOptions<Options> = {[Key in keyof Options]: Key extends keyof ParseOptions | keyof StringifyOptions ? Options[Key] : never};
+
 /**
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
@@ -351,10 +375,7 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 
 @param query - The query string to parse.
 */
-export function parse(query: string, options: {parseBooleans: true; parseNumbers: true} & ParseOptions): ParsedQuery<string | boolean | number>;
-export function parse(query: string, options: {parseBooleans: true} & ParseOptions): ParsedQuery<string | boolean>;
-export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQuery<string | number>;
-export function parse(query: string, options?: ParseOptions): ParsedQuery;
+export function parse<Options extends ParseOptions>(query: string, options?: KnownOptions<Options>): ParsedQuery<ParsedValue<Options>>;
 
 export type ParsedUrl<T = string> = {
 	readonly url: string;
@@ -387,10 +408,7 @@ queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: tr
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 */
-export function parseUrl(url: string, options: {parseBooleans: true; parseNumbers: true} & ParseOptions): ParsedUrl<string | boolean | number>;
-export function parseUrl(url: string, options: {parseBooleans: true} & ParseOptions): ParsedUrl<string | boolean>;
-export function parseUrl(url: string, options: {parseNumbers: true} & ParseOptions): ParsedUrl<string | number>;
-export function parseUrl(url: string, options?: ParseOptions): ParsedUrl;
+export function parseUrl<Options extends ParseOptions>(url: string, options?: KnownOptions<Options>): ParsedUrl<ParsedValue<Options>>;
 
 export type StringifyOptions = {
 	/**
@@ -777,25 +795,10 @@ export function pick(
 	keys: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string;
-export function pick(
+export function pick<Options extends ParseOptions & StringifyOptions>(
 	url: string,
-	filter: (key: string, value: ParsedQuery<string | boolean | number>[string]) => boolean,
-	options: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
-): string;
-export function pick(
-	url: string,
-	filter: (key: string, value: ParsedQuery<string | boolean>[string]) => boolean,
-	options: {parseBooleans: true} & ParseOptions & StringifyOptions
-): string;
-export function pick(
-	url: string,
-	filter: (key: string, value: ParsedQuery<string | number>[string]) => boolean,
-	options: {parseNumbers: true} & ParseOptions & StringifyOptions
-): string;
-export function pick(
-	url: string,
-	filter: (key: string, value: ParsedQuery[string]) => boolean,
-	options?: ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<ParsedValue<Options>>[string]) => boolean,
+	options?: KnownOptions<Options>
 ): string;
 
 /**
@@ -821,23 +824,8 @@ export function exclude(
 	keys: readonly string[],
 	options?: ParseOptions & StringifyOptions
 ): string;
-export function exclude(
+export function exclude<Options extends ParseOptions & StringifyOptions>(
 	url: string,
-	filter: (key: string, value: ParsedQuery<string | boolean | number>[string]) => boolean,
-	options: {parseBooleans: true; parseNumbers: true} & ParseOptions & StringifyOptions
-): string;
-export function exclude(
-	url: string,
-	filter: (key: string, value: ParsedQuery<string | boolean>[string]) => boolean,
-	options: {parseBooleans: true} & ParseOptions & StringifyOptions
-): string;
-export function exclude(
-	url: string,
-	filter: (key: string, value: ParsedQuery<string | number>[string]) => boolean,
-	options: {parseNumbers: true} & ParseOptions & StringifyOptions
-): string;
-export function exclude(
-	url: string,
-	filter: (key: string, value: ParsedQuery[string]) => boolean,
-	options?: ParseOptions & StringifyOptions
+	filter: (key: string, value: ParsedQuery<ParsedValue<Options>>[string]) => boolean,
+	options?: KnownOptions<Options>
 ): string;

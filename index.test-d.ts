@@ -1,4 +1,4 @@
-import {expectType} from 'tsd';
+import {expectType, expectError} from 'tsd';
 import queryString, {type ParsedQuery} from './index.js';
 
 // Stringify
@@ -218,3 +218,56 @@ queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | boolean | number>[string]>(value);
 	return true;
 }, {parseBooleans: true, parseNumbers: true});
+
+// The `types` option types the values.
+expectType<queryString.ParsedQuery<string | number>>(queryString.parse('?a=1', {types: {a: 'number'}}));
+expectType<queryString.ParsedQuery<string | number>>(queryString.parse('?a=1', {types: {a: 'number[]'}}));
+expectType<queryString.ParsedQuery<string | boolean>>(queryString.parse('?a=1', {types: {a: 'boolean'}}));
+expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {types: {a: 'string', b: 'string[]'}}));
+expectType<queryString.ParsedQuery<string | Date>>(queryString.parse('?a=1', {types: {a: value => new Date(value)}}));
+expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseNumbers: true, types: {a: 'boolean'}}));
+expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseBooleans: true, types: {a: 'number'}}));
+expectType<queryString.ParsedUrl<string | number>>(queryString.parseUrl('?a=1', {types: {a: 'number'}}));
+queryString.pick('http://foo.bar/?abc=def', (key, value) => {
+	expectType<ParsedQuery<string | number>[string]>(value);
+	return true;
+}, {types: {abc: 'number'}});
+queryString.exclude('http://foo.bar/?abc=def', (key, value) => {
+	expectType<ParsedQuery<string | boolean>[string]>(value);
+	return true;
+}, {types: {abc: 'boolean'}});
+
+// Options declared with the option types, or with a `boolean` variable, do not narrow the values.
+const declaredOptions: queryString.ParseOptions = {parseNumbers: true, types: {a: 'boolean'}};
+expectType<queryString.ParsedQuery>(queryString.parse('?a=1', declaredOptions));
+expectType<queryString.ParsedUrl>(queryString.parseUrl('?a=1', declaredOptions));
+const parseNumbers = Boolean(Math.random());
+expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {parseNumbers}));
+const sharedOptions: queryString.ParseOptions & queryString.StringifyOptions = {arrayFormat: 'comma'};
+expectType<queryString.ParsedQuery>(queryString.parse('?a=1', sharedOptions));
+expectType<string>(queryString.pick('http://foo.bar/?abc=def', (key, value) => value === '1', sharedOptions));
+queryString.pick('http://foo.bar/?abc=def', (key, value) => {
+	expectType<ParsedQuery<string | number | boolean>[string]>(value);
+	return true;
+}, {
+	parseNumbers: true,
+	types: {abc: 'boolean'},
+	sort: false,
+	encode: false,
+});
+
+// A typo in an option is rejected, like it is for a non-generic signature.
+expectError(queryString.parse('?a=1', {decode: false, sortt: false}));
+expectError(queryString.parseUrl('?a=1', {decode: false, sortt: false}));
+expectError(queryString.pick('https://foo.bar/?a=1', () => true, {encode: false, sortt: false}));
+expectError(queryString.exclude('https://foo.bar/?a=1', () => true, {encode: false, sortt: false}));
+
+// A generic wrapper can forward its options. Its options are not known, so it gets the plain value type.
+const parseWrapper = <Options extends queryString.ParseOptions>(options: Options) => queryString.parse('?a=1', options);
+const parseUrlWrapper = <Options extends queryString.ParseOptions>(options: Options) => queryString.parseUrl('?a=1', options);
+const pickWrapper = <Options extends queryString.ParseOptions & queryString.StringifyOptions>(options: Options) => queryString.pick('https://foo.bar/?a=1', () => true, options);
+const excludeWrapper = <Options extends queryString.ParseOptions & queryString.StringifyOptions>(options: Options) => queryString.exclude('https://foo.bar/?a=1', () => true, options);
+expectType<queryString.ParsedQuery>(parseWrapper({parseNumbers: true}));
+expectType<queryString.ParsedUrl>(parseUrlWrapper({parseNumbers: true}));
+expectType<string>(pickWrapper({parseNumbers: true}));
+expectType<string>(excludeWrapper({parseNumbers: true}));
