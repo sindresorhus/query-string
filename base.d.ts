@@ -27,6 +27,8 @@ export type ParseOptions = {
 		//=> {foo: ['1', '2', '3']}
 		```
 
+		Entries without an index, such as `foo[]`, are appended after the highest index seen so far. Appending after an index greater than or equal to `Number.MAX_SAFE_INTEGER` is unsupported.
+
 	- `comma`: Parse arrays with elements separated by comma:
 
 		```
@@ -37,6 +39,18 @@ export type ParseOptions = {
 
 		queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma'});
 		//=> {foo: ['1', '2', '3']}
+		```
+
+		A single value has no separator, so it is a plain value, not an array with one element. Use the `types` option to always get an array, or use `bracket-separator`, which marks arrays explicitly.
+
+		```
+		import queryString from 'query-string';
+
+		queryString.parse('foo=1', {arrayFormat: 'comma'});
+		//=> {foo: '1'}
+
+		queryString.parse('foo=1', {arrayFormat: 'comma', types: {foo: 'string[]'}});
+		//=> {foo: ['1']}
 		```
 
 	- `separator`: Parse arrays with elements separated by a custom character:
@@ -60,13 +74,13 @@ export type ParseOptions = {
 		//=> {foo: ['']}
 
 		queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-	 	//=> {foo: ['1']}
+		//=> {foo: ['1']}
 
 		queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3']}
 
 		queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-		//=> {foo: ['1', '', 3, '', '', '6']}
+		//=> {foo: ['1', '', '3', '', '', '6']}
 
 		queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
 		//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
@@ -102,7 +116,7 @@ export type ParseOptions = {
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-	Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how `.stringify()` encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
+	Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how `.stringify()` encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
 
 	@example
 	```
@@ -200,7 +214,7 @@ export type ParseOptions = {
 
 	You can also provide a custom function to transform the value. The function will receive the raw string and should return the desired parsed result. When used with array formats (like `comma`, `separator`, `bracket`, etc.), the function is applied to each array element individually.
 
-	NOTE: Array types (`string[]`, `number[]`) are ignored if `arrayFormat` is set to `'none'`.
+	NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. A repeated key is still an array, and its items are parsed with the element type.
 
 	@default {}
 
@@ -275,7 +289,7 @@ export type ParseOptions = {
 	```
 
 	@example
-	Array types are ignored when `arrayFormat` is set to `'none'`:
+	Array types do not split a single value when `arrayFormat` is set to `'none'`:
 	```
 	queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
 		arrayFormat: 'none',
@@ -284,7 +298,7 @@ export type ParseOptions = {
 			foods: 'string[]',
 		},
 	});
-	//=> {ids: '001,002,003', foods: 'apple,orange,mango'}
+	//=> {foods: 'apple,orange,mango', ids: '001,002,003'}
 	```
 
 	@example
@@ -316,7 +330,7 @@ export type ParseOptions = {
 					isOkay: 'boolean',
 			},
 	});
-	//=> {isAdmin: 'true', flagged: true, isOkay: false}
+	//=> {flagged: true, isAdmin: 'true', isOkay: false}
 	```
 
 	Note: The `'boolean'` type also converts `'0'` and `'1'` to booleans, and treats valueless keys (e.g. `?flag`) as `true`.
@@ -425,7 +439,7 @@ export type StringifyOptions = {
 		queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 		//=> 'foo=1,,'
 		// Note that typing information for null values is lost
-		// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
+		// and `.parse('foo=1,,')` would return `{foo: ['1', '', '']}`.
 		```
 
 	- `separator`: Serialize arrays by separating elements with character:
@@ -461,7 +475,7 @@ export type StringifyOptions = {
 		//=> 'foo[]=1||3|6'
 
 		queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-		//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
+		//=> 'bar=fluffy&baz[]=4&foo[]=1|2|3'
 		```
 
 	- `colon-list-separator`: Serialize arrays with parameter names that are explicitly marked with `:list`:
@@ -487,7 +501,7 @@ export type StringifyOptions = {
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-	A separator inside an element is percent-encoded, so `.parse()` can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
+	A separator inside an element is percent-encoded, so `.parse()` can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
 
 	@default ,
 	*/
@@ -742,7 +756,7 @@ Pick query parameters from a URL.
 @param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
-@returns The URL with the picked query parameters.
+@returns The URL with the picked query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order.
 
 @example
 ```
@@ -786,7 +800,7 @@ Exclude query parameters from a URL. Like `.pick()` but reversed.
 @param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
 
-@returns The URL without the excluded the query parameters.
+@returns The URL without the excluded query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order.
 
 @example
 ```

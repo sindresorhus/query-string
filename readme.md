@@ -97,6 +97,8 @@ queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
 //=> {foo: ['1', '2', '3']}
 ```
 
+Entries without an index, such as `foo[]`, are appended after the highest index seen so far. Appending after an index greater than or equal to `Number.MAX_SAFE_INTEGER` is unsupported.
+
 - `'comma'`: Parse arrays with elements separated by comma:
 
 ```js
@@ -107,6 +109,18 @@ queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 
 queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma'});
 //=> {foo: ['1', '2', '3']}
+```
+
+A single value has no separator, so it is a plain value, not an array with one element. Use the [`types`](#types) option to always get an array, or use `'bracket-separator'`, which marks arrays explicitly.
+
+```js
+import queryString from 'query-string';
+
+queryString.parse('foo=1', {arrayFormat: 'comma'});
+//=> {foo: '1'}
+
+queryString.parse('foo=1', {arrayFormat: 'comma', types: {foo: 'string[]'}});
+//=> {foo: ['1']}
 ```
 
 - `'separator'`: Parse arrays with elements separated by a custom character:
@@ -167,7 +181,7 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
+Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
 
 ```js
 import queryString from 'query-string';
@@ -227,7 +241,6 @@ You can also provide a custom function to transform the value. The function will
 
 Supported Types:
 
-
 - `'boolean'`: Parse `flagged` as a boolean (overriding the `parseBooleans` option):
 
 ```js
@@ -238,7 +251,7 @@ queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
 				isOkay: 'boolean',
 		},
 });
-//=> {isAdmin: 'true', flagged: true, isOkay: false}
+//=> {flagged: true, isAdmin: 'true', isOkay: false}
 ```
 
 Note: The `'boolean'` type also converts `'0'` and `'1'` to booleans, and treats valueless keys (e.g. `?flag`) as `true`.
@@ -321,7 +334,7 @@ queryString.parse('?scores=10,20,30', {
 //=> {scores: [20, 40, 60]}
 ```
 
-NOTE: Array types (`string[]`, `number[]`) are ignored if `arrayFormat` is set to `'none'`.
+NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. A repeated key is still an array, and its items are parsed with the element type.
 
 ```js
 queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
@@ -331,20 +344,7 @@ queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
 		foods: 'string[]',
 	},
 });
-//=> {ids: '001,002,003', foods: 'apple,orange,mango'}
-```
-
-###### Function
-
-```js
-import queryString from 'query-string';
-
-queryString.parse('?age=20&id=01234&zipcode=90210', {
-	types: {
-		age: value => value * 2,
-	}
-});
-//=> {age: 40, id: '01234', zipcode: '90210'}
+//=> {foods: 'apple,orange,mango', ids: '001,002,003'}
 ```
 
 ### .stringify(object, options?)
@@ -405,7 +405,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 //=> 'foo=1,,'
 // Note that typing information for null values is lost
-// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
+// and `.parse('foo=1,,')` would return `{foo: ['1', '', '']}`.
 ```
 
 - `'separator'`: Serialize arrays by separating elements with a custom character:
@@ -469,11 +469,12 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements.
+A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
 
 ##### sort
 
-Type: `Function | boolean`
+Type: `Function | boolean`\
+Default: `true`
 
 Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
@@ -712,7 +713,7 @@ queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '/users?id
 
 Pick query parameters from a URL.
 
-Returns a string with the new URL.
+Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order.
 
 ```js
 import queryString from 'query-string';
@@ -729,7 +730,7 @@ queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value ===
 
 Exclude query parameters from a URL.
 
-Returns a string with the new URL.
+Returns a string with the new URL. The query parameters are sorted, like with [`.stringify()`](#stringifyobject-options). Pass `sort: false` in the options to keep their order.
 
 ```js
 import queryString from 'query-string';

@@ -33,6 +33,15 @@ test('picks elements in a URL with a fragment identifier that starts with `#`', 
 	t.is(queryString.pick('https://foo.bar/?a=1&b=2#%23top', ['a']), 'https://foo.bar/?a=1#%23top');
 });
 
+test('sorts the query parameters by default and keeps their order with sort false', t => {
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', ['c', 'a']), 'http://example.com/?a=1&c=3');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', ['c', 'a'], {sort: false}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1#hash', ['c', 'b', 'a'], {sort: false}), 'http://example.com/?c=3&b=2&a=1#hash');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', (key, value) => value !== '2', {sort: false}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', ['c', 'a'], {sort: (left, right) => right.localeCompare(left)}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.pick('http://example.com/?c[]=3&a[]=1&c[]=4', ['c', 'a'], {arrayFormat: 'bracket', sort: false}), 'http://example.com/?c[]=3&c[]=4&a[]=1');
+});
+
 test('picks elements in a URL when sort is true', t => {
 	t.is(queryString.pick('http://example.com/?c=3&b=2&a=1', ['c', 'a'], {sort: true}), 'http://example.com/?a=1&c=3');
 });

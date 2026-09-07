@@ -163,6 +163,62 @@ test('handles scalar values before explicit array entries', t => {
 	t.deepEqual(queryString.parse('a=one&a[]=two,three', {arrayFormat: 'bracket-separator'}), {a: ['one', 'two', 'three']});
 });
 
+test('comma and separator formats parse a single value as a plain value unless an array type is given', t => {
+	// A single value has no separator, so it cannot be told apart from a plain value. This is documented, and the `types` option is the way to always get an array.
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'comma'}), {foo: '1'});
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'separator', arrayFormatSeparator: '|'}), {foo: '1'});
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: ['1']});
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [1]});
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'separator', arrayFormatSeparator: '|', types: {foo: 'string[]'}}), {foo: ['1']});
+	t.deepEqual(queryString.parse('foo=', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: ['']});
+	t.deepEqual(queryString.parse('foo=a%2Cb', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: ['a,b']});
+	t.deepEqual(queryString.parse('foo=1,2', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator'}), {foo: ['1']});
+	t.deepEqual(queryString.parse(queryString.stringify({foo: [1]}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [1]});
+});
+
+test('bracket-style array formats keep the values of a repeated key without the array marker', t => {
+	// A repeated plain key is not in the array syntax of these formats, so it is collected like with `arrayFormat: 'none'` instead of silently dropping the earlier values.
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2&foo=3', {arrayFormat: 'bracket'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'colon-list-separator'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket-separator'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'}), {foo: ['1', '2']});
+
+	// Valueless and empty repeats are kept too.
+	t.deepEqual(queryString.parse('foo&foo=1', {arrayFormat: 'bracket'}), {foo: [null, '1']});
+	t.deepEqual(queryString.parse('foo=&foo=1', {arrayFormat: 'colon-list-separator'}), {foo: ['', '1']});
+	t.deepEqual(queryString.parse('foo&foo', {arrayFormat: 'bracket-separator'}), {foo: [null, null]});
+
+	// A plain value after the marked entries is added to the array, like a plain value before them already was.
+	t.deepEqual(queryString.parse('foo[]=1&foo=2', {arrayFormat: 'bracket'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo[]=2&foo=3', {arrayFormat: 'bracket'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo:list=1&foo=2', {arrayFormat: 'colon-list-separator'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo[]=1|2&foo=3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo[]&foo=1', {arrayFormat: 'bracket-separator'}), {foo: ['1']});
+
+	// Plain values are decoded, like the array items.
+	t.deepEqual(queryString.parse('foo=a%20b&foo=c%2Cd', {arrayFormat: 'bracket-separator'}), {foo: ['a b', 'c,d']});
+	t.deepEqual(queryString.parse('foo=a%20b&foo=c', {arrayFormat: 'bracket-separator', decode: false}), {foo: ['a%20b', 'c']});
+
+	// The other options still apply to the collected array.
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket', parseNumbers: true}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket', types: {foo: 'number[]'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket', types: {foo: 'string'}}), {foo: '1,2'});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'bracket', types: {foo: value => `<${value}>`}}), {foo: ['<1>', '<2>']});
+	t.deepEqual(queryString.parse('b=1&a=2&b=3', {arrayFormat: 'bracket', sort: false}), {b: ['1', '3'], a: '2'});
+	t.deepEqual(Object.keys(queryString.parse('b=1&a=2&b=3', {arrayFormat: 'bracket', sort: false})), ['b', 'a']);
+
+	// A single plain key is still a plain value, and other keys are not affected.
+	t.deepEqual(queryString.parse('foo=1&bar=2', {arrayFormat: 'bracket'}), {foo: '1', bar: '2'});
+	t.deepEqual(queryString.parse('foo=1&bar=2&bar=3', {arrayFormat: 'colon-list-separator'}), {foo: '1', bar: ['2', '3']});
+
+	// `stringify()` writes an array with these formats using the marker, and the URL helpers keep every value of a repeated plain key.
+	t.is(queryString.pick('https://foo.bar?foo=1&foo=2&bar=3', ['foo'], {arrayFormat: 'bracket'}), 'https://foo.bar?foo[]=1&foo[]=2');
+	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=3', ['bar'], {arrayFormat: 'colon-list-separator'}), 'https://foo.bar?foo:list=1&foo:list=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1&foo=2', query: {bar: 3}}, {arrayFormat: 'bracket-separator'}), 'https://foo.bar?bar=3&foo[]=1,2');
+});
+
 test('handles many empty parameters without allocating split results', t => {
 	const query = '&'.repeat(5_000_000);
 	const startTime = performance.now();
@@ -256,6 +312,29 @@ test('single value with encoded separator should not be split into array', t => 
 		arrayFormat: 'separator',
 		arrayFormatSeparator: '|',
 	}), {foo: ['a|b', 'c|d']});
+});
+
+test('query strings having percent-encoded array markers in the key', t => {
+	// The key is decoded before the array marker is checked, like `URLSearchParams`, Rack, and PHP do. `new URLSearchParams({'foo[]': 1}).toString()` gives `foo%5B%5D=1`.
+	t.deepEqual(queryString.parse('foo%5B%5D=1&foo%5B%5D=2', {arrayFormat: 'bracket'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo%5B%5D=1&foo[]=2', {arrayFormat: 'bracket'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo%5B%5D', {arrayFormat: 'bracket'}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo%5B0%5D=a&foo%5B1%5D=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo%5B1%5D=b&foo[0]=a', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo%5B%5D=1|2', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo%5B%5D', {arrayFormat: 'bracket-separator'}), {foo: []});
+	t.deepEqual(queryString.parse('foo%3Alist=1&foo%3Alist=2', {arrayFormat: 'colon-list-separator'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('a%20b%5B%5D=1', {arrayFormat: 'bracket'}), {'a b': ['1']});
+
+	// The marker is not decoded without `decode`, so it is a plain key then.
+	t.deepEqual(queryString.parse('foo%5B%5D=1', {arrayFormat: 'bracket', decode: false}), {'foo%5B%5D': '1'});
+
+	// Without an array format, the decoded marker is part of the key.
+	t.deepEqual(queryString.parse('foo%5B%5D=1'), {'foo[]': '1'});
+
+	// The trade-off: a key that itself ends in a marker cannot be told apart from the marker after decoding.
+	t.is(queryString.stringify({'foo[]': 'x'}, {arrayFormat: 'bracket'}), 'foo%5B%5D=x');
+	t.deepEqual(queryString.parse('foo%5B%5D=x', {arrayFormat: 'bracket'}), {foo: ['x']});
 });
 
 test('query strings having brackets arrays with null and format option as `bracket`', t => {
@@ -827,9 +906,42 @@ test('index array format does not throw when a scalar precedes the indexed entri
 	t.deepEqual(queryString.parse('foo=1&foo[0]=2', {arrayFormat: 'index', parseNumbers: true}), {foo: [1, 2]});
 });
 
-test('index array format lets a later scalar override the indexed entries', t => {
-	t.deepEqual(queryString.parse('foo[0]=1&foo=2', {arrayFormat: 'index'}), {foo: '2'});
-	t.deepEqual(queryString.parse('foo[0]=1&foo=2&foo[0]=3', {arrayFormat: 'index'}), {foo: ['2', '3']});
+test('index array format preserves distinct explicit index strings', t => {
+	t.deepEqual(queryString.parse('foo[01]=a&foo[1]=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo[9007199254740992]=a&foo[9007199254740993]=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo[01]=a&foo[01]=b', {arrayFormat: 'index'}), {foo: ['b']});
+});
+
+test('index array format appends entries without an index', t => {
+	// `foo[]` is what PHP and Rack write for an array item without an index, and it is what `arrayFormat: 'bracket'` produces. Every such entry landed on the same empty index and silently overrode the previous one.
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'index'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo[]=1', {arrayFormat: 'index'}), {foo: ['1']});
+	t.deepEqual(queryString.parse('foo[]', {arrayFormat: 'index'}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo[]&foo[]=1&foo[]=', {arrayFormat: 'index'}), {foo: [null, '1', '']});
+	t.deepEqual(queryString.parse('foo%5B%5D=1&foo%5B%5D=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+
+	// Entries without an index take the next free index, like in PHP.
+	t.deepEqual(queryString.parse('foo[0]=a&foo[]=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo[]=a&foo[1]=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo[]=a&foo[0]=b', {arrayFormat: 'index'}), {foo: ['b']});
+	t.deepEqual(queryString.parse('foo[1]=b&foo[]=c&foo[0]=a', {arrayFormat: 'index'}), {foo: ['a', 'b', 'c']});
+	t.deepEqual(queryString.parse('foo[]=a&foo[]=b&foo[1]=c', {arrayFormat: 'index'}), {foo: ['a', 'c']});
+	t.deepEqual(queryString.parse('foo[5]=a&foo[]=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+
+	// A plain value before the entries is the first item, like for indexed entries.
+	t.deepEqual(queryString.parse('foo=a&foo[]=b&foo[]=c', {arrayFormat: 'index'}), {foo: ['a', 'b', 'c']});
+
+	// Other keys are not affected, and the other options still apply.
+	t.deepEqual(queryString.parse('foo[]=1&bar[]=2&foo[]=3', {arrayFormat: 'index'}), {foo: ['1', '3'], bar: ['2']});
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2', {arrayFormat: 'index', sort: false}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2', {arrayFormat: 'index', parseNumbers: true}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2', {arrayFormat: 'index', types: {foo: 'number[]'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo[]=1&foo[]=2', {arrayFormat: 'index', types: {foo: 'string'}}), {foo: '1,2'});
+	t.deepEqual(queryString.parse('foo[]=a%20b&foo[]=c', {arrayFormat: 'index', decode: false}), {foo: ['a%20b', 'c']});
+
+	// A bracket-format URL survives the URL helpers with the index format.
+	t.is(queryString.pick('https://foo.bar?foo[]=1&foo[]=2&bar=3', ['foo'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo[]=1&foo[]=2', query: {bar: 3}}, {arrayFormat: 'index'}), 'https://foo.bar?bar=3&foo[0]=1&foo[1]=2');
 });
 
 test('types option: an explicit type takes precedence over `parseNumbers` and `parseBooleans` when the value does not match the type', t => {
@@ -839,6 +951,9 @@ test('types option: an explicit type takes precedence over `parseNumbers` and `p
 	t.deepEqual(queryString.parse('flag=yes', {types: {flag: 'boolean'}, parseNumbers: true, parseBooleans: true}), {flag: 'yes'});
 	t.deepEqual(queryString.parse('ids=1,true', {arrayFormat: 'comma', types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, 'true']});
 	t.deepEqual(queryString.parse('ids=1&ids=true', {types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, 'true']});
+	t.deepEqual(queryString.parse('ids=1&ids=2', {types: {ids: 'number[]'}}), {ids: [1, 2]});
+	t.deepEqual(queryString.parse('ids=1,2', {types: {ids: 'number[]'}}), {ids: '1,2'});
+	t.deepEqual(queryString.parse('ids=1', {types: {ids: 'number[]'}}), {ids: '1'});
 	t.deepEqual(queryString.parse('flags=true&flags=2', {types: {flags: 'boolean'}, parseNumbers: true}), {flags: [true, '2']});
 	t.deepEqual(queryString.parse('id[]=true', {arrayFormat: 'bracket', types: {id: 'number[]'}, parseBooleans: true}), {id: ['true']});
 });
@@ -894,4 +1009,83 @@ test('comma and separator array formats still parse a single key', t => {
 	t.deepEqual(queryString.parse('foo=1,2', {arrayFormat: 'comma'}), {foo: ['1', '2']});
 	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma'}), {foo: null});
 	t.deepEqual(queryString.parse('foo=', {arrayFormat: 'comma'}), {foo: ''});
+});
+
+test('types option: explicit types combined with `parseNumbers` and `parseBooleans` edge cases', t => {
+	t.deepEqual(queryString.parse('flag=0', {types: {flag: 'boolean'}, parseNumbers: true}), {flag: false});
+	t.deepEqual(queryString.parse('flag=1', {types: {flag: 'boolean'}, parseNumbers: true}), {flag: true});
+	t.deepEqual(queryString.parse('x=true', {types: {x: value => `fn:${value}`}, parseBooleans: true}), {x: 'fn:true'});
+	t.deepEqual(queryString.parse('id=', {types: {id: 'number'}, parseNumbers: true}), {id: ''});
+	t.deepEqual(queryString.parse('id', {types: {id: 'number'}, parseNumbers: true}), {id: null});
+	t.deepEqual(queryString.parse('id=%20', {types: {id: 'number'}, parseNumbers: true}), {id: ' '});
+});
+
+test('types option: array types wrap a single value for every array format', t => {
+	t.deepEqual(queryString.parse('ids[]=hello', {arrayFormat: 'bracket-separator', types: {ids: 'string[]'}}), {ids: ['hello']});
+	t.deepEqual(queryString.parse('ids:list=42', {arrayFormat: 'colon-list-separator', types: {ids: 'number[]'}}), {ids: [42]});
+	t.deepEqual(queryString.parse('ids=42', {arrayFormat: 'colon-list-separator', types: {ids: 'number[]'}}), {ids: [42]});
+	t.deepEqual(queryString.parse('ids=5', {arrayFormat: 'comma', decode: false, types: {ids: 'number[]'}}), {ids: [5]});
+	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'string[]'}}), {ids: null});
+	t.deepEqual(queryString.parse('ids=1', {arrayFormat: 'comma', types: {ids: 'string[]'}, parseNumbers: true}), {ids: ['1']});
+	t.deepEqual(queryString.parse(queryString.stringify({ids: [1, 2, 3]}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1, 2, 3]});
+	t.deepEqual(queryString.parse(queryString.stringify({ids: [1]}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1]});
+	t.deepEqual(queryString.parse(queryString.stringify({ids: ['a']}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: ['a']});
+});
+
+test('comma and separator array formats merge a repeated key with types and other options', t => {
+	t.deepEqual(queryString.parse('foo&foo&foo', {arrayFormat: 'comma'}), {foo: [null, null, null]});
+	t.deepEqual(queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [1, 2, 3]});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'comma', types: {foo: 'number'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma', types: {foo: value => `${value}!`}}), {foo: ['1!', '2!', '3!']});
+	t.deepEqual(queryString.parse('foo=a,b&foo=c', {arrayFormat: 'comma', decode: false}), {foo: ['a', 'b', 'c']});
+	t.deepEqual(queryString.parse('foo=a%2Cb&foo=c', {arrayFormat: 'comma', decode: false}), {foo: ['a%2Cb', 'c']});
+	t.deepEqual(queryString.parse('foo=a', {arrayFormat: 'separator', arrayFormatSeparator: '|'}), {foo: 'a'});
+	t.is(queryString.stringify(queryString.parse('foo=1,2&foo=3', {arrayFormat: 'comma'}), {arrayFormat: 'comma'}), 'foo=1,2,3');
+	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=1,2&foo=3', {arrayFormat: 'comma'}), {url: 'https://foo.bar', query: {foo: ['1', '2', '3']}});
+	t.is(queryString.pick('https://foo.bar?foo=1&foo=2&bar=3', ['foo'], {arrayFormat: 'comma'}), 'https://foo.bar?foo=1,2');
+	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=3', ['bar'], {arrayFormat: 'comma'}), 'https://foo.bar?foo=1,2');
+});
+
+test('index array format keeps the values of a repeated key without an index', t => {
+	// A repeated plain key is not in the array syntax of this format, so it is collected like with `arrayFormat: 'none'` and the other formats instead of silently dropping the earlier values.
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2&foo=3', {arrayFormat: 'index'}), {foo: ['1', '2', '3']});
+
+	// A plain value after the indexed entries is appended, like `foo[]`.
+	t.deepEqual(queryString.parse('foo[0]=1&foo=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo[0]=1&foo[1]=2&foo=3', {arrayFormat: 'index'}), {foo: ['1', '2', '3']});
+	t.deepEqual(queryString.parse('foo[]=1&foo=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo[1]=b&foo=c&foo[0]=a', {arrayFormat: 'index'}), {foo: ['a', 'b', 'c']});
+	t.deepEqual(queryString.parse('foo[5]=a&foo=b', {arrayFormat: 'index'}), {foo: ['a', 'b']});
+	t.deepEqual(queryString.parse('foo=a&foo[0]=b&foo=c', {arrayFormat: 'index'}), {foo: ['a', 'b', 'c']});
+	t.deepEqual(queryString.parse('foo%5B0%5D=1&foo=2', {arrayFormat: 'index'}), {foo: ['1', '2']});
+
+	// Null and empty values are kept.
+	t.deepEqual(queryString.parse('foo&foo=', {arrayFormat: 'index'}), {foo: [null, '']});
+	t.deepEqual(queryString.parse('foo[0]=1&foo', {arrayFormat: 'index'}), {foo: ['1', null]});
+	t.deepEqual(queryString.parse('foo[0]=1&foo=', {arrayFormat: 'index'}), {foo: ['1', '']});
+
+	// An explicit index still overrides the item at that index.
+	t.deepEqual(queryString.parse('foo[0]=a&foo=b&foo[0]=c', {arrayFormat: 'index'}), {foo: ['c', 'b']});
+	t.deepEqual(queryString.parse('foo[0]=1&foo=2&foo[1]=3', {arrayFormat: 'index'}), {foo: ['1', '3']});
+
+	// Other keys are not affected, and the other options still apply.
+	t.deepEqual(queryString.parse('foo=1&bar=x&foo=2', {arrayFormat: 'index'}), {foo: ['1', '2'], bar: 'x'});
+	t.deepEqual(queryString.parse('foo[0]=1&foo=2', {arrayFormat: 'index', sort: false}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index', sort: false}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index', parseNumbers: true}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=true&foo=false', {arrayFormat: 'index', parseBooleans: true}), {foo: [true, false]});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index', types: {foo: 'number[]'}}), {foo: [1, 2]});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index', types: {foo: 'string'}}), {foo: '1,2'});
+	t.deepEqual(queryString.parse('foo=1&foo=2', {arrayFormat: 'index', types: {foo: value => `<${value}>`}}), {foo: ['<1>', '<2>']});
+	t.deepEqual(queryString.parse('foo=a%20b&foo=c', {arrayFormat: 'index', decode: false}), {foo: ['a%20b', 'c']});
+
+	// A single plain key is still a plain value.
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'index'}), {foo: '1'});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'index'}), {foo: null});
+
+	// `stringify()` writes an array with this format using indexes, and the URL helpers keep every value of a repeated plain key.
+	t.is(queryString.pick('https://foo.bar?foo=1&foo=2&bar=3', ['foo'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
+	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=3', ['bar'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1&foo=2', query: {bar: 3}}, {arrayFormat: 'index'}), 'https://foo.bar?bar=3&foo[0]=1&foo[1]=2');
 });

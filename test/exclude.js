@@ -148,3 +148,12 @@ test('drops a query parameter named `__proto__` even when it is not excluded', t
 	t.is(queryString.exclude('https://foo.bar?__proto__=1&a=2', ['a']), 'https://foo.bar');
 	t.is(queryString.exclude('https://foo.bar?__proto__=1&a=2', ['__proto__']), 'https://foo.bar?a=2');
 });
+
+test('sorts the query parameters by default and keeps their order with sort false', t => {
+	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1', ['b']), 'http://example.com/?a=1&c=3');
+	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1', ['b'], {sort: false}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1#hash', [], {sort: false}), 'http://example.com/?c=3&b=2&a=1#hash');
+	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1', (key, value) => value === '2', {sort: false}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1', ['b'], {sort: (left, right) => right.localeCompare(left)}), 'http://example.com/?c=3&a=1');
+	t.is(queryString.exclude('http://example.com/?c[]=3&a[]=1&c[]=4', ['b'], {arrayFormat: 'bracket', sort: false}), 'http://example.com/?c[]=3&c[]=4&a[]=1');
+});

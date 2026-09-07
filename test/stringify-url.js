@@ -253,3 +253,25 @@ test('stringify URL drops a query parameter named `__proto__`', t => {
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?__proto__=1&a=2', query: {b: 3}}), 'https://foo.bar?a=2&b=3');
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {['__proto__']: 1}}), 'https://foo.bar');
 });
+
+test('stringify URL applies skipNull and skipEmptyString to the replacer result', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {a: 1, b: 2}}, {skipNull: true, replacer: (key, value) => key === 'b' ? null : value}), 'https://foo.bar?a=1');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?b=2', query: {a: 1}}, {skipEmptyString: true, replacer: (key, value) => key === 'b' ? '' : value}), 'https://foo.bar?a=1');
+});
+
+test('stringify URL merges a repeated key in the existing query with the comma array format', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1&foo=2', query: {}}, {arrayFormat: 'comma'}), 'https://foo.bar?foo=1,2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1,2&foo=3', query: {bar: 'x'}}, {arrayFormat: 'comma'}), 'https://foo.bar?bar=x&foo=1,2,3');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1&foo=2', query: {foo: [3]}}, {arrayFormat: 'comma'}), 'https://foo.bar?foo=3');
+});
+
+test('stringifyUrl keeps a plain value that contains the separator with the comma and separator formats', t => {
+	const options = {arrayFormat: 'separator', arrayFormatSeparator: '.'};
+	const url = queryString.stringifyUrl({url: 'https://foo.bar', query: {version: '1.2.3', tags: ['a.b', 'c']}}, options);
+	t.is(url, 'https://foo.bar?tags=a%2Eb.c&version=1%2E2%2E3');
+	t.deepEqual(queryString.parseUrl(url, options).query, {version: '1.2.3', tags: ['a.b', 'c']});
+
+	// A plain value in the existing query string is parsed and written back unchanged.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?version=1%2E2%2E3', query: {page: 2}}, options), 'https://foo.bar?page=2&version=1%2E2%2E3');
+	t.is(queryString.pick('https://foo.bar?version=1%2E2%2E3&page=2', ['version'], options), 'https://foo.bar?version=1%2E2%2E3');
+});

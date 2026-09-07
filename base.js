@@ -139,12 +139,16 @@ function parserForArrayFormat(options) {
 
 	switch (options.arrayFormat) {
 		case 'index': {
+			// The next free index per key for an entry without one, like `foo[]`. That is what PHP and Rack write for an array item, and what `arrayFormat: 'bracket'` produces. It is appended after the highest index seen so far, like in PHP, instead of every such entry overriding the previous one.
+			const nextIndexes = new Map();
+
 			return (key, value, accumulator) => {
 				result = /\[(\d*)]$/.exec(key);
 
 				key = key.replace(/\[\d*]$/, '');
 
-				if (!result) {
+				// A repeated key adds its value whether or not it has an index, like the other array formats, instead of silently dropping the earlier values. A plain entry after the first is appended like `foo[]`. A repeated index keeps the last value, like in PHP.
+				if (!result && accumulator[key] === undefined) {
 					accumulator[key] = value;
 					return;
 				}
@@ -154,9 +158,12 @@ function parserForArrayFormat(options) {
 				} else if (typeof accumulator[key] !== 'object' || accumulator[key] === null) {
 					// A scalar seen before the indexed entries becomes the first item, like in the other array formats. The empty key sorts before any index.
 					accumulator[key] = {'': accumulator[key]};
+					nextIndexes.set(key, 1);
 				}
 
-				accumulator[key][result[1]] = value;
+				const index = result?.[1] || (nextIndexes.get(key) ?? 0);
+				accumulator[key][index] = value;
+				nextIndexes.set(key, Math.max(nextIndexes.get(key) ?? 0, Number(index) + 1));
 			};
 		}
 
@@ -165,13 +172,9 @@ function parserForArrayFormat(options) {
 				result = /(\[])$/.exec(key);
 				key = key.replace(/\[]$/, '');
 
-				if (!result) {
-					accumulator[key] = value;
-					return;
-				}
-
+				// A repeated key adds its value whether or not it has the marker, like `arrayFormat: 'none'`, instead of silently dropping the earlier values.
 				if (accumulator[key] === undefined) {
-					accumulator[key] = [value];
+					accumulator[key] = result ? [value] : value;
 					return;
 				}
 
@@ -189,13 +192,8 @@ function parserForArrayFormat(options) {
 				result = /(:list)$/.exec(key);
 				key = key.replace(/:list$/, '');
 
-				if (!result) {
-					accumulator[key] = value;
-					return;
-				}
-
 				if (accumulator[key] === undefined) {
-					accumulator[key] = [value];
+					accumulator[key] = result ? [value] : value;
 					return;
 				}
 
@@ -230,18 +228,19 @@ function parserForArrayFormat(options) {
 				const isArray = /(\[])$/.test(key);
 				key = key.replace(/\[]$/, '');
 
+				// Split the raw value before decoding, like `comma` and `separator`, so an item that contains the separator round-trips: `stringify({foo: ['a,b', 'c']})` gives `foo[]=a%2Cb,c`, which must parse back to `['a,b', 'c']`. Decoding first would make the separator ambiguous, which is also why swagger-js rejected encoding the separator (swagger-api/swagger-ui#9289). A value where the client percent-encoded everything, including the separators, is therefore a single item. See https://github.com/sindresorhus/query-string/issues/398
+				// A key without the marker is a single item. A repeated key adds its items either way, like `arrayFormat: 'none'`, instead of silently dropping the earlier values.
+				let items;
 				if (!isArray) {
-					accumulator[key] = value ? decode(value, options) : value;
-					return;
+					items = [value === null ? value : decode(value, options)];
+				} else if (value === null) {
+					items = [];
+				} else {
+					items = value.split(options.arrayFormatSeparator).map(item => decode(item, options));
 				}
 
-				// Split the raw value before decoding, like `comma` and `separator`, so an item that contains the separator round-trips: `stringify({foo: ['a,b', 'c']})` gives `foo[]=a%2Cb,c`, which must parse back to `['a,b', 'c']`. Decoding first would make the separator ambiguous, which is also why swagger-js rejected encoding the separator (swagger-api/swagger-ui#9289). A value where the client percent-encoded everything, including the separators, is therefore a single item. See https://github.com/sindresorhus/query-string/issues/398
-				const arrayValue = value === null
-					? []
-					: value.split(options.arrayFormatSeparator).map(item => decode(item, options));
-
 				if (accumulator[key] === undefined) {
-					accumulator[key] = arrayValue;
+					accumulator[key] = isArray ? items : items[0];
 					return;
 				}
 
@@ -249,7 +248,7 @@ function parserForArrayFormat(options) {
 					accumulator[key] = [accumulator[key]];
 				}
 
-				for (const item of arrayValue) {
+				for (const item of items) {
 					accumulator[key].push(item);
 				}
 			};
@@ -456,6 +455,8 @@ export function parse(query, options) {
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : (['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options));
+
+		// The key is decoded before the array format looks for its marker, so a percent-encoded marker like `foo%5B%5D` is also an array item. This is intentional. `URLSearchParams` and HTML forms percent-encode `[`, `]`, and `:` in keys, and servers like Rack and PHP decode the key before they look for the marker. The trade-off is that a key that itself ends in a marker is not distinguishable from the marker after decoding, so `stringify({'foo[]': 'x'}, {arrayFormat: 'bracket'})` does not round-trip.
 		formatter(decode(key, options), value, returnValue);
 
 		parameterStart = index + 1;
@@ -546,7 +547,7 @@ export function stringify(object, options) {
 
 		if (Array.isArray(value)) {
 			// Apply replacer to array elements if provided
-			// Note: We don't re-apply replacer to the array itself, only to elements
+			// Note: The replacer was already applied to the array itself above. Here it is applied to each element.
 			let processedArray = value;
 			if (options.replacer) {
 				processedArray = value.map((item, index) =>

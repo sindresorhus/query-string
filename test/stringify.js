@@ -317,6 +317,73 @@ test('array stringify representation with brackets and separators when every ite
 	}
 });
 
+test('a plain value that contains the separator is percent-encoded with the comma and separator formats', t => {
+	// `parse()` splits every value on a literal separator with `comma` and `separator`, so a plain value that contains it would come back as an array.
+	t.is(queryString.stringify({foo: 'a,b'}, {arrayFormat: 'comma'}), 'foo=a%2Cb');
+	t.is(queryString.stringify({foo: 'a|b'}, {arrayFormat: 'separator', arrayFormatSeparator: '|'}), 'foo=a%7Cb');
+
+	// `encodeURIComponent` leaves `-`, `.`, `_`, and `~` as-is, so those are encoded by hand.
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=a%2Db');
+	t.is(queryString.stringify({foo: 'a.b'}, {arrayFormat: 'separator', arrayFormatSeparator: '.'}), 'foo=a%2Eb');
+	t.is(queryString.stringify({foo: 'a_b'}, {arrayFormat: 'separator', arrayFormatSeparator: '_'}), 'foo=a%5Fb');
+	t.is(queryString.stringify({foo: 'a~b'}, {arrayFormat: 'separator', arrayFormatSeparator: '~'}), 'foo=a%7Eb');
+	t.is(queryString.stringify({foo: 'a.b'}, {arrayFormat: 'comma', arrayFormatSeparator: '.'}), 'foo=a%2Eb');
+
+	// `!`, `'`, `(`, `)`, and `*` are only encoded by the strict encoding. As a separator, they are encoded in both modes.
+	t.is(queryString.stringify({foo: 'a!b'}, {arrayFormat: 'separator', arrayFormatSeparator: '!', strict: false}), 'foo=a%21b');
+	t.is(queryString.stringify({foo: 'a(b)'}, {arrayFormat: 'separator', arrayFormatSeparator: '(', strict: false}), 'foo=a%28b)');
+	t.is(queryString.stringify({foo: 'a*b'}, {arrayFormat: 'separator', arrayFormatSeparator: '*'}), 'foo=a%2Ab');
+
+	// Every occurrence is encoded, also at the start and the end, and when the value is only the separator.
+	t.is(queryString.stringify({foo: '-a--b-'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=%2Da%2D%2Db%2D');
+	t.is(queryString.stringify({foo: '-'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=%2D');
+
+	// A number is converted to a string first, so a decimal point is encoded with a `.` separator.
+	t.is(queryString.stringify({foo: 1.5}, {arrayFormat: 'separator', arrayFormatSeparator: '.'}), 'foo=1%2E5');
+	t.is(queryString.stringify({foo: 15}, {arrayFormat: 'separator', arrayFormatSeparator: '.'}), 'foo=15');
+
+	// A separator that is a hex digit is encoded too, and the rest of the value is not searched for it inside a `%XX` escape.
+	t.is(queryString.stringify({foo: 'aCb'}, {arrayFormat: 'separator', arrayFormatSeparator: 'C'}), 'foo=a%43b');
+	t.is(queryString.stringify({foo: 'a,b'}, {arrayFormat: 'separator', arrayFormatSeparator: 'C'}), 'foo=a%2Cb');
+
+	// A separator outside ASCII is percent-encoded anyway.
+	t.is(queryString.stringify({foo: 'aåb'}, {arrayFormat: 'separator', arrayFormatSeparator: 'å'}), 'foo=a%C3%A5b');
+
+	// The key is not split by `parse()`, so the separator in the key follows the normal encoding.
+	t.is(queryString.stringify({'a-b': 'c'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'a-b=c');
+
+	// A plain value and an array item are encoded the same way in one object.
+	t.is(queryString.stringify({a: ['x-y', 'z'], b: 'x-y'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'a=x%2Dy-z&b=x%2Dy');
+
+	// A null value has no separator to encode. An empty string is unaffected too.
+	t.is(queryString.stringify({foo: null, bar: ''}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'bar=&foo');
+	t.is(queryString.stringify({foo: null, bar: ''}, {
+		arrayFormat: 'separator', arrayFormatSeparator: '-', skipNull: true, skipEmptyString: true,
+	}), '');
+
+	// The replacer runs before the encoding, so its result is encoded too.
+	t.is(queryString.stringify({foo: 'x'}, {arrayFormat: 'separator', arrayFormatSeparator: '-', replacer: () => 'a-b'}), 'foo=a%2Db');
+
+	// Without encoding, the value is written as-is.
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'separator', arrayFormatSeparator: '-', encode: false}), 'foo=a-b');
+
+	// The other array formats do not split a plain value, so it keeps the normal encoding.
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '-'}), 'foo=a-b');
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'bracket', arrayFormatSeparator: '-'}), 'foo=a-b');
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'index', arrayFormatSeparator: '-'}), 'foo=a-b');
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'none', arrayFormatSeparator: '-'}), 'foo=a-b');
+
+	// The value round-trips as a plain value, not as an array.
+	for (const arrayFormatSeparator of ['-', '.', '_', '~', '!', '*', 'C', 'å', ',', '|']) {
+		for (const arrayFormat of ['comma', 'separator']) {
+			const options = {arrayFormat, arrayFormatSeparator};
+			for (const value of [`a${arrayFormatSeparator}b`, arrayFormatSeparator, `${arrayFormatSeparator}${arrayFormatSeparator}`]) {
+				t.deepEqual(queryString.parse(queryString.stringify({foo: value}, options), options), {foo: value}, `${arrayFormat} with ${JSON.stringify(arrayFormatSeparator)} and ${JSON.stringify(value)}`);
+			}
+		}
+	}
+});
+
 test('array stringify representation with separators percent-encodes a separator inside an item', t => {
 	// `parse()` only splits on a literal separator, so a separator inside an item must be percent-encoded, also when `encodeURIComponent` leaves it as-is, like `-`, `.`, `_`, and `~`.
 	t.is(queryString.stringify({foo: ['a,b', 'c']}, {arrayFormat: 'comma'}), 'foo=a%2Cb,c');
@@ -843,4 +910,13 @@ test('skipNull and skipEmptyString still apply without a replacer', t => {
 		skipEmptyString: true,
 		sort: false,
 	}), '');
+});
+
+test('skipNull and skipEmptyString with a replacer and array formats', t => {
+	t.is(queryString.stringify({a: [1, null, 2]}, {arrayFormat: 'bracket', skipNull: true, replacer: (key, value) => value}), 'a[]=1&a[]=2');
+	t.is(queryString.stringify({a: [1, null, 2]}, {arrayFormat: 'comma', skipNull: true, replacer: (key, value) => value}), 'a=1,2');
+	t.is(queryString.stringify({a: [1, 2, 3]}, {arrayFormat: 'index', skipNull: true, replacer: (key, value) => value === 2 ? null : value}), 'a[0]=1&a[1]=3');
+	t.is(queryString.stringify({a: null, b: 1}, {skipNull: true, replacer: (key, value) => value === null ? 'rescued' : value}), 'a=rescued&b=1');
+	t.is(queryString.stringify({a: 1, b: ''}, {skipEmptyString: true, replacer: (key, value) => key === 'a' ? '' : value}), '');
+	t.is(queryString.stringify({a: 1, b: 2}, {skipNull: true, replacer: (key, value) => key === 'a' ? undefined : value}), 'b=2');
 });
