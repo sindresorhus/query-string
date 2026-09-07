@@ -777,7 +777,7 @@ Pick query parameters from a URL.
 
 @param url - The URL containing the query parameters to pick.
 @param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
-@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, `types`, and `decode` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, decoded only when `encode` is `true`, so a value like `007` is not rewritten as `7` and a value like `a%20b` is not percent-encoded a second time.
 
 @returns The URL with the picked query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
@@ -806,7 +806,7 @@ Exclude query parameters from a URL. Like `.pick()` but reversed.
 
 @param url - The URL containing the query parameters to exclude.
 @param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
-@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`.
+@param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, `types`, and `decode` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, decoded only when `encode` is `true`, so a value like `007` is not rewritten as `7` and a value like `a%20b` is not percent-encoded a second time.
 
 @returns The URL without the excluded query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 

@@ -78,7 +78,7 @@ test('picks elements in a URL with `encode: false` and keeps the values as-is', 
 });
 
 test('picks elements in a URL with `encode: false` and an explicit `decode: true`', t => {
-	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a= ');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20');
 });
 
 test('picks elements in a URL with `encode: false` and a filter predicate that sees the raw values', t => {
@@ -155,4 +155,15 @@ test('parse options that change a value only apply to the value the filter recei
 	t.is(queryString.pick('https://foo.bar?a=%26&b=007', (key, value) => value === 7, {encode: false, parseNumbers: true}), 'https://foo.bar?b=007');
 	// A custom type can return a value that `stringify()` cannot write, since it is only passed to the filter.
 	t.is(queryString.pick('https://foo.bar?date=2024-01-02&other=x', (key, value) => value instanceof Date, {types: {date: value => new Date(value)}}), 'https://foo.bar?date=2024-01-02');
+});
+
+test('the `decode` option only applies to the value the filter receives', t => {
+	// The URL is written back from the values decoded when `encode` is `true`, or kept as-is when it is `false`, so `decode: false` does not percent-encode the query a second time.
+	t.is(queryString.pick('https://foo.bar?foo=a%20b&bar=1', ['foo'], {decode: false}), 'https://foo.bar?foo=a%20b');
+	t.is(queryString.pick('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === 'a%26b', {decode: false}), 'https://foo.bar?foo=a%26b');
+	t.is(queryString.pick('https://foo.bar?foo=1%2B2&bar=1', (key, value) => value === '1%2B2', {decode: false, parseNumbers: true}), 'https://foo.bar?foo=1%2B2');
+	t.is(queryString.pick('https://foo.bar?foo=a%2Cb,c&bar=1', (key, value) => Array.isArray(value) && value[0] === 'a%2Cb', {decode: false, arrayFormat: 'comma'}), 'https://foo.bar?foo=a%2Cb,c');
+	t.is(queryString.pick('https://foo.bar?foo=a%20b&bar=1', (key, value) => value === 'a%20b', {decode: false, encode: false}), 'https://foo.bar?foo=a%20b');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1#x%20y', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20#x%20y');
 });

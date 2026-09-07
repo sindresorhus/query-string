@@ -166,3 +166,9 @@ test('parse options that change a value only apply to the value the filter recei
 	t.is(queryString.exclude('https://foo.bar?f=1&age=020&other=x', (key, value) => value === 'x', {types: {f: 'boolean', age: 'number'}}), 'https://foo.bar?age=020&f=1');
 	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=x', (key, value) => value === 'x', {types: {foo: 'string'}}), 'https://foo.bar?foo=1&foo=2');
 });
+
+test('the `decode` option only applies to the value the filter receives', t => {
+	t.is(queryString.exclude('https://foo.bar?foo=a%20b&bar=1', ['bar'], {decode: false}), 'https://foo.bar?foo=a%20b');
+	t.is(queryString.exclude('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === '1', {decode: false}), 'https://foo.bar?foo=a%26b');
+	t.is(queryString.exclude('https://foo.bar?a=%20&b=1', (name, value) => value === '1', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+});
