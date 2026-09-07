@@ -36,16 +36,50 @@ expectType<string>(
 	),
 );
 
-// Ensure it accepts an `interface`.
-type Query = {
+// Ensure it accepts an `interface`. Unlike a type alias, an interface has no implicit index signature.
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+interface Query {
 	foo: string;
-};
+}
 
 const query: Query = {
 	foo: 'bar',
 };
 
 queryString.stringify(query);
+queryString.stringifyUrl({url: 'https://sindresorhus.com', query});
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+interface FullQuery {
+	foo: string;
+	count: number;
+	enabled: boolean;
+	big: bigint;
+	missing?: string;
+	tags: readonly string[];
+	mixed: Array<string | number | boolean | undefined>;
+}
+
+const fullQuery: FullQuery = {
+	foo: 'bar',
+	count: 1,
+	enabled: true,
+	big: 1n,
+	tags: ['a', 'b'],
+	mixed: ['a', 1, true, undefined],
+};
+
+expectType<string>(queryString.stringify(fullQuery));
+expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery}));
+expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery, fragmentIdentifier: 'top'}, {arrayFormat: 'bracket'}));
+
+// A spread object has no index signature either. See https://github.com/microsoft/TypeScript/issues/42021
+const queryWithExtraBits = {...query, baz: 'bang'};
+expectType<string>(queryString.stringify(queryWithExtraBits));
+expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: queryWithExtraBits}));
+
+const urlObject: queryString.UrlObject = {url: 'https://sindresorhus.com', query: fullQuery};
+expectType<string>(queryString.stringifyUrl(urlObject));
 
 // Parse
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));

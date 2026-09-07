@@ -690,7 +690,12 @@ export type UrlObject = {
 	/**
 	Overrides queries in the `url` property.
 	*/
-	readonly query?: StringifiableRecord;
+	// TODO: Use the below instead when the following TS issues are fixed:
+	// - https://github.com/microsoft/TypeScript/issues/15300
+	// - https://github.com/microsoft/TypeScript/issues/42021
+	// Context: https://github.com/sindresorhus/query-string/issues/298
+	// readonly query?: StringifiableRecord;
+	readonly query?: Record<string, any>;
 
 	/**
 	Overrides the fragment identifier in the `url` property.
