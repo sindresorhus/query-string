@@ -632,10 +632,16 @@ export function stringifyUrl(object, options) {
 
 	let hash = getHash(object.url);
 	if (typeof object.fragmentIdentifier === 'string') {
-		// Percent-encode the fragment with a throwaway URL. The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
-		const throwawayUrl = new URL('https://query-string.invalid');
-		throwawayUrl.hash = `#${object.fragmentIdentifier}`;
-		hash = throwawayUrl.hash;
+		// An empty fragment identifier removes the fragment, like `url.hash = ''` does.
+		hash = object.fragmentIdentifier === '' ? '' : `#${object.fragmentIdentifier}`;
+
+		if (options.encode) {
+			// The fragment identifier is a decoded value, like the query values, so `parseUrl()` reads it back unchanged. That is what the `fragment` component of Go's `net/url`, Java's `URI`, and Swift's `URLComponents` does too. The `URL` hash setter instead expects an already-encoded fragment: it leaves `%` as-is, which would turn `100%` into an invalid URL and `%23top` into `#top` after parsing. So `%` is encoded here first. The URL parser also silently strips ASCII tab and newline from its input, so those are encoded first too. The setter then encodes the rest of the WHATWG fragment percent-encode set (controls, space, `"`, `<`, `>`, and backtick) and keeps `/`, `?`, and `#`, so hash routes like `#/users?id=1` stay readable. With `encode: false`, the fragment identifier is written as-is, like the query.
+			// The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
+			const throwawayUrl = new URL('https://query-string.invalid');
+			throwawayUrl.hash = hash.replaceAll(/[%\t\n\r]/g, character => `%${character.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
+			hash = throwawayUrl.hash;
+		}
 	}
 
 	return `${url}${queryString}${hash}`;

@@ -107,10 +107,86 @@ test('stringify URL from the result of `parseUrl` with a `#` in the fragment ide
 	}
 });
 
-test('stringify URL does not double-encode a fragment identifier', t => {
-	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%23top'}), 'https://foo.bar/#%23top');
-	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a%b'}), 'https://foo.bar/#a%b');
+test('stringify URL percent-encodes `%` in the fragment identifier', t => {
+	// The fragment identifier is a decoded value, like the query values, so `%` is encoded and `parseUrl()` reads it back unchanged. A bare `%` would make `decodeURIComponent(location.hash)` throw in the browser.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%23top'}), 'https://foo.bar/#%2523top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a%b'}), 'https://foo.bar/#a%25b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '100%'}), 'https://foo.bar/#100%25');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%'}), 'https://foo.bar/#%25');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '50%25'}), 'https://foo.bar/#50%2525');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a%20b'}), 'https://foo.bar/#a%2520b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {a: '100%'}, fragmentIdentifier: '100%'}), 'https://foo.bar/?a=100%25#100%25');
+
+	// Like the `URL` hash setter, `/`, `?`, and `#` stay as-is, so hash routes keep working.
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a?b'}), 'https://foo.bar/#a?b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '/users?id=1&x=%'}), 'https://foo.bar/#/users?id=1&x=%25');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a b"<>`'}), 'https://foo.bar/#a%20b%22%3C%3E%60');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'ståle'}), 'https://foo.bar/#st%C3%A5le');
+
+	// `strict` only applies to the query. The fragment keeps `!'()*`, like the `URL` hash setter.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {a: '!\'()*'}, fragmentIdentifier: '!\'()*'}), 'https://foo.bar/?a=%21%27%28%29%2A#!\'()*');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '100%!\'()*'}, {strict: false}), 'https://foo.bar/#100%25!\'()*');
+
+	// A fragment identifier already in the URL is kept as-is. Only the `fragmentIdentifier` property is a decoded value.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#a%20b%25', query: {x: 1}}), 'https://foo.bar/?x=1#a%20b%25');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/?x=1#old%20frag', query: {}, fragmentIdentifier: 'new%'}), 'https://foo.bar/?x=1#new%25');
+});
+
+test('stringify URL percent-encodes tab, newline, and carriage return in the fragment identifier', t => {
+	// The `URL` parser silently strips ASCII tab and newline from its input, so they are encoded before the hash setter sees them, like `%`. The fragment identifier is a decoded value, so `parseUrl()` reads it back unchanged.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\tb'}), 'https://foo.bar/#a%09b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\nb'}), 'https://foo.bar/#a%0Ab');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\rb'}), 'https://foo.bar/#a%0Db');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\r\nb'}), 'https://foo.bar/#a%0D%0Ab');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '\t'}), 'https://foo.bar/#%09');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '\n'}), 'https://foo.bar/#%0A');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '\t\n\r'}), 'https://foo.bar/#%09%0A%0D');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'line one\nline two'}), 'https://foo.bar/#line%20one%0Aline%20two');
+
+	// `%` is still encoded alongside the control characters.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '100%\n'}), 'https://foo.bar/#100%25%0A');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%09'}), 'https://foo.bar/#%2509');
+
+	// The other C0 controls were already encoded by the hash setter and stay that way.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\u0000b\u001Fc\u007Fd'}), 'https://foo.bar/#a%00b%1Fc%7Fd');
+
+	// The query already encodes these characters, so both parts agree.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {a: 'x\ty'}, fragmentIdentifier: 'x\ty'}), 'https://foo.bar/?a=x%09y#x%09y');
+
+	// A fragment identifier already in the URL is kept as-is.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#a%09b', query: {x: 1}}), 'https://foo.bar/?x=1#a%09b');
+
+	// With `encode: false`, the fragment identifier is written as-is.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a\tb'}, {encode: false}), 'https://foo.bar/#a\tb');
+
+	for (const fragmentIdentifier of ['a\tb', 'a\nb', 'a\rb', '\t\n\r', 'x\r\ny%', ' \t ']) {
+		const url = queryString.stringifyUrl({url: 'https://foo.bar/', query: {a: 1}, fragmentIdentifier});
+		t.is(queryString.parseUrl(url, {parseFragmentIdentifier: true}).fragmentIdentifier, fragmentIdentifier, `${encodeURIComponent(fragmentIdentifier)}`);
+		t.is(queryString.stringifyUrl(queryString.parseUrl(url, {parseFragmentIdentifier: true})), url, `${encodeURIComponent(fragmentIdentifier)} stable`);
+	}
+});
+
+test('stringify URL fragment identifier round-trips through `parseUrl`', t => {
+	for (const fragmentIdentifier of ['100%', '%', '%zz', '%23top', '50%25', 'a%20b', 'a%2Fb', 'a b', '/foo/bar?x=1', '#top', 'ståle', 'a"b<c>`d', '=&+']) {
+		const url = queryString.stringifyUrl({url: 'https://foo.bar/', query: {a: 1}, fragmentIdentifier});
+		t.is(queryString.parseUrl(url, {parseFragmentIdentifier: true}).fragmentIdentifier, fragmentIdentifier, `${fragmentIdentifier}`);
+		t.is(queryString.stringifyUrl(queryString.parseUrl(url, {parseFragmentIdentifier: true})), url, `${fragmentIdentifier} stable`);
+	}
+});
+
+test('stringify URL with `encode: false` writes the fragment identifier as-is', t => {
+	// Like the query, the fragment identifier is treated as already encoded then.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '%23top'}, {encode: false}), 'https://foo.bar/#%23top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a%20b'}, {encode: false}), 'https://foo.bar/#a%20b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: 'a b'}, {encode: false}), 'https://foo.bar/#a b');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '100%'}, {encode: false}), 'https://foo.bar/#100%');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/', query: {}, fragmentIdentifier: '#top'}, {encode: false}), 'https://foo.bar/##top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#old', query: {}, fragmentIdentifier: ''}, {encode: false}), 'https://foo.bar/');
+
+	// A URL parsed without decoding round-trips byte-for-byte.
+	for (const url of ['https://foo.bar/?a=%20#a%20b%25', 'https://foo.bar/#%23top', 'https://foo.bar/?x=1#/route?y=2']) {
+		t.is(queryString.stringifyUrl(queryString.parseUrl(url, {decode: false, parseFragmentIdentifier: true}), {encode: false}), url);
+	}
 });
 
 test('stringify URL with a fragment identifier does not parse the URL', t => {

@@ -677,6 +677,21 @@ export type UrlObject = {
 
 	/**
 	Overrides the fragment identifier in the `url` property.
+
+	The fragment identifier without the leading `#`. An empty string removes the fragment identifier from the URL.
+
+	Like the query values, it is a decoded value and is percent-encoded when `encode` is `true`, so `.parseUrl()` reads it back unchanged. `/`, `?`, and `#` are kept as-is, so hash routes like `#/users?id=1` work. When `encode` is `false`, it is written as-is.
+
+	@example
+	```
+	import queryString from 'query-string';
+
+	queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '100%'});
+	//=> 'https://foo.bar#100%25'
+
+	queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '/users?id=1'});
+	//=> 'https://foo.bar#/users?id=1'
+	```
 	*/
 	readonly fragmentIdentifier?: string;
 };

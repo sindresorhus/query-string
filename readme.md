@@ -689,6 +689,24 @@ Type: `object`
 
 Query items to add to the URL.
 
+##### fragmentIdentifier
+
+Type: `string`
+
+The fragment identifier to add to the URL, without the leading `#`. An empty string removes the fragment identifier from the URL.
+
+Like the query values, it is a decoded value and is percent-encoded when `encode` is `true`, so [`.parseUrl()`](#parseurlstring-options) reads it back unchanged. `/`, `?`, and `#` are kept as-is, so hash routes like `#/users?id=1` work. When `encode` is `false`, it is written as-is.
+
+```js
+import queryString from 'query-string';
+
+queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '100%'});
+//=> 'https://foo.bar#100%25'
+
+queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '/users?id=1'});
+//=> 'https://foo.bar#/users?id=1'
+```
+
 ### .pick(url, keys, options?)
 ### .pick(url, filter, options?)
 
