@@ -204,8 +204,15 @@ function parserForArrayFormat(options) {
 					return;
 				}
 
-				// A repeated key adds its items, like in the other array formats.
-				accumulator[key] = [accumulator[key], newValue].flat();
+				// A repeated key adds its items, like in the other array formats. The items are appended in place, since rebuilding the array for every repetition is quadratic.
+				if (!Array.isArray(accumulator[key])) {
+					accumulator[key] = [accumulator[key]];
+				}
+
+				const items = Array.isArray(newValue) ? newValue : [newValue];
+				for (const item of items) {
+					accumulator[key].push(item);
+				}
 			};
 		}
 

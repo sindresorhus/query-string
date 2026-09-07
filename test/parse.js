@@ -1187,3 +1187,30 @@ test('an option that is explicitly `undefined` uses its default', t => {
 	t.deepEqual(queryString.parse('foo=1&bar=true', {parseNumbers: undefined, parseBooleans: undefined, types: undefined}), {foo: '1', bar: 'true'});
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=%26', {decode: undefined}), {url: 'https://foo.bar', query: {foo: '&'}});
 });
+
+test('comma and separator array formats parse a key repeated many times without quadratic slowdown', t => {
+	const count = 20_000;
+	const query = Array.from({length: count}, (_, index) => `a=${index}`).join('&');
+
+	const baselineStartTime = performance.now();
+	const baseline = queryString.parse(query);
+	const baselineElapsedTime = performance.now() - baselineStartTime;
+
+	const commaStartTime = performance.now();
+	const comma = queryString.parse(query, {arrayFormat: 'comma'});
+	const commaElapsedTime = performance.now() - commaStartTime;
+
+	const separatorStartTime = performance.now();
+	const separator = queryString.parse(query, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+	const separatorElapsedTime = performance.now() - separatorStartTime;
+
+	t.is(baseline.a.length, count);
+	t.deepEqual(comma, baseline);
+	t.deepEqual(separator, baseline);
+	t.true(commaElapsedTime < (baselineElapsedTime * 5) + 50, `Expected the comma format to stay near the default format. Comma: ${commaElapsedTime}ms. Default: ${baselineElapsedTime}ms.`);
+	t.true(separatorElapsedTime < (baselineElapsedTime * 5) + 50, `Expected the separator format to stay near the default format. Separator: ${separatorElapsedTime}ms. Default: ${baselineElapsedTime}ms.`);
+
+	// A value with more items than a function call can take as arguments is appended without spreading it.
+	const manyItems = Array.from({length: 300_000}, (_, index) => index).join(',');
+	t.is(queryString.parse(`a=${manyItems}&a=${manyItems}`, {arrayFormat: 'comma'}).a.length, 600_000);
+});
