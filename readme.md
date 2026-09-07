@@ -469,7 +469,7 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
+A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. With `comma` and `separator`, a plain value that contains the separator is percent-encoded the same way, so it does not turn into an array. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
 
 ##### sort
 

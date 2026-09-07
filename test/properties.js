@@ -41,8 +41,9 @@ test('should read correctly from stringified query parameters', t => {
 });
 
 test('should read correctly from stringified query parameters with the separator formats', t => {
-	// A plain value or an item that contains the separator must be percent-encoded so that it round-trips. `null` is written as an empty string in these formats, so it is left out. A single-item array has no separator, so it reads back as a plain value and is left out too.
-	const stringArbitrary = fastCheck.fullUnicodeString({maxLength: 10});
+	// A plain value or an item that contains the separator must be percent-encoded so that it round-trips. `null` is written as an empty string in these formats, so it is left out. A single-item array has no separator, so it reads back as a plain value and is left out too. A separator that is a hex digit is documented as unsupported, since it also appears inside the `%XX` escapes.
+	// The values are built from a small alphabet that includes every candidate separator, so that a value with the separator is common instead of rare.
+	const stringArbitrary = fastCheck.stringOf(fastCheck.constantFrom(',', '|', '-', '.', '_', '~', '!', '*', 'å', 'a', 'b', ' ', '%', 'é'), {maxLength: 10});
 	const separatorQueryParametersArbitrary = fastCheck.dictionary(
 		fastCheck.fullUnicodeString({minLength: 1, maxLength: 10}).filter(key => key !== '__proto__' && !key.endsWith('[]')),
 		fastCheck.oneof(
@@ -53,7 +54,7 @@ test('should read correctly from stringified query parameters with the separator
 
 	const separatorOptionsArbitrary = fastCheck.record({
 		arrayFormat: fastCheck.constantFrom('comma', 'separator', 'bracket-separator'),
-		arrayFormatSeparator: fastCheck.constantFrom(',', '|', '-', '.', '_', '~', '!', '*', 'C', 'å'),
+		arrayFormatSeparator: fastCheck.constantFrom(',', '|', '-', '.', '_', '~', '!', '*', 'å'),
 		strict: fastCheck.boolean(),
 		sort: fastCheck.constant(false),
 	});

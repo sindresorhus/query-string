@@ -374,7 +374,7 @@ test('a plain value that contains the separator is percent-encoded with the comm
 	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'none', arrayFormatSeparator: '-'}), 'foo=a-b');
 
 	// The value round-trips as a plain value, not as an array.
-	for (const arrayFormatSeparator of ['-', '.', '_', '~', '!', '*', 'C', 'å', ',', '|']) {
+	for (const arrayFormatSeparator of ['-', '.', '_', '~', '!', '*', 'å', ',', '|']) {
 		for (const arrayFormat of ['comma', 'separator']) {
 			const options = {arrayFormat, arrayFormatSeparator};
 			for (const value of [`a${arrayFormatSeparator}b`, arrayFormatSeparator, `${arrayFormatSeparator}${arrayFormatSeparator}`]) {
@@ -408,8 +408,8 @@ test('array stringify representation with separators percent-encodes a separator
 	// The key is not an item, so the separator in the key follows the normal encoding.
 	t.is(queryString.stringify({'a-b': ['c', 'd']}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'a-b=c-d');
 
-	// A scalar is not an item, so the separator is not encoded there.
-	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=a-b');
+	// A scalar that contains the separator is encoded the same way, since `parse()` would otherwise split it into an array.
+	t.is(queryString.stringify({foo: 'a-b'}, {arrayFormat: 'separator', arrayFormatSeparator: '-'}), 'foo=a%2Db');
 
 	// Without encoding, the item is written as-is.
 	t.is(queryString.stringify({foo: ['a-b', 'c']}, {arrayFormat: 'separator', arrayFormatSeparator: '-', encode: false}), 'foo=a-b-c');

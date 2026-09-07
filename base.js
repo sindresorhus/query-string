@@ -76,20 +76,6 @@ function encoderForArrayFormat(options) {
 				? '[]='
 				: '=';
 
-			// `parse()` only splits on a literal separator, so a separator inside an item is percent-encoded. `encodeURIComponent` leaves some ASCII characters as-is, like `-`, `.`, `_`, and `~`, so the pieces of the item between the separators are encoded separately and joined with the percent-encoded separator. The encoded item is not searched for the separator, since a separator that is a hex digit would clash with the `%XX` escapes.
-			const {arrayFormatSeparator} = options;
-			const encodedSeparator = encodeURIComponent(arrayFormatSeparator) === arrayFormatSeparator ? `%${arrayFormatSeparator.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}` : encodeURIComponent(arrayFormatSeparator);
-			const encodeItem = value => {
-				// `encode()` validates the value type first, since `String()` would hide an unsupported type.
-				const encodedValue = encode(value, options);
-				const stringValue = String(value);
-				if (!options.encode || !stringValue.includes(arrayFormatSeparator)) {
-					return encodedValue;
-				}
-
-				return stringValue.split(arrayFormatSeparator).map(piece => encode(piece, options)).join(encodedSeparator);
-			};
-
 			return key => (result, value) => {
 				if (
 					value === undefined
@@ -103,11 +89,11 @@ function encoderForArrayFormat(options) {
 				value = value === null ? '' : value;
 
 				if (result.length === 0) {
-					result.push([encode(key, options), keyValueSeparator, encodeItem(value)].join(''));
+					result.push([encode(key, options), keyValueSeparator, encodeArrayItem(value, options)].join(''));
 					return result;
 				}
 
-				result.push(encodeItem(value));
+				result.push(encodeArrayItem(value, options));
 				return result;
 			};
 		}
@@ -289,6 +275,20 @@ function encode(value, options) {
 	}
 
 	return value;
+}
+
+// `parse()` only splits on a literal separator, so a separator inside an item is percent-encoded. `encodeURIComponent` leaves some ASCII characters as-is, like `-`, `.`, `_`, and `~`, so the pieces of the item between the separators are encoded separately and joined with the percent-encoded separator. The encoded item is not searched for the separator, since a separator that is a hex digit would clash with the `%XX` escapes.
+function encodeArrayItem(value, options) {
+	// `encode()` validates the value type first, since `String()` would hide an unsupported type.
+	const encodedValue = encode(value, options);
+	const stringValue = String(value);
+	const {arrayFormatSeparator} = options;
+	if (!options.encode || !stringValue.includes(arrayFormatSeparator)) {
+		return encodedValue;
+	}
+
+	const encodedSeparator = encodeURIComponent(arrayFormatSeparator) === arrayFormatSeparator ? `%${arrayFormatSeparator.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}` : encodeURIComponent(arrayFormatSeparator);
+	return stringValue.split(arrayFormatSeparator).map(piece => encode(piece, options)).join(encodedSeparator);
 }
 
 function decode(value, options) {
@@ -566,7 +566,9 @@ export function stringify(object, options) {
 			return result.join(arrayFormatSeparator);
 		}
 
-		return encode(key, options) + '=' + encode(value, options);
+		// With `comma` and `separator`, `parse()` splits any value on the separator, so a scalar that contains it is encoded like an array item. `bracket-separator` only splits a value with the array marker.
+		const encodedValue = options.arrayFormat === 'comma' || options.arrayFormat === 'separator' ? encodeArrayItem(value, options) : encode(value, options);
+		return encode(key, options) + '=' + encodedValue;
 	}).filter(x => x.length > 0).join('&');
 }
 
