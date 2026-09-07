@@ -696,15 +696,20 @@ export function pick(input, filter, options) {
 
 	options = definedOptions(options);
 
-	// `parseNumbers`, `parseBooleans`, `types`, and `decode` only apply to the `value` the predicate receives. The URL is written back from the plain string values, decoded only when they are encoded again, so a value like `007` is kept as-is instead of being rewritten as `7`, and a value like `a%20b` is not percent-encoded a second time. When the output is not encoded, the input is not decoded either, since decoding without re-encoding would corrupt it.
+	// Leading and trailing whitespace is ignored, like `parseUrl()` does. `parseUrl()` trims the URL and the query itself, but the fragment identifier is taken from the input below, so a newline from pasted input would otherwise end up after it.
+	input = input.trim();
+
+	// `parseNumbers`, `parseBooleans`, and `types` only apply to the `value` the predicate receives. The URL is written back from the plain string values, so a value like `007` is kept as-is instead of being rewritten as `7`.
+	// The query is decoded exactly when it is encoded again, so a value like `a%20b` is not percent-encoded a second time. When the output is not encoded, the input is not decoded either, since decoding without re-encoding would corrupt it. The `decode` option is ignored: decoding the predicate's view differently from the output would give the two views different keys, so a percent-encoded key, or a `+` in a key, would not find its value.
+	const shouldDecode = options.encode ?? true;
 	const {url, query} = parseUrl(input, {
 		...options,
-		decode: options.encode ?? true,
+		decode: shouldDecode,
 		parseNumbers: false,
 		parseBooleans: false,
 		types: undefined,
 	});
-	const typedQuery = parse(extract(input), {decode: options.encode ?? true, ...options});
+	const typedQuery = parse(extract(input), {...options, decode: shouldDecode});
 
 	// Keep the fragment identifier as-is. Decoding and re-encoding it could change it.
 	return stringifyUrl({

@@ -748,7 +748,7 @@ queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value 
 
 Type: `string`
 
-The URL containing the query parameters to filter.
+The URL containing the query parameters to filter. Leading and trailing whitespace is ignored.
 
 #### keys
 
@@ -760,7 +760,7 @@ The names of the query parameters to filter based on the function used.
 
 Type: `(key, value) => boolean`
 
-A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, `types`, and `decode` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, decoded only when `encode` is `true`, so a value like `007` is not rewritten as `7` and a value like `a%20b` is not percent-encoded a second time.
+A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`. The query is decoded only when `encode` is `true`, so a value like `a%20b` is not percent-encoded a second time. With `encode: false`, the filter receives the key and value as they are in the URL. The `decode` option is ignored.
 
 #### options
 

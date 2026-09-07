@@ -78,7 +78,9 @@ test('picks elements in a URL with `encode: false` and keeps the values as-is', 
 });
 
 test('picks elements in a URL with `encode: false` and an explicit `decode: true`', t => {
-	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+	// With `encode: false`, the query is not decoded, so the filter receives the raw value. The `decode` option is ignored.
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === '%20', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1', ['a'], {encode: false, decode: true}), 'https://foo.bar?a=%20');
 });
 
 test('picks elements in a URL with `encode: false` and a filter predicate that sees the raw values', t => {
@@ -157,13 +159,49 @@ test('parse options that change a value only apply to the value the filter recei
 	t.is(queryString.pick('https://foo.bar?date=2024-01-02&other=x', (key, value) => value instanceof Date, {types: {date: value => new Date(value)}}), 'https://foo.bar?date=2024-01-02');
 });
 
-test('the `decode` option only applies to the value the filter receives', t => {
+test('the query is decoded exactly when it is encoded again, and the `decode` option is ignored', t => {
 	// The URL is written back from the values decoded when `encode` is `true`, or kept as-is when it is `false`, so `decode: false` does not percent-encode the query a second time.
 	t.is(queryString.pick('https://foo.bar?foo=a%20b&bar=1', ['foo'], {decode: false}), 'https://foo.bar?foo=a%20b');
-	t.is(queryString.pick('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === 'a%26b', {decode: false}), 'https://foo.bar?foo=a%26b');
-	t.is(queryString.pick('https://foo.bar?foo=1%2B2&bar=1', (key, value) => value === '1%2B2', {decode: false, parseNumbers: true}), 'https://foo.bar?foo=1%2B2');
-	t.is(queryString.pick('https://foo.bar?foo=a%2Cb,c&bar=1', (key, value) => Array.isArray(value) && value[0] === 'a%2Cb', {decode: false, arrayFormat: 'comma'}), 'https://foo.bar?foo=a%2Cb,c');
 	t.is(queryString.pick('https://foo.bar?foo=a%20b&bar=1', (key, value) => value === 'a%20b', {decode: false, encode: false}), 'https://foo.bar?foo=a%20b');
-	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20');
-	t.is(queryString.pick('https://foo.bar?a=%20&b=1#x%20y', (name, value) => value === ' ', {encode: false, decode: true}), 'https://foo.bar?a=%20#x%20y');
+	// The filter receives the value decoded like the key. Decoding only one of them made a percent-encoded key, or a `+` in a key, look up a value that did not exist, so the filter received `undefined` and dropped the parameter.
+	t.is(queryString.pick('https://foo.bar?a%20b=x%20y&c=1', (key, value) => value === 'x y', {decode: false}), 'https://foo.bar?a%20b=x%20y');
+	t.is(queryString.pick('https://foo.bar?first+name=John&c=1', (key, value) => value === 'John', {decode: false}), 'https://foo.bar?first%20name=John');
+	t.is(queryString.pick('https://foo.bar?a%20b=%20&c=1', (key, value) => value === '%20', {encode: false, decode: true}), 'https://foo.bar?a%20b=%20');
+	t.is(queryString.pick('https://foo.bar?foo%5B%5D=1&foo%5B%5D=2&c=1', (key, value) => Array.isArray(value), {decode: false, arrayFormat: 'bracket'}), 'https://foo.bar?foo[]=1&foo[]=2');
+	t.is(queryString.pick('https://foo.bar?a%20b=7&c=1', (key, value) => value === 7, {decode: false, types: {'a b': 'number'}}), 'https://foo.bar?a%20b=7');
+	// The filter always receives the key and the value from the same decoding.
+	const seen = [];
+	queryString.pick('https://foo.bar?a%20b=x%20y&c+d=1', (key, value) => {
+		seen.push([key, value]);
+		return true;
+	}, {decode: false});
+	t.deepEqual(seen, [['a b', 'x y'], ['c d', '1']]);
+	const seenRaw = [];
+	queryString.pick('https://foo.bar?a%20b=x%20y&c+d=1', (key, value) => {
+		seenRaw.push([key, value]);
+		return true;
+	}, {encode: false, decode: true});
+	t.deepEqual(seenRaw, [['a%20b', 'x%20y'], ['c+d', '1']]);
+	// The values are decoded before `parseNumbers` and the array format split them, like with `parse()`.
+	t.is(queryString.pick('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === 'a&b', {decode: false}), 'https://foo.bar?foo=a%26b');
+	t.is(queryString.pick('https://foo.bar?foo=1%2B2&bar=1', (key, value) => value === '1+2', {decode: false, parseNumbers: true}), 'https://foo.bar?foo=1%2B2');
+	t.is(queryString.pick('https://foo.bar?foo=a%2Cb,c&bar=1', (key, value) => Array.isArray(value) && value[0] === 'a,b', {decode: false, arrayFormat: 'comma'}), 'https://foo.bar?foo=a%2Cb,c');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === '%20', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+	t.is(queryString.pick('https://foo.bar?a=%20&b=1#x%20y', (name, value) => value === '%20', {encode: false, decode: true}), 'https://foo.bar?a=%20#x%20y');
+});
+
+test('ignores leading and trailing whitespace, like `parseUrl()` does', t => {
+	// The URL and the query were already trimmed by `parseUrl()`, but the fragment identifier was taken from the untrimmed input, so a newline from pasted input ended up after it in the output.
+	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello\n', ['a']), 'https://foo.bar?a=1#hello');
+	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello ', ['a']), 'https://foo.bar?a=1#hello');
+	t.is(queryString.pick(' https://foo.bar?a=1&b=2#hello ', ['a']), 'https://foo.bar?a=1#hello');
+	t.is(queryString.pick('\thttps://foo.bar?a=1&b=2\t', ['a']), 'https://foo.bar?a=1');
+	t.is(queryString.pick('https://foo.bar#hello\n', ['a']), 'https://foo.bar#hello');
+	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello\n', (key, value) => value === '1'), 'https://foo.bar?a=1#hello');
+	t.is(queryString.exclude('https://foo.bar?a=1&b=2#hello\n', ['a']), 'https://foo.bar?b=2#hello');
+	t.is(queryString.exclude(' https://foo.bar?a=1&b=2#hello ', (key, value) => value === '1'), 'https://foo.bar?b=2#hello');
+	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello\n', ['a'], {encode: false}), 'https://foo.bar?a=1#hello');
+	// Whitespace inside the fragment identifier is kept.
+	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello world\n', ['a']), 'https://foo.bar?a=1#hello world');
+	t.is(queryString.pick(' ', ['a']), '');
 });

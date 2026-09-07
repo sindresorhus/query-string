@@ -167,8 +167,15 @@ test('parse options that change a value only apply to the value the filter recei
 	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=x', (key, value) => value === 'x', {types: {foo: 'string'}}), 'https://foo.bar?foo=1&foo=2');
 });
 
-test('the `decode` option only applies to the value the filter receives', t => {
+test('the query is decoded exactly when it is encoded again, and the `decode` option is ignored', t => {
 	t.is(queryString.exclude('https://foo.bar?foo=a%20b&bar=1', ['bar'], {decode: false}), 'https://foo.bar?foo=a%20b');
 	t.is(queryString.exclude('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === '1', {decode: false}), 'https://foo.bar?foo=a%26b');
 	t.is(queryString.exclude('https://foo.bar?a=%20&b=1', (name, value) => value === '1', {encode: false, decode: true}), 'https://foo.bar?a=%20');
+	// The filter receives the value decoded like the key. Decoding only one of them made a percent-encoded key, or a `+` in a key, look up a value that did not exist, so the filter received `undefined` and kept the parameter.
+	t.is(queryString.exclude('https://foo.bar?a%20b=x%20y&c=1', (key, value) => value === 'x y', {decode: false}), 'https://foo.bar?c=1');
+	t.is(queryString.exclude('https://foo.bar?first+name=John&c=1', (key, value) => value === 'John', {decode: false}), 'https://foo.bar?c=1');
+	t.is(queryString.exclude('https://foo.bar?a%20b=%20&c=1', (key, value) => value === '%20', {encode: false, decode: true}), 'https://foo.bar?c=1');
+	t.is(queryString.exclude('https://foo.bar?foo%5B%5D=1&foo%5B%5D=2&c=1', (key, value) => Array.isArray(value), {decode: false, arrayFormat: 'bracket'}), 'https://foo.bar?c=1');
+	t.is(queryString.exclude('https://foo.bar?a%20b=7&c=1', (key, value) => value === 7, {decode: false, types: {'a b': 'number'}}), 'https://foo.bar?c=1');
+	t.is(queryString.exclude('https://foo.bar?foo=a%26b&bar=1', (key, value) => value === 'a&b', {decode: false}), 'https://foo.bar?bar=1');
 });
