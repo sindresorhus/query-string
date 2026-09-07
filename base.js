@@ -603,6 +603,9 @@ export function parseUrl(url, options) {
 		...definedOptions(options),
 	};
 
+	// Leading and trailing whitespace is ignored, like `parse()` does for the query and the URL parser does for the whole URL. Otherwise a newline from pasted input would end up in `fragmentIdentifier`.
+	url = url.trim();
+
 	let [url_, hash] = splitOnFirst(url, '#');
 
 	if (url_ === undefined) {

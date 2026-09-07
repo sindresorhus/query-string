@@ -607,7 +607,7 @@ queryString.extract('https://foo.bar?foo=bar');
 
 ### .parseUrl(string, options?)
 
-Extract the URL and the query string as an object.
+Extract the URL and the query string as an object. Leading and trailing whitespace is ignored.
 
 Returns an object with a `url` and `query` property.
 

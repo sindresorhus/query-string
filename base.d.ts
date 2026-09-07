@@ -390,7 +390,7 @@ export type ParsedUrl<T = string> = {
 };
 
 /**
-Extract the URL and the query string as an object.
+Extract the URL and the query string as an object. Leading and trailing whitespace is ignored.
 
 @param url - The URL to parse.
 @returns An object with a `url` and `query` property.

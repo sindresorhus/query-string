@@ -60,3 +60,17 @@ test('a `?` inside the fragment identifier does not start a query string', t => 
 	t.deepEqual(queryString.parseUrl('https://foo.bar?a=1#b?c=2', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {a: '1'}, fragmentIdentifier: 'b?c=2'});
 	t.is(queryString.extract('https://foo.bar#/users?id=1'), '');
 });
+
+test('ignores leading and trailing whitespace, like `parse()` and the URL parser do', t => {
+	// `parse()` already trims the query, so the query and the rest of the URL agreed only when nothing followed the query. Trailing whitespace after the fragment identifier, like a newline from pasted input, ended up in `fragmentIdentifier` and was percent-encoded by `stringifyUrl()`.
+	t.deepEqual(queryString.parseUrl('https://foo.bar?a=1#top ', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {a: '1'}, fragmentIdentifier: 'top'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar?a=1#top\n', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {a: '1'}, fragmentIdentifier: 'top'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar/ '), {url: 'https://foo.bar/', query: {}});
+	t.deepEqual(queryString.parseUrl(' https://foo.bar?a=1'), {url: 'https://foo.bar', query: {a: '1'}});
+	t.deepEqual(queryString.parseUrl('\thttps://foo.bar?a=1\t'), {url: 'https://foo.bar', query: {a: '1'}});
+	t.deepEqual(queryString.parseUrl('https://foo.bar/#\t', {parseFragmentIdentifier: true}), {url: 'https://foo.bar/', query: {}});
+	t.deepEqual(queryString.parseUrl(' '), {url: '', query: {}});
+	// Whitespace inside the URL is kept.
+	t.deepEqual(queryString.parseUrl('https://foo.bar/a b?c=1#d e', {parseFragmentIdentifier: true}), {url: 'https://foo.bar/a b', query: {c: '1'}, fragmentIdentifier: 'd e'});
+	t.is(queryString.stringifyUrl(queryString.parseUrl('https://foo.bar?a=1#top ', {parseFragmentIdentifier: true})), 'https://foo.bar?a=1#top');
+});
