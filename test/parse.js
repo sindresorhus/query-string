@@ -1176,3 +1176,14 @@ test('index array format does not pollute the prototype with a `__proto__` key',
 	t.false(0 in Object.prototype);
 	t.deepEqual(queryString.parse('constructor=x&constructor=y'), {constructor: ['x', 'y']});
 });
+
+test('an option that is explicitly `undefined` uses its default', t => {
+	// Passing through an optional setting, like `{decode: config.decode}`, must behave like leaving the option out.
+	t.deepEqual(queryString.parse('foo=%26+bar', {decode: undefined}), {foo: '& bar'});
+	t.deepEqual(queryString.parse('b=1&a=2', {sort: undefined}), {a: '2', b: '1'});
+	t.deepEqual(Object.keys(queryString.parse('b=1&a=2', {sort: undefined})), ['a', 'b']);
+	t.deepEqual(queryString.parse('foo=1,2', {arrayFormat: undefined}), {foo: '1,2'});
+	t.deepEqual(queryString.parse('foo=1,2', {arrayFormat: 'comma', arrayFormatSeparator: undefined}), {foo: ['1', '2']});
+	t.deepEqual(queryString.parse('foo=1&bar=true', {parseNumbers: undefined, parseBooleans: undefined, types: undefined}), {foo: '1', bar: 'true'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar?foo=%26', {decode: undefined}), {url: 'https://foo.bar', query: {foo: '&'}});
+});

@@ -157,3 +157,12 @@ test('sorts the query parameters by default and keeps their order with sort fals
 	t.is(queryString.exclude('http://example.com/?c=3&b=2&a=1', ['b'], {sort: (left, right) => right.localeCompare(left)}), 'http://example.com/?c=3&a=1');
 	t.is(queryString.exclude('http://example.com/?c[]=3&a[]=1&c[]=4', ['b'], {arrayFormat: 'bracket', sort: false}), 'http://example.com/?c[]=3&c[]=4&a[]=1');
 });
+
+test('parse options that change a value only apply to the value the filter receives', t => {
+	// `parseNumbers`, `parseBooleans`, and `types` type the `value` the predicate gets. The URL is written back from the plain values, so a value like `007` or `1.00` is kept as-is instead of being rewritten.
+	t.is(queryString.exclude('https://foo.bar?id=007&price=1.00&name=bond', ['name'], {parseNumbers: true}), 'https://foo.bar?id=007&price=1.00');
+	t.is(queryString.exclude('https://foo.bar?id=007&name=bond', (key, value) => value === 'bond', {parseNumbers: true}), 'https://foo.bar?id=007');
+	t.is(queryString.exclude('https://foo.bar?flag=TRUE&other=x', (key, value) => value === 'x', {parseBooleans: true}), 'https://foo.bar?flag=TRUE');
+	t.is(queryString.exclude('https://foo.bar?f=1&age=020&other=x', (key, value) => value === 'x', {types: {f: 'boolean', age: 'number'}}), 'https://foo.bar?age=020&f=1');
+	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=x', (key, value) => value === 'x', {types: {foo: 'string'}}), 'https://foo.bar?foo=1&foo=2');
+});

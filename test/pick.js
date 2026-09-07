@@ -132,3 +132,27 @@ test('keeps the fragment identifier when the URL has no query string', t => {
 	t.is(queryString.exclude('https://foo.bar#/path?not=a-query', ['not']), 'https://foo.bar#/path?not=a-query');
 	t.is(queryString.pick('https://foo.bar?foo=1#hello', []), 'https://foo.bar#hello');
 });
+
+test('an option that is explicitly `undefined` uses its default', t => {
+	// The input is decoded and the output is encoded, so a value with a reserved character is written back unchanged instead of corrupting the URL.
+	t.is(queryString.pick('https://foo.bar?foo=%26&bar=2', ['foo'], {encode: undefined}), 'https://foo.bar?foo=%26');
+	t.is(queryString.pick('https://foo.bar?foo=%26&bar=2', ['foo'], {decode: undefined}), 'https://foo.bar?foo=%26');
+	t.is(queryString.exclude('https://foo.bar?foo=%26&bar=2', ['bar'], {encode: undefined}), 'https://foo.bar?foo=%26');
+	t.is(queryString.pick('https://foo.bar?b=1&a=2', ['a', 'b'], {sort: undefined}), 'https://foo.bar?a=2&b=1');
+	t.is(queryString.pick('https://foo.bar?foo=1,2', ['foo'], {arrayFormat: 'comma', arrayFormatSeparator: undefined}), 'https://foo.bar?foo=1,2');
+});
+
+test('parse options that change a value only apply to the value the filter receives', t => {
+	// `parseNumbers`, `parseBooleans`, and `types` type the `value` the predicate gets. The URL is written back from the plain values, so a value like `007` or `1.00` is kept as-is instead of being rewritten.
+	t.is(queryString.pick('https://foo.bar?id=007&price=1.00&n=1e2', ['id', 'price', 'n'], {parseNumbers: true}), 'https://foo.bar?id=007&n=1e2&price=1.00');
+	t.is(queryString.pick('https://foo.bar?id=007&name=bond', (key, value) => value === 7, {parseNumbers: true}), 'https://foo.bar?id=007');
+	t.is(queryString.pick('https://foo.bar?flag=TRUE&other=x', (key, value) => value === true, {parseBooleans: true}), 'https://foo.bar?flag=TRUE');
+	t.is(queryString.pick('https://foo.bar?f=1&age=020', (key, value) => value === true || value === 20, {types: {f: 'boolean', age: 'number'}}), 'https://foo.bar?age=020&f=1');
+	t.is(queryString.pick('https://foo.bar?foo=1&foo=2', (key, value) => value === '1,2', {types: {foo: 'string'}}), 'https://foo.bar?foo=1&foo=2');
+	t.is(queryString.pick('https://foo.bar?ids=007,1&n=007', (key, value) => Array.isArray(value), {arrayFormat: 'comma', types: {ids: 'number[]'}, parseNumbers: true}), 'https://foo.bar?ids=007,1');
+	t.is(queryString.pick('https://foo.bar?flag&other=x', (key, value) => value === true, {types: {flag: 'boolean'}}), 'https://foo.bar?flag');
+	// With `encode: false`, the input is not decoded, and the typed value is still only for the filter.
+	t.is(queryString.pick('https://foo.bar?a=%26&b=007', (key, value) => value === 7, {encode: false, parseNumbers: true}), 'https://foo.bar?b=007');
+	// A custom type can return a value that `stringify()` cannot write, since it is only passed to the filter.
+	t.is(queryString.pick('https://foo.bar?date=2024-01-02&other=x', (key, value) => value instanceof Date, {types: {date: value => new Date(value)}}), 'https://foo.bar?date=2024-01-02');
+});

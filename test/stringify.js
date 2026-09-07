@@ -920,3 +920,13 @@ test('skipNull and skipEmptyString with a replacer and array formats', t => {
 	t.is(queryString.stringify({a: 1, b: ''}, {skipEmptyString: true, replacer: (key, value) => key === 'a' ? '' : value}), '');
 	t.is(queryString.stringify({a: 1, b: 2}, {skipNull: true, replacer: (key, value) => key === 'a' ? undefined : value}), 'b=2');
 });
+
+test('an option that is explicitly `undefined` uses its default', t => {
+	// Passing through an optional setting, like `{encode: config.encode}`, must behave like leaving the option out.
+	t.is(queryString.stringify({foo: 'a&b=c'}, {encode: undefined}), 'foo=a%26b%3Dc');
+	t.is(queryString.stringify({foo: '!'}, {strict: undefined}), 'foo=%21');
+	t.is(queryString.stringify({b: 1, a: 2}, {sort: undefined}), 'a=2&b=1');
+	t.is(queryString.stringify({foo: [1, 2]}, {arrayFormat: undefined}), 'foo=1&foo=2');
+	t.is(queryString.stringify({foo: [1, 2]}, {arrayFormat: 'comma', arrayFormatSeparator: undefined}), 'foo=1,2');
+	t.is(queryString.stringify({foo: null, bar: ''}, {skipNull: undefined, skipEmptyString: undefined, replacer: undefined}), 'bar=&foo');
+});

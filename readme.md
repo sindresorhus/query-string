@@ -758,7 +758,7 @@ The names of the query parameters to filter based on the function used.
 
 Type: `(key, value) => boolean`
 
-A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers` and `parseBooleans` options also affect `value`.
+A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`.
 
 #### options
 

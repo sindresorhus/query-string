@@ -275,3 +275,10 @@ test('stringifyUrl keeps a plain value that contains the separator with the comm
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?version=1%2E2%2E3', query: {page: 2}}, options), 'https://foo.bar?page=2&version=1%2E2%2E3');
 	t.is(queryString.pick('https://foo.bar?version=1%2E2%2E3&page=2', ['version'], options), 'https://foo.bar?version=1%2E2%2E3');
 });
+
+test('an option that is explicitly `undefined` uses its default', t => {
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=%26', query: {bar: '='}}, {encode: undefined}), 'https://foo.bar?bar=%3D&foo=%26');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: '!'}}, {strict: undefined}), 'https://foo.bar?foo=%21');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?b=1', query: {a: 2}}, {sort: undefined}), 'https://foo.bar?a=2&b=1');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar', fragmentIdentifier: '100%'}, {encode: undefined}), 'https://foo.bar#100%25');
+});

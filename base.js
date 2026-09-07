@@ -299,6 +299,19 @@ function decode(value, options) {
 	return value;
 }
 
+// An option that is explicitly `undefined` uses its default, like an omitted option. That is what a caller passes through with an optional setting, like `{decode: config.decode}`. Spreading it over the defaults would instead override the default with `undefined`, so `{encode: undefined}` would write the values unencoded.
+function definedOptions(options) {
+	const result = {};
+
+	for (const [key, value] of Object.entries(options ?? {})) {
+		if (value !== undefined) {
+			result[key] = value;
+		}
+	}
+
+	return result;
+}
+
 function keysSorter(input) {
 	if (Array.isArray(input)) {
 		return input.sort();
@@ -402,7 +415,7 @@ export function parse(query, options) {
 		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false,
-		...options,
+		...definedOptions(options),
 		types: {__proto__: null, ...options?.types},
 	};
 
@@ -504,7 +517,7 @@ export function stringify(object, options) {
 		strict: true,
 		arrayFormat: 'none',
 		arrayFormatSeparator: ',',
-		...options,
+		...definedOptions(options),
 	};
 
 	validateArrayFormatSeparator(options.arrayFormatSeparator);
@@ -575,7 +588,7 @@ export function stringify(object, options) {
 export function parseUrl(url, options) {
 	options = {
 		decode: true,
-		...options,
+		...definedOptions(options),
 	};
 
 	let [url_, hash] = splitOnFirst(url, '#');
@@ -595,7 +608,7 @@ export function stringifyUrl(object, options) {
 	options = {
 		encode: true,
 		strict: true,
-		...options,
+		...definedOptions(options),
 	};
 
 	const url = getUrlWithoutQuery(removeHash(object.url)) || '';
@@ -657,13 +670,24 @@ export function pick(input, filter, options) {
 		return pick(input, key => filterSet.has(key), options);
 	}
 
+	options = definedOptions(options);
+
 	// When the output is not encoded, do not decode the input either. Decoding without re-encoding would corrupt it.
-	const {url, query} = parseUrl(input, {decode: options?.encode ?? true, ...options});
+	const parseOptions = {decode: options.encode ?? true, ...options};
+
+	// `parseNumbers`, `parseBooleans`, and `types` only type the `value` the predicate receives. The URL is written back from the plain string values, so a value like `007` or `1.00` is kept as-is instead of being rewritten as `7` or `1`.
+	const {url, query} = parseUrl(input, {
+		...parseOptions,
+		parseNumbers: false,
+		parseBooleans: false,
+		types: undefined,
+	});
+	const typedQuery = parse(extract(input), parseOptions);
 
 	// Keep the fragment identifier as-is. Decoding and re-encoding it could change it.
 	return stringifyUrl({
 		url: url + getHash(input),
-		query: includeKeys(query, filter),
+		query: includeKeys(query, key => filter(key, typedQuery[key])),
 	}, options);
 }
 
