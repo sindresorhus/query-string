@@ -988,7 +988,7 @@ test('types option: `number[]` wraps a single value that is not a number in an a
 	t.deepEqual(queryString.parse('ids=true', {arrayFormat: 'comma', types: {ids: 'number[]'}, parseBooleans: true}), {ids: ['true']});
 	t.deepEqual(queryString.parse('ids=1', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1]});
 	t.deepEqual(queryString.parse('ids=abc', {arrayFormat: 'none', types: {ids: 'number[]'}}), {ids: 'abc'});
-	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: null});
+	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [null]});
 });
 
 test('comma and separator array formats keep the values of a repeated key', t => {
@@ -1025,7 +1025,7 @@ test('types option: array types wrap a single value for every array format', t =
 	t.deepEqual(queryString.parse('ids:list=42', {arrayFormat: 'colon-list-separator', types: {ids: 'number[]'}}), {ids: [42]});
 	t.deepEqual(queryString.parse('ids=42', {arrayFormat: 'colon-list-separator', types: {ids: 'number[]'}}), {ids: [42]});
 	t.deepEqual(queryString.parse('ids=5', {arrayFormat: 'comma', decode: false, types: {ids: 'number[]'}}), {ids: [5]});
-	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'string[]'}}), {ids: null});
+	t.deepEqual(queryString.parse('ids', {arrayFormat: 'comma', types: {ids: 'string[]'}}), {ids: [null]});
 	t.deepEqual(queryString.parse('ids=1', {arrayFormat: 'comma', types: {ids: 'string[]'}, parseNumbers: true}), {ids: ['1']});
 	t.deepEqual(queryString.parse(queryString.stringify({ids: [1, 2, 3]}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1, 2, 3]});
 	t.deepEqual(queryString.parse(queryString.stringify({ids: [1]}, {arrayFormat: 'comma'}), {arrayFormat: 'comma', types: {ids: 'number[]'}}), {ids: [1]});
@@ -1088,4 +1088,38 @@ test('index array format keeps the values of a repeated key without an index', t
 	t.is(queryString.pick('https://foo.bar?foo=1&foo=2&bar=3', ['foo'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
 	t.is(queryString.exclude('https://foo.bar?foo=1&foo=2&bar=3', ['bar'], {arrayFormat: 'index'}), 'https://foo.bar?foo[0]=1&foo[1]=2');
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?foo=1&foo=2', query: {bar: 3}}, {arrayFormat: 'index'}), 'https://foo.bar?bar=3&foo[0]=1&foo[1]=2');
+});
+
+test('types option: array types turn a valueless key into an array with a null item', t => {
+	// A valueless key is parsed as `null`. With an array type it is one item, like `foo=` is `['']`, and like a valueless item of a repeated key. Otherwise the type would not give an array for every value.
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'separator', arrayFormatSeparator: '|', types: {foo: 'string[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'bracket', types: {foo: 'string[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'index', types: {foo: 'number[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'colon-list-separator', types: {foo: 'string[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'bracket-separator', types: {foo: 'string[]'}}), {foo: [null]});
+
+	// The other values of the type are unchanged.
+	t.deepEqual(queryString.parse('foo=', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: ['']});
+	t.deepEqual(queryString.parse('foo=1', {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [1]});
+	t.deepEqual(queryString.parse('foo=1&foo', {arrayFormat: 'comma', types: {foo: 'number[]'}}), {foo: [1, null]});
+	t.deepEqual(queryString.parse('foo[]', {arrayFormat: 'bracket', types: {foo: 'string[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo[]', {arrayFormat: 'bracket-separator', types: {foo: 'string[]'}}), {foo: []});
+
+	// The other options do not change the item.
+	t.deepEqual(queryString.parse('foo', {
+		arrayFormat: 'comma',
+		parseNumbers: true,
+		parseBooleans: true,
+		types: {foo: 'string[]'},
+	}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma', decode: false, types: {foo: 'number[]'}}), {foo: [null]});
+	t.deepEqual(queryString.parse('foo&bar', {arrayFormat: 'comma', types: {foo: 'string[]'}}), {foo: [null], bar: null});
+
+	// A valueless key with a non-array type, or with `arrayFormat: 'none'`, stays `null`.
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma', types: {foo: 'string'}}), {foo: null});
+	t.deepEqual(queryString.parse('foo', {arrayFormat: 'comma', types: {foo: 'number'}}), {foo: null});
+	t.deepEqual(queryString.parse('foo', {types: {foo: 'string[]'}}), {foo: null});
+	t.deepEqual(queryString.parse('foo', {types: {foo: 'number[]'}}), {foo: null});
 });

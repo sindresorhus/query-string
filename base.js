@@ -359,8 +359,8 @@ function parseValue(value, options, type) {
 		return value.toLowerCase() === '1';
 	}
 
-	if ((type === 'string[]' || type === 'number[]') && options.arrayFormat !== 'none' && typeof value === 'string') {
-		// A single value is still an array. The item is parsed with the element type, so a value that is not a number stays a string.
+	if ((type === 'string[]' || type === 'number[]') && options.arrayFormat !== 'none' && (typeof value === 'string' || value === null)) {
+		// A single value is still an array. The item is parsed with the element type, so a value that is not a number stays a string. A valueless key is an array with a `null` item, like a valueless item of a repeated key.
 		return [parseValue(value, options, type.slice(0, -2))];
 	}
 
