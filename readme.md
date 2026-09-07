@@ -59,8 +59,8 @@ The returned object is created with [`Object.create(null)`](https://developer.mo
 queryString.parse('?foo=bar');
 //=> {foo: 'bar'}
 
-queryString.parse('#token=secret&name=jhon');
-//=> {token: 'secret', name: 'jhon'}
+queryString.parse('#token=secret&name=john');
+//=> {name: 'john', token: 'secret'}
 ```
 
 #### options
@@ -153,7 +153,7 @@ queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayForm
 //=> {foo: ['1', '', '3', '', '', '6']}
 
 queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
-//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
+//=> {bar: 'fluffy', baz: ['4'], foo: ['1', '2', '3']}
 ```
 
 - `'colon-list-separator'`: Parse arrays with parameter names that are explicitly marked with `:list`:
@@ -181,7 +181,7 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. Whitespace is also unsupported because leading and trailing whitespace is ignored when parsing. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
+Only a literal separator delimits array elements. A percent-encoded separator (for example, `%2C`) is part of the element, which is how [`.stringify()`](#stringifyobject-options) encodes elements that contain the separator. Because of this, `%` and a hexadecimal digit are unsupported, since those also appear inside percent-encoded elements, and so are `&`, `+`, and `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier. Those are handled on a best-effort basis, so the result is undefined. Whitespace cannot work at all, since leading and trailing whitespace is ignored when parsing, and a lone surrogate cannot be percent-encoded, so both throw a `TypeError`.
 
 ```js
 import queryString from 'query-string';
@@ -244,12 +244,14 @@ Supported Types:
 - `'boolean'`: Parse `flagged` as a boolean (overriding the `parseBooleans` option):
 
 ```js
+import queryString from 'query-string';
+
 queryString.parse('?isAdmin=true&flagged=true&isOkay=0', {
-		parseBooleans: false,
-		types: {
-				flagged: 'boolean',
-				isOkay: 'boolean',
-		},
+	parseBooleans: false,
+	types: {
+		flagged: 'boolean',
+		isOkay: 'boolean',
+	},
 });
 //=> {flagged: true, isAdmin: 'true', isOkay: false}
 ```
@@ -267,7 +269,7 @@ queryString.parse('?phoneNumber=%2B380951234567&id=1', {
 		phoneNumber: 'string',
 	}
 });
-//=> {phoneNumber: '+380951234567', id: 1}
+//=> {id: 1, phoneNumber: '+380951234567'}
 ```
 
 - `'number'`:  Parse `age` as a number (even when `parseNumbers` is false):
@@ -407,7 +409,7 @@ queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
 //=> 'foo=1,,'
 // Note that typing information for null values is lost
-// and `.parse('foo=1,,')` would return `{foo: ['1', '', '']}`.
+// and `.parse('foo=1,,', {arrayFormat: 'comma'})` would return `{foo: ['1', '', '']}`.
 ```
 
 - `'separator'`: Serialize arrays by separating elements with a custom character:
@@ -471,7 +473,7 @@ Default: `','`
 
 The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
-A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. With `comma` and `separator`, a plain value that contains the separator is percent-encoded the same way, so it does not turn into an array. Because of this, the separator cannot be `%` or a hexadecimal digit, since those also appear inside percent-encoded elements. Whitespace is also unsupported because leading and trailing whitespace is ignored when parsing. It also cannot be `&`, `+`, or `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier.
+A separator inside an element is percent-encoded, so [`.parse()`](#parsestring-options) can tell it apart from the separator between elements. With `comma` and `separator`, a plain value that contains the separator is percent-encoded the same way, so it does not turn into an array. Because of this, `%` and a hexadecimal digit are unsupported, since those also appear inside percent-encoded elements, and so are `&`, `+`, and `#`, since those already have a meaning in a URL: `&` separates parameters, `+` is decoded as a space, and `#` starts the fragment identifier. Those are handled on a best-effort basis, so the result is undefined. Whitespace cannot work at all, since leading and trailing whitespace is ignored when parsing, and a lone surrogate cannot be percent-encoded, so both throw a `TypeError`.
 
 ##### sort
 
@@ -653,9 +655,9 @@ The `options` are the same as for `.stringify()`.
 
 Returns a string with the URL and a query string.
 
-Query items in the `query` property overrides queries in the `url` property.
+Query items in the `query` property overrides queries in the `url` property. The query in the `url` property is written back from its plain string values, so `parseNumbers`, `parseBooleans`, and `types` do not rewrite it when the options are shared with [`.parseUrl()`](#parseurlstring-options).
 
-With `encode: false`, array markers in existing parameter names must be literal, such as `a[]`, for those parameters to be overridden.
+With `encode: false`, an array marker in an existing parameter name is only treated as a marker when it is literal, such as `a[]`, so a percent-encoded marker such as `a%5B%5D` is not overridden by the plain key. The existing parameter is kept as-is, so overriding `a` alongside an existing `a%5B%5D` in the URL writes both `a=2&a%5B%5D=1`.
 
 The `fragmentIdentifier` property overrides the fragment identifier in the `url` property.
 
@@ -684,7 +686,7 @@ Type: `object`
 
 Type: `string`
 
-The URL to stringify.
+The URL to stringify. Leading and trailing whitespace is ignored.
 
 ##### query
 
@@ -760,7 +762,7 @@ The names of the query parameters to filter based on the function used.
 
 Type: `(key, value) => boolean`
 
-A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`. The query is decoded only when `encode` is `true`, so a value like `a%20b` is not percent-encoded a second time. With `encode: false`, the filter receives the key and value as they are in the URL. The `decode` option is ignored.
+A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`. The query is decoded only when `encode` is `true`, so a value like `a%20b` is not percent-encoded a second time. With `encode: false`, the filter receives the key and value as they are in the URL. The `decode` option is ignored. The stringify options apply to the output, so `skipNull` and `skipEmptyString` also drop a parameter that the filter kept.
 
 #### options
 

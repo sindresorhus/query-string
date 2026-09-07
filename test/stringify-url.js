@@ -287,3 +287,56 @@ test('stringify URL replaces a lone surrogate in the query with the replacement 
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar', query: {foo: 'x\uD800y'}, fragmentIdentifier: 'x\uD800y'}), 'https://foo.bar?foo=x%EF%BF%BDy#x%EF%BF%BDy');
 	t.is(queryString.stringifyUrl({url: 'https://foo.bar?a=1', query: {'\uDC00': 'b'}}), 'https://foo.bar?a=1&%EF%BF%BD=b');
 });
+
+test('stringify URL ignores leading and trailing whitespace in the URL, like `parseUrl()` does', t => {
+	// `parse()` already trims the query, so whitespace after the query disappeared, while whitespace before the query or after the fragment identifier was kept and ended up inside the URL, like `https://foo.bar/ ?a=1`.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/ ', query: {a: 1}}), 'https://foo.bar/?a=1');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/\n', query: {}}), 'https://foo.bar/');
+	t.is(queryString.stringifyUrl({url: ' https://foo.bar/?b=2 ', query: {a: 1}}), 'https://foo.bar/?a=1&b=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#top\n', query: {a: 1}}), 'https://foo.bar/?a=1#top');
+	t.is(queryString.stringifyUrl({url: '\thttps://foo.bar/?a=1#top\n'}), 'https://foo.bar/?a=1#top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/ ', fragmentIdentifier: 'top'}), 'https://foo.bar/#top');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/?a=1 \n', fragmentIdentifier: ''}), 'https://foo.bar/?a=1');
+	t.is(queryString.stringifyUrl({url: '  ', query: {a: 1}}), '?a=1');
+	t.is(queryString.stringifyUrl({url: '  '}), '');
+
+	// Whitespace inside the URL is kept.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/a b', query: {a: 'x y'}}), 'https://foo.bar/a b?a=x%20y');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar/#hello world\n', query: {}}), 'https://foo.bar/#hello world');
+
+	// The same URL round-trips through `parseUrl()` either way.
+	const url = ' https://foo.bar/?a=1#top\n';
+	t.is(queryString.stringifyUrl({url}), queryString.stringifyUrl(queryString.parseUrl(url, {parseFragmentIdentifier: true})));
+});
+
+test('stringify URL does not rewrite the query parameters in the URL with `parseNumbers`, `parseBooleans`, or `types`', t => {
+	// The query in the URL was parsed with every option, so a parse option passed along with the stringify options, like when the same options object is shared with `parseUrl()`, rewrote a value like `007` as `7` and `TRUE` as `true`.
+	const url = 'https://foo.bar?id=007&flag=TRUE&ratio=1.50';
+	const expected = 'https://foo.bar?flag=TRUE&id=007&ratio=1.50';
+	t.is(queryString.stringifyUrl({url, query: {}}, {parseNumbers: true}), expected);
+	t.is(queryString.stringifyUrl({url, query: {}}, {parseBooleans: true}), expected);
+	t.is(queryString.stringifyUrl({url, query: {}}, {types: {id: 'number', flag: 'boolean', ratio: 'number'}}), expected);
+	t.is(queryString.stringifyUrl({url, query: {}}, {types: {id: value => value.toUpperCase()}}), expected);
+	t.is(queryString.stringifyUrl({url, query: {page: 2}}, {parseNumbers: true, parseBooleans: true, types: {id: 'number'}}), 'https://foo.bar?flag=TRUE&id=007&page=2&ratio=1.50');
+
+	// A custom type function is not called for the query in the URL.
+	let calls = 0;
+	queryString.stringifyUrl({url, query: {}}, {
+		types: {
+			id() {
+				calls++;
+			},
+		},
+	});
+	t.is(calls, 0);
+
+	// Array items and a repeated key with the `string` type are kept as-is too.
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?ids=001,002'}, {arrayFormat: 'comma', types: {ids: 'number[]'}}), 'https://foo.bar?ids=001,002');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?id=1&id=2'}, {types: {id: 'string'}}), 'https://foo.bar?id=1&id=2');
+	t.is(queryString.stringifyUrl({url: 'https://foo.bar?id=001'}, {arrayFormat: 'bracket', types: {id: 'number[]'}}), 'https://foo.bar?id=001');
+
+	// The query passed in `query` still overrides the URL, and `pick()` and `exclude()` are unaffected.
+	t.is(queryString.stringifyUrl({url, query: {id: 8}}, {parseNumbers: true}), 'https://foo.bar?flag=TRUE&id=8&ratio=1.50');
+	t.is(queryString.pick(url, ['id'], {parseNumbers: true}), 'https://foo.bar?id=007');
+	t.is(queryString.exclude(url, ['flag'], {parseBooleans: true, types: {id: 'number'}}), 'https://foo.bar?id=007&ratio=1.50');
+});

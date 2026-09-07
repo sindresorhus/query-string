@@ -205,3 +205,12 @@ test('ignores leading and trailing whitespace, like `parseUrl()` does', t => {
 	t.is(queryString.pick('https://foo.bar?a=1&b=2#hello world\n', ['a']), 'https://foo.bar?a=1#hello world');
 	t.is(queryString.pick(' ', ['a']), '');
 });
+
+test('applies the stringify options to the output, so `skipNull` and `skipEmptyString` also drop a kept parameter', t => {
+	// A valueless key parses to `null` and an empty value to `''`. The options are shared with `stringify()`, so they look at the plain values that are written back, and they drop a parameter that the keys array or the filter kept.
+	t.is(queryString.pick('https://foo.bar?a&b=1', ['a', 'b']), 'https://foo.bar?a&b=1');
+	t.is(queryString.pick('https://foo.bar?a&b=1', ['a', 'b'], {skipNull: true}), 'https://foo.bar?b=1');
+	t.is(queryString.pick('https://foo.bar?a=&b=1', ['a', 'b'], {skipEmptyString: true}), 'https://foo.bar?b=1');
+	t.is(queryString.pick('https://foo.bar?a&b=1', ['a'], {skipNull: true}), 'https://foo.bar');
+	t.is(queryString.exclude('https://foo.bar?a&b=1', ['b'], {skipNull: true}), 'https://foo.bar');
+});

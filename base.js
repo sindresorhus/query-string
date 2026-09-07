@@ -266,7 +266,7 @@ function parserForArrayFormat(options) {
 }
 
 function validateArrayFormatSeparator(value) {
-	// A lone surrogate is one UTF-16 code unit, but it is not a character and cannot be percent-encoded, so it would make the encoder throw a `URIError` later instead. Whitespace cannot be a separator because `parse()` ignores leading and trailing whitespace in the query.
+	// A lone surrogate is one UTF-16 code unit, but it is not a character and cannot be percent-encoded, so it would make the encoder throw a `URIError` later instead. Whitespace cannot be a separator because `parse()` ignores leading and trailing whitespace in the query. A separator that only works sometimes, like `%` or a hexadecimal digit, is documented as unsupported instead, so that the encoder can keep its best-effort behavior for it.
 	if (typeof value !== 'string' || value.length !== 1) {
 		throw new TypeError('arrayFormatSeparator must be a single character');
 	}
@@ -635,11 +635,22 @@ export function stringifyUrl(object, options) {
 		...definedOptions(options),
 	};
 
-	const url = getUrlWithoutQuery(removeHash(object.url)) || '';
-	const queryFromUrl = extract(object.url);
+	// Leading and trailing whitespace is ignored, like `parseUrl()` does. `parse()` already trims the query, so whitespace after it disappeared, while whitespace before it or after the fragment identifier was written back, like `https://foo.bar/ ?a=1`.
+	const inputUrl = object.url.trim();
+
+	const url = getUrlWithoutQuery(removeHash(inputUrl));
+	const queryFromUrl = extract(inputUrl);
 
 	// When the output is not encoded, keep the existing query as-is instead of decoding it. Decoding without re-encoding would corrupt it.
-	let query = parse(queryFromUrl, {sort: false, ...options, decode: options.encode});
+	// The query in the URL is written back from the plain string values, so `parseNumbers`, `parseBooleans`, and `types` passed along with the stringify options, like when the same options object is shared with `parseUrl()`, do not rewrite a value like `007` as `7`.
+	let query = parse(queryFromUrl, {
+		sort: false,
+		...options,
+		decode: options.encode,
+		parseNumbers: false,
+		parseBooleans: false,
+		types: undefined,
+	});
 
 	const queryFromObject = Object.fromEntries(Object.entries(object.query ?? {}));
 
@@ -670,7 +681,7 @@ export function stringifyUrl(object, options) {
 	let queryString = stringify({...query, ...queryFromObject}, options);
 	queryString &&= `?${queryString}`;
 
-	let hash = getHash(object.url);
+	let hash = getHash(inputUrl);
 	if (typeof object.fragmentIdentifier === 'string') {
 		// An empty fragment identifier removes the fragment, like `url.hash = ''` does.
 		hash = object.fragmentIdentifier === '' ? '' : `#${object.fragmentIdentifier}`;
@@ -695,9 +706,6 @@ export function pick(input, filter, options) {
 	}
 
 	options = definedOptions(options);
-
-	// Leading and trailing whitespace is ignored, like `parseUrl()` does. `parseUrl()` trims the URL and the query itself, but the fragment identifier is taken from the input below, so a newline from pasted input would otherwise end up after it.
-	input = input.trim();
 
 	// `parseNumbers`, `parseBooleans`, and `types` only apply to the `value` the predicate receives. The URL is written back from the plain string values, so a value like `007` is kept as-is instead of being rewritten as `7`.
 	// The query is decoded exactly when it is encoded again, so a value like `a%20b` is not percent-encoded a second time. When the output is not encoded, the input is not decoded either, since decoding without re-encoding would corrupt it. The `decode` option is ignored: decoding the predicate's view differently from the output would give the two views different keys, so a percent-encoded key, or a `+` in a key, would not find its value.
