@@ -1123,3 +1123,56 @@ test('types option: array types turn a valueless key into an array with a null i
 	t.deepEqual(queryString.parse('foo', {types: {foo: 'string[]'}}), {foo: null});
 	t.deepEqual(queryString.parse('foo', {types: {foo: 'number[]'}}), {foo: null});
 });
+
+test('types option: an array type takes precedence over `parseNumbers` and `parseBooleans` for a single value with `arrayFormat: "none"`', t => {
+	t.deepEqual(queryString.parse('ids=1', {types: {ids: 'string[]'}, parseNumbers: true}), {ids: '1'});
+	t.deepEqual(queryString.parse('ids=true', {types: {ids: 'string[]'}, parseBooleans: true}), {ids: 'true'});
+	t.deepEqual(queryString.parse('ids=true', {types: {ids: 'number[]'}, parseBooleans: true}), {ids: 'true'});
+	t.deepEqual(queryString.parse('ids=1', {
+		arrayFormat: 'none', types: {ids: 'string[]'}, parseNumbers: true, parseBooleans: true,
+	}), {ids: '1'});
+	t.deepEqual(queryString.parse('ids=1&other=1', {types: {ids: 'string[]'}, parseNumbers: true}), {ids: '1', other: 1});
+	// A repeated key is still an array, and its items are parsed with the element type.
+	t.deepEqual(queryString.parse('ids=1&ids=true', {types: {ids: 'string[]'}, parseNumbers: true, parseBooleans: true}), {ids: ['1', 'true']});
+});
+
+test('types option: edge cases of a single value with an array type and `arrayFormat: "none"`', t => {
+	// A value that is not a number is a string either way.
+	t.deepEqual(queryString.parse('ids=1,2', {types: {ids: 'string[]'}, parseNumbers: true}), {ids: '1,2'});
+	t.deepEqual(queryString.parse('ids=1,2', {types: {ids: 'number[]'}, parseNumbers: true}), {ids: '1,2'});
+	// `0` and `1` are not booleans without an explicit `boolean` type.
+	t.deepEqual(queryString.parse('flag=0', {types: {flag: 'string[]'}, parseBooleans: true}), {flag: '0'});
+	t.deepEqual(queryString.parse('flag=false', {types: {flag: 'number[]'}, parseBooleans: true}), {flag: 'false'});
+	// An empty value stays an empty string.
+	t.deepEqual(queryString.parse('ids=', {types: {ids: 'number[]'}, parseNumbers: true}), {ids: ''});
+	// A valueless key stays `null`.
+	t.deepEqual(queryString.parse('ids', {types: {ids: 'string[]'}, parseNumbers: true, parseBooleans: true}), {ids: null});
+	// The value is still decoded.
+	t.deepEqual(queryString.parse('ids=%31', {types: {ids: 'string[]'}, parseNumbers: true}), {ids: '1'});
+	t.deepEqual(queryString.parse('ids=%31', {types: {ids: 'string[]'}, parseNumbers: true, decode: false}), {ids: '%31'});
+	// Other keys are still parsed with the general options.
+	t.deepEqual(queryString.parse('ids=1&flag=true&n=2', {
+		types: {ids: 'string[]'}, parseNumbers: true, parseBooleans: true, sort: false,
+	}), {ids: '1', flag: true, n: 2});
+	// A repeated key is an array, and its items are parsed with the element type, not the general options.
+	t.deepEqual(queryString.parse('ids=1&ids=2', {types: {ids: 'string[]'}, parseNumbers: true}), {ids: ['1', '2']});
+	t.deepEqual(queryString.parse('ids=1&ids=true', {types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, 'true']});
+	t.deepEqual(queryString.parse('ids=1&ids', {types: {ids: 'number[]'}, parseBooleans: true}), {ids: [1, null]});
+	// A custom function still takes precedence over the general options for a single value.
+	t.deepEqual(queryString.parse('ids=1', {types: {ids: value => `<${value}>`}, parseNumbers: true}), {ids: '<1>'});
+});
+
+test('types option: a single value with an array type and `arrayFormat: "none"` stays a string in `parseUrl()`, `pick()`, and `exclude()`', t => {
+	t.deepEqual(queryString.parseUrl('https://foo.bar?ids=1&n=1', {types: {ids: 'string[]'}, parseNumbers: true}), {url: 'https://foo.bar', query: {ids: '1', n: 1}});
+	t.is(queryString.pick('https://foo.bar?ids=1&n=1', (key, value) => value === '1', {types: {ids: 'string[]'}, parseNumbers: true}), 'https://foo.bar?ids=1');
+	t.is(queryString.exclude('https://foo.bar?ids=1&n=1', (key, value) => value === '1', {types: {ids: 'string[]'}, parseNumbers: true}), 'https://foo.bar?n=1');
+});
+
+test('index array format does not pollute the prototype with a `__proto__` key', t => {
+	const parsed = queryString.parse('__proto__[0]=x&__proto__[1]=y', {arrayFormat: 'index'});
+	t.deepEqual(Object.getOwnPropertyDescriptor(parsed, '__proto__').value, ['x', 'y']);
+	t.is(Object.getPrototypeOf(parsed), null);
+	t.deepEqual(Object.keys({}), []);
+	t.false(0 in Object.prototype);
+	t.deepEqual(queryString.parse('constructor=x&constructor=y'), {constructor: ['x', 'y']});
+});

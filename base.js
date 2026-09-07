@@ -368,8 +368,8 @@ function parseValue(value, options, type) {
 		return Number(value);
 	}
 
-	// An explicit type takes precedence over `parseNumbers` and `parseBooleans`. A value that does not match its type stays a string.
-	if (type === 'boolean' || type === 'number') {
+	// An explicit type takes precedence over `parseNumbers` and `parseBooleans`. A value that does not match its type stays a string. With `arrayFormat: 'none'`, a single value with an array type is not an array and stays a string too.
+	if (type === 'boolean' || type === 'number' || type === 'string[]' || type === 'number[]') {
 		return value;
 	}
 

@@ -214,7 +214,7 @@ export type ParseOptions = {
 
 	You can also provide a custom function to transform the value. The function will receive the raw string and should return the desired parsed result. When used with array formats (like `comma`, `separator`, `bracket`, etc.), the function is applied to each array element individually.
 
-	NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. A repeated key is still an array, and its items are parsed with the element type.
+	NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. The value stays a string, and `parseNumbers` and `parseBooleans` do not apply to it. A repeated key is still an array, and its items are parsed with the element type.
 
 	@default {}
 

@@ -54,3 +54,9 @@ test('throws for invalid values', t => {
 test('handles index array format without sorting', t => {
 	t.deepEqual(queryString.parseUrl('https://foo.bar?foo[1]=b&foo[0]=a', {arrayFormat: 'index', sort: false}), {url: 'https://foo.bar', query: {foo: ['a', 'b']}});
 });
+
+test('a `?` inside the fragment identifier does not start a query string', t => {
+	t.deepEqual(queryString.parseUrl('https://foo.bar#/users?id=1', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {}, fragmentIdentifier: '/users?id=1'});
+	t.deepEqual(queryString.parseUrl('https://foo.bar?a=1#b?c=2', {parseFragmentIdentifier: true}), {url: 'https://foo.bar', query: {a: '1'}, fragmentIdentifier: 'b?c=2'});
+	t.is(queryString.extract('https://foo.bar#/users?id=1'), '');
+});

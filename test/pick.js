@@ -125,3 +125,10 @@ test('keeps the order of the URL with sort false, not the order of the keys arra
 	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['c', 'b', 'a']), 'http://example.com/?a=2&b=1&c=3');
 	t.is(queryString.pick('http://example.com/?b=1&a=2&c=3', ['a', 'b', 'c'], {sort: (left, right) => right.localeCompare(left)}), 'http://example.com/?c=3&b=1&a=2');
 });
+
+test('keeps the fragment identifier when the URL has no query string', t => {
+	t.is(queryString.pick('https://foo.bar#hello', ['foo']), 'https://foo.bar#hello');
+	t.is(queryString.pick('https://foo.bar#/path?not=a-query', ['not']), 'https://foo.bar#/path?not=a-query');
+	t.is(queryString.exclude('https://foo.bar#/path?not=a-query', ['not']), 'https://foo.bar#/path?not=a-query');
+	t.is(queryString.pick('https://foo.bar?foo=1#hello', []), 'https://foo.bar#hello');
+});

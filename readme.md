@@ -334,7 +334,7 @@ queryString.parse('?scores=10,20,30', {
 //=> {scores: [20, 40, 60]}
 ```
 
-NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. A repeated key is still an array, and its items are parsed with the element type.
+NOTE: With `arrayFormat: 'none'`, array types (`string[]`, `number[]`) do not turn a single value into an array. The value stays a string, and `parseNumbers` and `parseBooleans` do not apply to it. A repeated key is still an array, and its items are parsed with the element type.
 
 ```js
 queryString.parse('ids=001,002,003&foods=apple,orange,mango', {
