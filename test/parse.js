@@ -1214,3 +1214,19 @@ test('comma and separator array formats parse a key repeated many times without 
 	const manyItems = Array.from({length: 300_000}, (_, index) => index).join(',');
 	t.is(queryString.parse(`a=${manyItems}&a=${manyItems}`, {arrayFormat: 'comma'}).a.length, 600_000);
 });
+
+test('rejects an invalid `arrayFormatSeparator`', t => {
+	const invalid = {
+		'arrayFormatSeparator must be a single character': ['\u{1F600}', '', ',,', 1, null],
+		'arrayFormatSeparator must not be whitespace, since parse() ignores leading and trailing whitespace in the query': [' ', '\t', '\n', '\r', '\u00A0'],
+		'arrayFormatSeparator must not be a lone surrogate, since it cannot be percent-encoded': ['\uD800', '\uDC00'],
+	};
+
+	for (const [message, arrayFormatSeparators] of Object.entries(invalid)) {
+		for (const arrayFormatSeparator of arrayFormatSeparators) {
+			t.throws(() => queryString.parse('foo=a|b', {arrayFormat: 'separator', arrayFormatSeparator}), {instanceOf: TypeError, message});
+		}
+	}
+
+	t.deepEqual(queryString.parse('foo=a·b', {arrayFormat: 'separator', arrayFormatSeparator: '·'}), {foo: ['a', 'b']});
+});

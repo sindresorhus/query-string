@@ -266,8 +266,17 @@ function parserForArrayFormat(options) {
 }
 
 function validateArrayFormatSeparator(value) {
+	// A lone surrogate is one UTF-16 code unit, but it is not a character and cannot be percent-encoded, so it would make the encoder throw a `URIError` later instead. Whitespace cannot be a separator because `parse()` ignores leading and trailing whitespace in the query.
 	if (typeof value !== 'string' || value.length !== 1) {
-		throw new TypeError('arrayFormatSeparator must be single character string');
+		throw new TypeError('arrayFormatSeparator must be a single character');
+	}
+
+	if (value.trim() === '') {
+		throw new TypeError('arrayFormatSeparator must not be whitespace, since parse() ignores leading and trailing whitespace in the query');
+	}
+
+	if (/\p{Surrogate}/u.test(value)) {
+		throw new TypeError('arrayFormatSeparator must not be a lone surrogate, since it cannot be percent-encoded');
 	}
 }
 

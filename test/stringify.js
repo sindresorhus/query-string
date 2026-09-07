@@ -986,3 +986,24 @@ test('replaces a lone surrogate with the replacement character instead of throwi
 	// With `encode: false`, the value is written as-is.
 	t.is(queryString.stringify({foo: 'x\uD800y'}, {encode: false}), 'foo=x\uD800y');
 });
+
+test('rejects an invalid `arrayFormatSeparator`', t => {
+	// A lone surrogate is one UTF-16 code unit, but it is not a character and cannot be percent-encoded. Whitespace cannot delimit a trailing empty item because `parse()` ignores it at the query boundary.
+	const invalid = {
+		'arrayFormatSeparator must be a single character': ['\u{1F600}', '', ',,', 1, null],
+		'arrayFormatSeparator must not be whitespace, since parse() ignores leading and trailing whitespace in the query': [' ', '\t', '\n', '\r', '\u00A0'],
+		'arrayFormatSeparator must not be a lone surrogate, since it cannot be percent-encoded': ['\uD800', '\uDC00'],
+	};
+
+	for (const [message, arrayFormatSeparators] of Object.entries(invalid)) {
+		for (const arrayFormatSeparator of arrayFormatSeparators) {
+			t.throws(() => queryString.stringify({foo: ['a', 'b']}, {arrayFormat: 'separator', arrayFormatSeparator}), {instanceOf: TypeError, message});
+		}
+	}
+
+	t.throws(() => queryString.stringify({foo: ['\uD800x', 'y']}, {arrayFormat: 'comma', arrayFormatSeparator: '\uD800'}), {instanceOf: TypeError});
+	t.throws(() => queryString.stringify({foo: ['a']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '\uDC00'}), {instanceOf: TypeError});
+	// A separator outside the Basic Multilingual Plane is one character but two code units, so it is still rejected. A single-unit character is accepted.
+	t.is(queryString.stringify({foo: ['a', 'b']}, {arrayFormat: 'separator', arrayFormatSeparator: '·'}), 'foo=a·b');
+	t.is(queryString.stringify({foo: ['a', 'b']}, {arrayFormat: 'separator', arrayFormatSeparator: '|'}), 'foo=a|b');
+});
