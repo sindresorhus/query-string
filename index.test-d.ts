@@ -93,11 +93,29 @@ expectType<queryString.ParsedUrl>(
 expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'comma'}),
 );
-expectType<queryString.ParsedUrl>(
+expectType<queryString.ParsedUrl<string | number>>(
 	queryString.parseUrl('?foo=1', {parseNumbers: true}),
 );
-expectType<queryString.ParsedUrl>(
+expectType<queryString.ParsedUrl<string | boolean>>(
 	queryString.parseUrl('?foo=true', {parseBooleans: true}),
+);
+expectType<queryString.ParsedUrl<string | boolean | number>>(
+	queryString.parseUrl('?foo=true', {parseBooleans: true, parseNumbers: true}),
+);
+expectType<queryString.ParsedQuery<string | number>>(
+	queryString.parseUrl('?foo=1', {parseNumbers: true}).query,
+);
+expectType<queryString.ParsedQuery>(
+	queryString.parseUrl('?foo=1', {parseNumbers: false}).query,
+);
+expectType<queryString.ParsedUrl<string | number>>(
+	queryString.parseUrl('?foo=1#bar', {parseNumbers: true, parseFragmentIdentifier: true}),
+);
+expectType<string | undefined>(
+	queryString.parseUrl('?foo=1#bar', {parseNumbers: true, parseFragmentIdentifier: true}).fragmentIdentifier,
+);
+expectType<string>(
+	queryString.stringifyUrl(queryString.parseUrl('?foo=1', {parseNumbers: true, parseBooleans: true})),
 );
 expectType<queryString.ParsedUrl>(
 	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true}),

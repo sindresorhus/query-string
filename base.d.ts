@@ -342,9 +342,9 @@ export function parse(query: string, options: {parseBooleans: true} & ParseOptio
 export function parse(query: string, options: {parseNumbers: true} & ParseOptions): ParsedQuery<string | number>;
 export function parse(query: string, options?: ParseOptions): ParsedQuery;
 
-export type ParsedUrl = {
+export type ParsedUrl<T = string> = {
 	readonly url: string;
-	readonly query: ParsedQuery;
+	readonly query: ParsedQuery<T>;
 
 	/**
 	The fragment identifier of the URL.
@@ -373,6 +373,9 @@ queryString.parseUrl('https://foo.bar?foo=bar#xyz', {parseFragmentIdentifier: tr
 //=> {url: 'https://foo.bar', query: {foo: 'bar'}, fragmentIdentifier: 'xyz'}
 ```
 */
+export function parseUrl(url: string, options: {parseBooleans: true; parseNumbers: true} & ParseOptions): ParsedUrl<string | boolean | number>;
+export function parseUrl(url: string, options: {parseBooleans: true} & ParseOptions): ParsedUrl<string | boolean>;
+export function parseUrl(url: string, options: {parseNumbers: true} & ParseOptions): ParsedUrl<string | number>;
 export function parseUrl(url: string, options?: ParseOptions): ParsedUrl;
 
 export type StringifyOptions = {
