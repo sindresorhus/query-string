@@ -449,9 +449,11 @@ export function parse(query, options) {
 		}
 
 		if (Array.isArray(value) && options.types[key] !== 'string') {
+			// The items are parsed with the element type. A type that is not a string, like a function, is passed through, and anything else is ignored, like it is for a scalar value.
+			const typeOption = options.types[key];
+			const type = typeof typeOption === 'string' ? typeOption.replace('[]', '') : typeOption;
+
 			for (const [index, item] of value.entries()) {
-				const typeOption = options.types[key];
-				const type = typeof typeOption === 'function' ? typeOption : (typeOption ? typeOption.replace('[]', '') : undefined);
 				value[index] = parseValue(item, options, type);
 			}
 		} else if (Array.isArray(value) && options.types[key] === 'string') {

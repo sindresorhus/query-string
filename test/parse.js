@@ -876,6 +876,18 @@ test('types option: function types with arrays apply to each element', t => {
 	});
 });
 
+test('types option: a value that is not a supported type is ignored for an array too', t => {
+	// The type is invalid, but the scalar path ignored it, while the array path called `.replace()` on it and threw.
+	for (const invalid of [1, null, true, {}]) {
+		t.deepEqual(queryString.parse('a=1&a=2', {types: {a: invalid}}), {a: ['1', '2']}, `array: ${JSON.stringify(invalid)}`);
+		t.deepEqual(queryString.parse('a=1', {types: {a: invalid}}), {a: '1'}, `scalar: ${JSON.stringify(invalid)}`);
+	}
+
+	// The valid types still apply to each item.
+	t.deepEqual(queryString.parse('a=1&a=2', {types: {a: 'number[]'}}), {a: [1, 2]});
+	t.deepEqual(queryString.parse('a=1&a=2', {types: {a: value => `<${value}>`}}), {a: ['<1>', '<2>']});
+});
+
 test('types option: does not treat `Object.prototype` keys as custom types', t => {
 	t.deepEqual(queryString.parse('toString=1&a=2', {types: {}}), {a: '2', toString: '1'});
 	t.deepEqual(queryString.parse('valueOf=hello', {types: {}}), {valueOf: 'hello'});
