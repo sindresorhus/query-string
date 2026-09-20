@@ -130,6 +130,17 @@ test('handles many explicit array items without quadratic slowdown', t => {
 			duplicateQuery: Array.from({length: count}, () => 'a[]=1').join('&'),
 			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}[]=1`).join('&'),
 		},
+		{
+			// The next free index is tracked per key, so an entry without an index does not have to look at the items seen so far.
+			arrayFormat: 'index',
+			duplicateQuery: Array.from({length: count}, () => 'a[]=1').join('&'),
+			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}[]=1`).join('&'),
+		},
+		{
+			arrayFormat: 'index',
+			duplicateQuery: Array.from({length: count}, (_, index) => `a[${index}]=1`).join('&'),
+			uniqueQuery: Array.from({length: count}, (_, index) => `a${index}[0]=1`).join('&'),
+		},
 	];
 
 	for (const {arrayFormat, duplicateQuery, uniqueQuery} of cases) {

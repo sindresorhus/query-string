@@ -340,3 +340,67 @@ test('stringify URL does not rewrite the query parameters in the URL with `parse
 	t.is(queryString.pick(url, ['id'], {parseNumbers: true}), 'https://foo.bar?id=007');
 	t.is(queryString.exclude(url, ['flag'], {parseBooleans: true, types: {id: 'number'}}), 'https://foo.bar?id=007&ratio=1.50');
 });
+
+test('stringify URL is the inverse of parse URL for every array format', t => {
+	// `.stringifyUrl()` is documented as the inverse of `.parseUrl()`, so a URL written from the parsed result has to come back byte-for-byte. The array formats write the marker from the option instead of from the parsed key, so a value and a marker that are written back unchanged are easy to get wrong.
+	const optionSets = [
+		{},
+		{arrayFormat: 'bracket'},
+		{arrayFormat: 'index'},
+		{arrayFormat: 'comma'},
+		{arrayFormat: 'separator', arrayFormatSeparator: '|'},
+		{arrayFormat: 'separator', arrayFormatSeparator: '.'},
+		{arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'},
+		{arrayFormat: 'colon-list-separator'},
+		{arrayFormat: 'comma', strict: false},
+		{arrayFormat: 'bracket', sort: false},
+		{arrayFormat: 'separator', arrayFormatSeparator: '-', encode: false},
+	];
+	const objects = [
+		{a: 'x'},
+		{a: ['x', 'y']},
+		{a: 'x,y'},
+		{a: ['a,b', 'c']},
+		{a: 'a-b'},
+		{a: ['a-b', 'c']},
+		{a: 'a.b'},
+		{a: null},
+		{a: ''},
+		{a: ['', 'x']},
+		{a: [null, 'x']},
+		{a: ['x'], b: ['y']},
+		{a: 1, b: 'x'},
+		{a: '%'},
+		{a: 'ståle'},
+		{a: 'x\uD800y'},
+		{a: 'x\ty'},
+	];
+
+	for (const options of optionSets) {
+		for (const object of objects) {
+			const label = `${JSON.stringify(options)} with ${JSON.stringify(object)}`;
+			const url = queryString.stringifyUrl({url: 'https://foo.bar', query: object, fragmentIdentifier: '100% /x?y#z'}, options);
+			t.is(queryString.stringifyUrl(queryString.parseUrl(url, {...options, parseFragmentIdentifier: true}), options), url, label);
+		}
+	}
+});
+
+test('stringify URL lets a query array override an array in the URL with every array format', t => {
+	// The URL's own parameter is written back in the syntax of the array format, so the override has to use that syntax too.
+	const cases = [
+		[{}, 'https://foo.bar?a=1&a=2', 'https://foo.bar?a=3&a=4'],
+		[{arrayFormat: 'bracket'}, 'https://foo.bar?a[]=1&a[]=2', 'https://foo.bar?a[]=3&a[]=4'],
+		[{arrayFormat: 'index'}, 'https://foo.bar?a[0]=1&a[1]=2', 'https://foo.bar?a[0]=3&a[1]=4'],
+		[{arrayFormat: 'comma'}, 'https://foo.bar?a=1,2', 'https://foo.bar?a=3,4'],
+		[{arrayFormat: 'separator', arrayFormatSeparator: '|'}, 'https://foo.bar?a=1|2', 'https://foo.bar?a=3|4'],
+		[{arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'}, 'https://foo.bar?a[]=1|2', 'https://foo.bar?a[]=3|4'],
+		[{arrayFormat: 'colon-list-separator'}, 'https://foo.bar?a:list=1&a:list=2', 'https://foo.bar?a:list=3&a:list=4'],
+	];
+
+	for (const [options, url, expected] of cases) {
+		const label = `array format ${JSON.stringify(options)}`;
+		t.is(queryString.stringifyUrl({url, query: {a: ['3', '4']}}, options), expected, label);
+		// The result reads back as the overriding array.
+		t.deepEqual(queryString.parse(queryString.extract(expected), options), {a: ['3', '4']}, label);
+	}
+});

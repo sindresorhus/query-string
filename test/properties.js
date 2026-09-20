@@ -10,7 +10,7 @@ import queryString from '../index.js';
 // --> null
 // --> array containing values defined above (at least two items)
 const queryParametersArbitrary = fastCheck.dictionary(
-	fastCheck.fullUnicodeString({minLength: 1, maxLength: 10}).filter(key => key !== '__proto__' && !/\[\d*]$/.test(key)),
+	fastCheck.fullUnicodeString({minLength: 1, maxLength: 10}).filter(key => key !== '__proto__' && !/\[\d*]$/.test(key) && !key.endsWith(':list')),
 	fastCheck.oneof(
 		fastCheck.fullUnicodeString(),
 		fastCheck.constant(null),
@@ -19,7 +19,7 @@ const queryParametersArbitrary = fastCheck.dictionary(
 );
 
 const optionsArbitrary = fastCheck.record({
-	arrayFormat: fastCheck.constantFrom('bracket', 'index', 'none'),
+	arrayFormat: fastCheck.constantFrom('bracket', 'index', 'colon-list-separator', 'none'),
 	strict: fastCheck.boolean(),
 	encode: fastCheck.constant(true),
 	sort: fastCheck.constant(false),

@@ -214,3 +214,52 @@ test('applies the stringify options to the output, so `skipNull` and `skipEmptyS
 	t.is(queryString.pick('https://foo.bar?a&b=1', ['a'], {skipNull: true}), 'https://foo.bar');
 	t.is(queryString.exclude('https://foo.bar?a&b=1', ['b'], {skipNull: true}), 'https://foo.bar');
 });
+
+test('pick and exclude are idempotent', t => {
+	// The query is decoded exactly when it is encoded again, so filtering a URL that was already filtered has to be a no-op. A value that is percent-encoded a second time, or decoded without being encoded again, changes on every pass, which is how the `encode` and `decode` bugs showed up. With `encode: false` the input is kept as-is, so it is a no-op too.
+	const optionSets = [
+		{},
+		{sort: false},
+		{arrayFormat: 'bracket'},
+		{arrayFormat: 'index'},
+		{arrayFormat: 'comma'},
+		{arrayFormat: 'separator', arrayFormatSeparator: '-'},
+		{arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'},
+		{arrayFormat: 'colon-list-separator'},
+		{encode: false},
+		{decode: false},
+		{encode: false, decode: true},
+		{parseNumbers: true, parseBooleans: true},
+		{strict: false},
+		{types: {a: 'string'}},
+		{skipNull: true},
+		{skipEmptyString: true},
+	];
+	const queries = [
+		'a=1&b=2',
+		'a=%20&b=1+2',
+		'a=%26&b=%3D',
+		'a=1,2&b=3',
+		'a=a%2Cb,c&b=3',
+		'a[]=1&a[]=2&b=3',
+		'a[0]=1&a[1]=2&b=3',
+		'a:list=1&a:list=2&b=3',
+		'a&b',
+		'a=&b=1',
+		'a=100%25&b=%2C',
+		'a=1&a=2&a=3&b=4',
+		'x=c&2=b&1=a',
+		'a=%2Da-b&b=3',
+	];
+
+	for (const options of optionSets) {
+		for (const query of queries) {
+			const label = `${JSON.stringify(options)} with ${JSON.stringify(query)}`;
+			const url = `https://foo.bar/?${query}#frag%20x`;
+			const picked = queryString.pick(url, ['a', 'b'], options);
+			t.is(queryString.pick(picked, ['a', 'b'], options), picked, `pick: ${label}`);
+			const excluded = queryString.exclude(url, ['b'], options);
+			t.is(queryString.exclude(excluded, ['b'], options), excluded, `exclude: ${label}`);
+		}
+	}
+});
