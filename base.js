@@ -5,131 +5,88 @@ import splitOnFirst from 'split-on-first';
 // eslint-disable-next-line unicorn/prefer-code-point
 const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
-function encoderForArrayFormat(options) {
-	switch (options.arrayFormat) {
+// A value that is left out of the query string. `undefined` is always left out, and `skipNull` and `skipEmptyString` leave out the two others.
+function isSkipped(value, options) {
+	return (
+		value === undefined
+		|| (options.skipNull && value === null)
+		|| (options.skipEmptyString && value === '')
+	);
+}
+
+// The suffix of the parameter name that `parse()` looks for. `index` numbers it, `bracket` and `colon-list-separator` use a fixed one, and the other formats use none.
+function itemMarkerFor(arrayFormat) {
+	switch (arrayFormat) {
 		case 'index': {
-			return key => (result, value) => {
-				const index = result.length;
-
-				if (
-					value === undefined
-					|| (options.skipNull && value === null)
-					|| (options.skipEmptyString && value === '')
-				) {
-					return result;
-				}
-
-				if (value === null) {
-					result.push([encode(key, options), '[', index, ']'].join(''));
-					return result;
-				}
-
-				result.push([encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join(''));
-				return result;
-			};
+			return index => `[${index}]`;
 		}
 
 		case 'bracket': {
-			return key => (result, value) => {
-				if (
-					value === undefined
-					|| (options.skipNull && value === null)
-					|| (options.skipEmptyString && value === '')
-				) {
-					return result;
-				}
-
-				if (value === null) {
-					result.push([encode(key, options), '[]'].join(''));
-					return result;
-				}
-
-				result.push([encode(key, options), '[]=', encode(value, options)].join(''));
-				return result;
-			};
+			return () => '[]';
 		}
 
 		case 'colon-list-separator': {
-			return key => (result, value) => {
-				if (
-					value === undefined
-					|| (options.skipNull && value === null)
-					|| (options.skipEmptyString && value === '')
-				) {
-					return result;
-				}
-
-				if (value === null) {
-					result.push([encode(key, options), ':list'].join(''));
-					return result;
-				}
-
-				result.push([encode(key, options), ':list=', encode(value, options)].join(''));
-				return result;
-			};
-		}
-
-		case 'comma':
-		case 'separator':
-		case 'bracket-separator': {
-			const keyValueSeparator = options.arrayFormat === 'bracket-separator'
-				? '[]='
-				: '=';
-
-			return key => (result, value) => {
-				if (
-					value === undefined
-					|| (options.skipNull && value === null)
-					|| (options.skipEmptyString && value === '')
-				) {
-					return result;
-				}
-
-				// Translate null to an empty string so that it doesn't serialize as 'null'
-				value = value === null ? '' : value;
-
-				if (result.length === 0) {
-					result.push([encode(key, options), keyValueSeparator, encodeArrayItem(value, options)].join(''));
-					return result;
-				}
-
-				result.push(encodeArrayItem(value, options));
-				return result;
-			};
+			return () => ':list';
 		}
 
 		default: {
-			return key => (result, value) => {
-				if (
-					value === undefined
-					|| (options.skipNull && value === null)
-					|| (options.skipEmptyString && value === '')
-				) {
-					return result;
-				}
-
-				if (value === null) {
-					result.push(encode(key, options));
-					return result;
-				}
-
-				result.push([encode(key, options), '=', encode(value, options)].join(''));
-				return result;
-			};
+			return () => '';
 		}
 	}
 }
 
-function parserForArrayFormat(options) {
-	let result;
+function encoderForArrayFormat(options) {
+	const {arrayFormat} = options;
 
+	if (arrayFormat === 'comma' || arrayFormat === 'separator' || arrayFormat === 'bracket-separator') {
+		const keyValueSeparator = arrayFormat === 'bracket-separator' ? '[]=' : '=';
+
+		return key => (result, value) => {
+			if (isSkipped(value, options)) {
+				return result;
+			}
+
+			// Translate null to an empty string so that it doesn't serialize as 'null'
+			const item = encodeArrayItem(value === null ? '' : value, options);
+
+			if (result.length === 0) {
+				result.push([encode(key, options), keyValueSeparator, item].join(''));
+				return result;
+			}
+
+			result.push(item);
+			return result;
+		};
+	}
+
+	// These formats write one parameter per item, with the marker in the name.
+	const marker = itemMarkerFor(arrayFormat);
+
+	return key => (result, value) => {
+		if (isSkipped(value, options)) {
+			return result;
+		}
+
+		const name = encode(key, options) + marker(result.length);
+
+		if (value === null) {
+			result.push(name);
+			return result;
+		}
+
+		result.push([name, '=', encode(value, options)].join(''));
+		return result;
+	};
+}
+
+function parserForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index': {
 			// The next free index per key for an entry without one, like `foo[]`. That is what PHP and Rack write for an array item, and what `arrayFormat: 'bracket'` produces. It is appended after the highest index seen so far, like in PHP, instead of every such entry overriding the previous one.
 			const nextIndexes = new Map();
 
 			return (key, value, accumulator) => {
-				result = /\[(\d*)]$/.exec(key);
+				const result = /\[(\d*)]$/.exec(key);
 
 				key = key.replace(/\[\d*]$/, '');
 
@@ -153,33 +110,17 @@ function parserForArrayFormat(options) {
 			};
 		}
 
-		case 'bracket': {
+		case 'bracket':
+		case 'colon-list-separator': {
+			const marker = options.arrayFormat === 'bracket' ? /(\[])$/ : /(:list)$/;
+
 			return (key, value, accumulator) => {
-				result = /(\[])$/.exec(key);
-				key = key.replace(/\[]$/, '');
+				const isArray = marker.test(key);
+				key = key.replace(marker, '');
 
 				// A repeated key adds its value whether or not it has the marker, like `arrayFormat: 'none'`, instead of silently dropping the earlier values.
 				if (accumulator[key] === undefined) {
-					accumulator[key] = result ? [value] : value;
-					return;
-				}
-
-				if (!Array.isArray(accumulator[key])) {
-					accumulator[key] = [accumulator[key], value];
-					return;
-				}
-
-				accumulator[key].push(value);
-			};
-		}
-
-		case 'colon-list-separator': {
-			return (key, value, accumulator) => {
-				result = /(:list)$/.exec(key);
-				key = key.replace(/:list$/, '');
-
-				if (accumulator[key] === undefined) {
-					accumulator[key] = result ? [value] : value;
+					accumulator[key] = isArray ? [value] : value;
 					return;
 				}
 
@@ -308,7 +249,12 @@ function encodeArrayItem(value, options) {
 		return encodedValue;
 	}
 
-	const encodedSeparator = encodeURIComponent(arrayFormatSeparator) === arrayFormatSeparator ? `%${arrayFormatSeparator.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}` : encodeURIComponent(arrayFormatSeparator);
+	const percentEncodedSeparator = encodeURIComponent(arrayFormatSeparator);
+	// `encodeURIComponent` leaves a few characters as-is, like `-`, `.`, `_`, `~`, and `*`, so the separator has to be encoded by hand for those.
+	const encodedSeparator = percentEncodedSeparator === arrayFormatSeparator
+		? `%${arrayFormatSeparator.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}`
+		: percentEncodedSeparator;
+
 	return stringValue.split(arrayFormatSeparator).map(piece => encode(piece, options)).join(encodedSeparator);
 }
 
@@ -318,6 +264,11 @@ function decode(value, options) {
 	}
 
 	return value;
+}
+
+// The key as `parse()` would decode it, so two spellings of the same key, like `a+b` and `a%20b`, can be compared.
+function decodeQueryKey(key) {
+	return decodeComponent(key.replaceAll('+', ' '));
 }
 
 // An option that is explicitly `undefined` uses its default, like an omitted option. That is what a caller passes through with an optional setting, like `{decode: config.decode}`. Spreading it over the defaults would instead override the default with `undefined`, so `{encode: undefined}` would write the values unencoded.
@@ -333,18 +284,12 @@ function definedOptions(options) {
 	return result;
 }
 
-function keysSorter(input) {
-	if (Array.isArray(input)) {
-		return input.sort();
-	}
-
-	if (typeof input === 'object') {
-		return keysSorter(Object.keys(input))
-			.sort((a, b) => Number(a) - Number(b))
-			.map(key => input[key]);
-	}
-
-	return input;
+// The `index` array format collects the items in an object keyed by the index. The keys are sorted as strings first, so that two spellings of the same index, like `01` and `1`, always come out in the same order, and then numerically. The empty key is the item of a scalar seen before the indexed entries, and it sorts before any index.
+function arrayFromIndexes(object) {
+	return Object.keys(object)
+		.sort()
+		.sort((a, b) => Number(a) - Number(b))
+		.map(key => object[key]);
 }
 
 function removeHash(input) {
@@ -497,9 +442,9 @@ export function parse(query, options) {
 	}
 
 	for (let [key, value] of Object.entries(returnValue)) {
-		// The `index` array format collects the items in an object keyed by index. Turn it into an array ordered by index.
+		// Only the `index` array format collects the items in an object instead of an array.
 		if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-			value = keysSorter(value);
+			value = arrayFromIndexes(value);
 			returnValue[key] = value;
 		}
 
@@ -567,11 +512,7 @@ export function stringify(object, options) {
 		}
 
 		// `skipNull` and `skipEmptyString` look at the replaced value, like they do for array items. A replacer that returns `undefined` skips the key.
-		if (
-			value === undefined
-			|| (options.skipNull && value === null)
-			|| (options.skipEmptyString && value === '')
-		) {
+		if (isSkipped(value, options)) {
 			return '';
 		}
 
@@ -654,28 +595,21 @@ export function stringifyUrl(object, options) {
 
 	const queryFromObject = Object.fromEntries(Object.entries(object.query ?? {}));
 
+	// The query in the URL is not decoded without encoding, so its keys are compared in their decoded form instead, like they are when the output is encoded. Otherwise a key like `%61` in the URL would not be overridden by an `a` in `query`.
 	if (!options.encode) {
 		const overrides = new Map();
 
 		for (const [key, value] of Object.entries(queryFromObject)) {
-			const decodedKey = decodeComponent(key.replaceAll('+', ' '));
+			const decodedKey = decodeQueryKey(key);
 			if (!overrides.has(decodedKey)) {
 				overrides.set(decodedKey, {key, value});
 			}
 		}
 
-		const mergedQuery = {};
-
-		for (const [key, value] of Object.entries(query)) {
-			const override = overrides.get(decodeComponent(key.replaceAll('+', ' ')));
-			if (override) {
-				mergedQuery[override.key] = override.value;
-			} else {
-				mergedQuery[key] = value;
-			}
-		}
-
-		query = mergedQuery;
+		query = Object.fromEntries(Object.entries(query).map(([key, value]) => {
+			const override = overrides.get(decodeQueryKey(key));
+			return override ? [override.key, override.value] : [key, value];
+		}));
 	}
 
 	let queryString = stringify({...query, ...queryFromObject}, options);
