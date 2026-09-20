@@ -84,6 +84,15 @@ expectType<string>(queryString.stringifyUrl(urlObject));
 // Parse
 expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
 
+// A key with no `=` parses to `null`, so the value type has to include it. The
+// whole-result assertions above cannot see this, because they never index in.
+// The type is spelled out rather than written as `ParsedQuery<string>['foo']`,
+// which would only restate whatever the declaration already says.
+/* eslint-disable @typescript-eslint/no-restricted-types, @typescript-eslint/array-type -- The `null` and `Array<T>` here are the point of the assertion. */
+expectType<string | null | (string | null)[]>(queryString.parse('foo')['foo']);
+expectType<string | null | (string | null)[]>(queryString.parse('foo=bar&baz')['foo']);
+/* eslint-enable @typescript-eslint/no-restricted-types, @typescript-eslint/array-type */
+
 expectType<queryString.ParsedQuery>(
 	queryString.parse('?foo=bar', {decode: false}),
 );
@@ -156,7 +165,7 @@ expectType<queryString.ParsedUrl>(
 );
 
 // Extract
-expectType<string>(queryString.extract('http://foo.bar/?abc=def&hij=klm'));
+expectType<string>(queryString.extract('https://foo.bar/?abc=def&hij=klm'));
 
 expectType<string>(
 	queryString.stringifyUrl({
@@ -179,42 +188,42 @@ expectType<string>(
 );
 
 // Pick
-expectType<string>(queryString.pick('http://foo.bar/?abc=def&hij=klm', ['abc']));
+expectType<string>(queryString.pick('https://foo.bar/?abc=def&hij=klm', ['abc']));
 
 // Exclude
-expectType<string>(queryString.exclude('http://foo.bar/?abc=def&hij=klm', ['abc']));
+expectType<string>(queryString.exclude('https://foo.bar/?abc=def&hij=klm', ['abc']));
 
-queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<string>(key);
 	expectType<ParsedQuery[string]>(value);
 	return true;
 });
-queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | number>[string]>(value);
 	return true;
 }, {parseNumbers: true});
-queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | boolean>[string]>(value);
 	return true;
 }, {parseBooleans: true});
-queryString.pick('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | boolean | number>[string]>(value);
 	return true;
 }, {parseBooleans: true, parseNumbers: true});
-queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<string>(key);
 	expectType<ParsedQuery[string]>(value);
 	return true;
 });
-queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | number>[string]>(value);
 	return true;
 }, {parseNumbers: true});
-queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | boolean>[string]>(value);
 	return true;
 }, {parseBooleans: true});
-queryString.exclude('http://foo.bar/?abc=def&hij=klm', (key, value) => {
+queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
 	expectType<ParsedQuery<string | boolean | number>[string]>(value);
 	return true;
 }, {parseBooleans: true, parseNumbers: true});
@@ -228,11 +237,11 @@ expectType<queryString.ParsedQuery<string | Date>>(queryString.parse('?a=1', {ty
 expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseNumbers: true, types: {a: 'boolean'}}));
 expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseBooleans: true, types: {a: 'number'}}));
 expectType<queryString.ParsedUrl<string | number>>(queryString.parseUrl('?a=1', {types: {a: 'number'}}));
-queryString.pick('http://foo.bar/?abc=def', (key, value) => {
+queryString.pick('https://foo.bar/?abc=def', (key, value) => {
 	expectType<ParsedQuery<string | number>[string]>(value);
 	return true;
 }, {types: {abc: 'number'}});
-queryString.exclude('http://foo.bar/?abc=def', (key, value) => {
+queryString.exclude('https://foo.bar/?abc=def', (key, value) => {
 	expectType<ParsedQuery<string | boolean>[string]>(value);
 	return true;
 }, {types: {abc: 'boolean'}});
@@ -241,12 +250,12 @@ queryString.exclude('http://foo.bar/?abc=def', (key, value) => {
 const declaredOptions: queryString.ParseOptions = {parseNumbers: true, types: {a: 'boolean'}};
 expectType<queryString.ParsedQuery>(queryString.parse('?a=1', declaredOptions));
 expectType<queryString.ParsedUrl>(queryString.parseUrl('?a=1', declaredOptions));
-const parseNumbers = Boolean(Math.random());
-expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {parseNumbers}));
+const isParseNumbers = Boolean(Math.random());
+expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {parseNumbers: isParseNumbers}));
 const sharedOptions: queryString.ParseOptions & queryString.StringifyOptions = {arrayFormat: 'comma'};
 expectType<queryString.ParsedQuery>(queryString.parse('?a=1', sharedOptions));
-expectType<string>(queryString.pick('http://foo.bar/?abc=def', (key, value) => value === '1', sharedOptions));
-queryString.pick('http://foo.bar/?abc=def', (key, value) => {
+expectType<string>(queryString.pick('https://foo.bar/?abc=def', (key, value) => value === '1', sharedOptions));
+queryString.pick('https://foo.bar/?abc=def', (key, value) => {
 	expectType<ParsedQuery<string | number | boolean>[string]>(value);
 	return true;
 }, {

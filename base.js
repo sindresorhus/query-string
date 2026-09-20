@@ -3,7 +3,7 @@ import {includeKeys} from 'filter-obj';
 import splitOnFirst from 'split-on-first';
 
 // eslint-disable-next-line unicorn/prefer-code-point
-const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
+const strictUriEncode = string => encodeURIComponent(string).replaceAll(/[!'\(\)*]/gv, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
 // A value that is left out of the query string. `undefined` is always left out, and `skipNull` and `skipEmptyString` leave out the two others.
 function isSkipped(value, options) {
@@ -38,7 +38,7 @@ function itemMarkerFor(arrayFormat) {
 function encoderForArrayFormat(options) {
 	const {arrayFormat} = options;
 
-	if (arrayFormat === 'comma' || arrayFormat === 'separator' || arrayFormat === 'bracket-separator') {
+	if (['comma', 'separator', 'bracket-separator'].includes(arrayFormat)) {
 		const keyValueSeparator = arrayFormat === 'bracket-separator' ? '[]=' : '=';
 
 		return key => (result, value) => {
@@ -86,9 +86,9 @@ function parserForArrayFormat(options) {
 			const nextIndexes = new Map();
 
 			return (key, value, accumulator) => {
-				const result = /\[(\d*)]$/.exec(key);
+				const result = /\[(?<index>\d*)\]$/v.exec(key);
 
-				key = key.replace(/\[\d*]$/, '');
+				key = key.replace(/\[(?<index>\d*)\]$/v, '');
 
 				// A repeated key adds its value whether or not it has an index, like the other array formats, instead of silently dropping the earlier values. A plain entry after the first is appended like `foo[]`. A repeated index keeps the last value, like in PHP.
 				if (!result && accumulator[key] === undefined) {
@@ -104,7 +104,7 @@ function parserForArrayFormat(options) {
 					nextIndexes.set(key, 1);
 				}
 
-				const index = result?.[1] || (nextIndexes.get(key) ?? 0);
+				const index = result?.groups?.index || (nextIndexes.get(key) ?? 0);
 				accumulator[key][index] = value;
 				nextIndexes.set(key, Math.max(nextIndexes.get(key) ?? 0, Number(index) + 1));
 			};
@@ -112,7 +112,7 @@ function parserForArrayFormat(options) {
 
 		case 'bracket':
 		case 'colon-list-separator': {
-			const marker = options.arrayFormat === 'bracket' ? /(\[])$/ : /(:list)$/;
+			const marker = options.arrayFormat === 'bracket' ? /\[\]$/v : /:list$/v;
 
 			return (key, value, accumulator) => {
 				const isArray = marker.test(key);
@@ -159,8 +159,8 @@ function parserForArrayFormat(options) {
 
 		case 'bracket-separator': {
 			return (key, value, accumulator) => {
-				const isArray = /(\[])$/.test(key);
-				key = key.replace(/\[]$/, '');
+				const isArray = /\[\]$/v.test(key);
+				key = key.replace(/\[\]$/v, '');
 
 				// Split the raw value before decoding, like `comma` and `separator`, so an item that contains the separator round-trips: `stringify({foo: ['a,b', 'c']})` gives `foo[]=a%2Cb,c`, which must parse back to `['a,b', 'c']`. Decoding first would make the separator ambiguous, which is also why swagger-js rejected encoding the separator (swagger-api/swagger-ui#9289). A value where the client percent-encoded everything, including the separators, is therefore a single item. See https://github.com/sindresorhus/query-string/issues/398
 				// A key without the marker is a single item. A repeated key adds its items either way, like `arrayFormat: 'none'`, instead of silently dropping the earlier values.
@@ -216,14 +216,14 @@ function validateArrayFormatSeparator(value) {
 		throw new TypeError('arrayFormatSeparator must not be whitespace, since parse() ignores leading and trailing whitespace in the query');
 	}
 
-	if (/\p{Surrogate}/u.test(value)) {
+	if (/\p{Surrogate}/v.test(value)) {
 		throw new TypeError('arrayFormatSeparator must not be a lone surrogate, since it cannot be percent-encoded');
 	}
 }
 
 function encode(value, options) {
 	const type = typeof value;
-	if ((type === 'object' && value !== null) || type === 'function' || type === 'symbol') {
+	if (type === 'function' || type === 'symbol' || (type === 'object' && value !== null)) {
 		throw new TypeError(`Unsupported value type: ${type}. Supported types are string, number, bigint, boolean, null, and undefined. Use the \`replacer\` option to transform other types.`);
 	}
 
@@ -232,7 +232,7 @@ function encode(value, options) {
 			return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
 		} catch {
 			// A lone surrogate cannot be encoded as UTF-8, so `encodeURIComponent` throws for it. It is replaced with U+FFFD, like `URLSearchParams` and the `URL` hash setter do. With the `u` flag, `\p{Surrogate}` only matches a surrogate that is not part of a pair.
-			return encode(String(value).replaceAll(/\p{Surrogate}/gu, '\uFFFD'), options);
+			return encode(String(value).replaceAll(/\p{Surrogate}/gv, '\u{FFFD}'), options);
 		}
 	}
 
@@ -259,11 +259,7 @@ function encodeArrayItem(value, options) {
 }
 
 function decode(value, options) {
-	if (options.decode) {
-		return decodeComponent(value);
-	}
-
-	return value;
+	return options.decode ? decodeComponent(value) : value;
 }
 
 // The key as `parse()` would decode it, so two spellings of the same key, like `a+b` and `a%20b`, can be compared.
@@ -287,8 +283,9 @@ function definedOptions(options) {
 // The `index` array format collects the items in an object keyed by the index. The keys are sorted as strings first, so that two spellings of the same index, like `01` and `1`, always come out in the same order, and then numerically. The empty key is the item of a scalar seen before the indexed entries, and it sorts before any index.
 function arrayFromIndexes(object) {
 	return Object.keys(object)
-		.sort()
-		.sort((a, b) => Number(a) - Number(b))
+		// eslint-disable-next-line unicorn/require-array-sort-compare -- The default string sort is what puts `01` and `1` in the same order.
+		.toSorted()
+		.toSorted((a, b) => Number(a) - Number(b))
 		.map(key => object[key]);
 }
 
@@ -343,34 +340,26 @@ function parseValue(value, options, type) {
 		return [parseValue(value, options, type.slice(0, -2))];
 	}
 
-	if (type === 'number' && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+	if (type === 'number' && typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value))) {
 		return Number(value);
 	}
 
 	// An explicit type takes precedence over `parseNumbers` and `parseBooleans`. A value that does not match its type stays a string. With `arrayFormat: 'none'`, a single value with an array type is not an array and stays a string too.
-	if (type === 'boolean' || type === 'number' || type === 'string[]' || type === 'number[]') {
+	if (['boolean', 'number', 'string[]', 'number[]'].includes(type)) {
 		return value;
 	}
 
-	if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+	if (value !== null && options.parseBooleans && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
 		return value.toLowerCase() === 'true';
 	}
 
-	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
-		return Number(value);
-	}
-
-	return value;
+	return typeof value === 'string' && options.parseNumbers && value.trim() !== '' && !Number.isNaN(Number(value)) ? Number(value) : value;
 }
 
 export function extract(input) {
 	input = removeHash(input);
 	const queryStart = input.indexOf('?');
-	if (queryStart === -1) {
-		return '';
-	}
-
-	return input.slice(queryStart + 1);
+	return queryStart === -1 ? '' : input.slice(queryStart + 1);
 }
 
 export function parse(query, options) {
@@ -396,13 +385,9 @@ export function parse(query, options) {
 		return returnValue;
 	}
 
-	query = query.trim().replace(/^[?#&]/, '');
+	query = query.trim().replace(/^[#&?]/v, '');
 
-	if (!query) {
-		return returnValue;
-	}
-
-	if (/^&+$/.test(query)) {
+	if (!query || /^&+$/v.test(query)) {
 		return returnValue;
 	}
 
@@ -432,7 +417,7 @@ export function parse(query, options) {
 		}
 
 		// Missing `=` should be `null`:
-		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		// https://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 		value = value === undefined ? null : (['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options));
 
 		// The key is decoded before the array format looks for its marker, so a percent-encoded marker like `foo%5B%5D` is also an array item. This is intentional. `URLSearchParams` and HTML forms percent-encode `[`, `]`, and `:` in keys, and servers like Rack and PHP decode the key before they look for the marker. The trade-off is that a key that itself ends in a marker is not distinguishable from the marker after decoding, so `stringify({'foo[]': 'x'}, {arrayFormat: 'bracket'})` does not round-trip.
@@ -468,8 +453,9 @@ export function parse(query, options) {
 	}
 
 	// TODO: Remove the use of `reduce`.
-	// eslint-disable-next-line unicorn/no-array-reduce
-	return (options.sort === true ? Object.keys(returnValue).sort() : Object.keys(returnValue).sort(options.sort)).reduce((result, key) => {
+	// The default sort is the documented one, and a test covers its code-unit ordering.
+	// eslint-disable-next-line unicorn/no-array-reduce, unicorn/require-array-sort-compare
+	return (options.sort === true ? Object.keys(returnValue).toSorted() : Object.keys(returnValue).toSorted(options.sort)).reduce((result, key) => {
 		result[key] = returnValue[key];
 		return result;
 	}, Object.create(null));
@@ -495,6 +481,9 @@ export function stringify(object, options) {
 	// Copying into a plain object intentionally drops a key named `__proto__`, since assigning it sets the prototype instead of a property.
 	const objectCopy = {};
 
+	// `Object.fromEntries()` would define the key as a real own property instead,
+	// which would keep a `__proto__` key that is meant to be dropped here.
+	// eslint-disable-next-line unicorn/prefer-object-from-entries
 	for (const [key, value] of Object.entries(object)) {
 		objectCopy[key] = value;
 	}
@@ -565,9 +554,9 @@ export function parseUrl(url, options) {
 	}
 
 	return {
-		url: getUrlWithoutQuery(url_ ?? ''),
+		url: getUrlWithoutQuery(url_),
 		query: parse(extract(url), options),
-		...(options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}),
+		...(options.parseFragmentIdentifier && hash && {fragmentIdentifier: decode(hash, options)}),
 	};
 }
 
@@ -626,7 +615,7 @@ export function stringifyUrl(object, options) {
 			// The fragment identifier is a decoded value, like the query values, so `parseUrl()` reads it back unchanged. That is what the `fragment` component of Go's `net/url`, Java's `URI`, and Swift's `URLComponents` does too. The `URL` hash setter instead expects an already-encoded fragment: it leaves `%` as-is, which would turn `100%` into an invalid URL and `%23top` into `#top` after parsing. So `%` is encoded here first. The URL parser also silently strips ASCII tab and newline from its input, so those are encoded first too. The setter then encodes the rest of the WHATWG fragment percent-encode set (controls, space, `"`, `<`, `>`, and backtick) and keeps `/`, `?`, and `#`, so hash routes like `#/users?id=1` stay readable. With `encode: false`, the fragment identifier is written as-is, like the query.
 			// The fragment percent-encode set does not depend on the scheme, so the caller's URL is deliberately not parsed here; it may not even be parseable.
 			const throwawayUrl = new URL('https://query-string.invalid');
-			throwawayUrl.hash = hash.replaceAll(/[%\t\n\r]/g, character => `%${character.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
+			throwawayUrl.hash = hash.replaceAll(/[\t\n\r%]/gv, character => `%${character.codePointAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
 			hash = throwawayUrl.hash;
 		}
 	}
@@ -638,6 +627,7 @@ export function pick(input, filter, options) {
 	// The keys array is a filter, not an order. Filtering with a predicate keeps the parsed object's key order, which matters with `sort: false`. Integer-index keys are enumerated first in numeric order, and repeated keys are grouped together.
 	if (Array.isArray(filter)) {
 		const filterSet = new Set(filter);
+		// eslint-disable-next-line unicorn/no-useless-recursion -- The array case is the same operation as the predicate case, so it delegates instead of duplicating the loop.
 		return pick(input, key => filterSet.has(key), options);
 	}
 

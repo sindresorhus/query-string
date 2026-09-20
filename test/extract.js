@@ -1,30 +1,27 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import queryString from '../index.js';
 
-test('extracts query string from url', t => {
-	t.is(queryString.extract('https://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
-	t.is(queryString.extract('https://foo.bar/?'), '');
-	t.is(queryString.extract('https://foo.bar/?regex=ab?c'), 'regex=ab?c');
-	t.is(queryString.extract('https://foo.bar#top?foo=bar'), '');
-	t.is(queryString.extract('https://foo.bar?foo=bar#top'), 'foo=bar');
+test('extracts query string from url', () => {
+	assert.equal(queryString.extract('https://foo.bar/?abc=def&hij=klm'), 'abc=def&hij=klm');
+	assert.equal(queryString.extract('https://foo.bar/?'), '');
+	assert.equal(queryString.extract('https://foo.bar/?regex=ab?c'), 'regex=ab?c');
+	assert.equal(queryString.extract('https://foo.bar#top?foo=bar'), '');
+	assert.equal(queryString.extract('https://foo.bar?foo=bar#top'), 'foo=bar');
 });
 
-test('handles strings not containing query string', t => {
-	t.is(queryString.extract('https://foo.bar'), '');
-	t.is(queryString.extract('https://foo.bar#top'), '');
-	t.is(queryString.extract(''), '');
+test('handles strings not containing query string', () => {
+	assert.equal(queryString.extract('https://foo.bar'), '');
+	assert.equal(queryString.extract('https://foo.bar#top'), '');
+	assert.equal(queryString.extract(''), '');
 });
 
-test('throws for invalid values', t => {
-	t.throws(() => {
+test('throws for invalid values', () => {
+	assert.throws(() => {
 		queryString.extract(null);
-	}, {
-		instanceOf: TypeError,
-	});
+	}, TypeError);
 
-	t.throws(() => {
+	assert.throws(() => {
 		queryString.extract(undefined);
-	}, {
-		instanceOf: TypeError,
-	});
+	}, TypeError);
 });

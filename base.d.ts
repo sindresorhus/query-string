@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/check-param-names -- The `pick()` and `exclude()` doc comments cover both overloads, so they document `filter` as well as `keys` and `options`. The rule only models the first overload. */
 export type ParseOptions = {
 	/**
 	Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
@@ -105,13 +106,13 @@ export type ParseOptions = {
 		```
 	*/
 	readonly arrayFormat?:
-	| 'bracket'
-	| 'index'
-	| 'comma'
-	| 'separator'
-	| 'bracket-separator'
-	| 'colon-list-separator'
-	| 'none';
+		| 'bracket'
+		| 'index'
+		| 'comma'
+		| 'separator'
+		| 'bracket-separator'
+		| 'colon-list-separator'
+		| 'none';
 
 	/**
 	The character used to separate array elements when using `{arrayFormat: 'separator'}`.
@@ -136,7 +137,7 @@ export type ParseOptions = {
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
-	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in Unicode code point order.
+	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in UTF-16 code unit order. This is not the same as Unicode code point order: a character outside the Basic Multilingual Plane, like an emoji, is stored as a surrogate pair whose leading code unit is below U+E000, so it sorts before a character in the U+E000–U+FFFF range.
 
 	@default true
 
@@ -336,12 +337,13 @@ export type ParseOptions = {
 	Note: The `'boolean'` type also converts `'0'` and `'1'` to booleans, and treats valueless keys (e.g. `?flag`) as `true`.
 	*/
 	readonly types?: Record<
-	string,
+		string,
 	'boolean' | 'number' | 'string' | 'string[]' | 'number[]' | ((value: string) => unknown)
 	>;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// `parse('foo')` returns `{foo: null}`, so `null` is part of the result and stays in the type.
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export type ParsedQuery<T = string> = Record<string, T | null | Array<T | null>>;
 
 type ParsedTypeValue<Type> =
@@ -530,7 +532,7 @@ export type StringifyOptions = {
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
-	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in Unicode code point order.
+	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in UTF-16 code unit order. This is not the same as Unicode code point order: a character outside the Basic Multilingual Plane, like an emoji, is stored as a surrogate pair whose leading code unit is below U+E000, so it sorts before a character in the U+E000–U+FFFF range.
 
 	@default true
 
@@ -658,13 +660,15 @@ Supported value types for query string parameters.
 
 Note: `Symbol`, functions, and objects (except arrays) are not supported and will throw an error when stringified.
 */
-export type Stringifiable = string | boolean | number | bigint | null | undefined; // eslint-disable-line @typescript-eslint/ban-types
+// `null` is a value `stringify()` accepts and `parse()` can produce, so it stays in the type.
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+export type Stringifiable = string | boolean | number | bigint | null | undefined;
 
 /**
 A record of stringifiable values.
 */
 export type StringifiableRecord = Record<
-string,
+	string,
 Stringifiable | readonly Stringifiable[]
 >;
 
@@ -688,7 +692,7 @@ export function stringify(
 	// Context: https://github.com/sindresorhus/query-string/issues/298
 	// object: StringifiableRecord,
 	object: Record<string, any>,
-	options?: StringifyOptions
+	options?: StringifyOptions,
 ): string;
 
 /**
@@ -774,7 +778,7 @@ queryString.stringifyUrl({
 */
 export function stringifyUrl(
 	object: UrlObject,
-	options?: StringifyOptions
+	options?: StringifyOptions,
 ): string;
 
 /**
@@ -783,6 +787,8 @@ Pick query parameters from a URL.
 @param url - The URL containing the query parameters to pick. Leading and trailing whitespace is ignored.
 @param keys - The names of the query parameters to keep. All other query parameters will be removed from the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`. The query is decoded only when `encode` is `true`, so a value like `a%20b` is not percent-encoded a second time. With `encode: false`, the filter receives the key and value as they are in the URL. The `decode` option is ignored. The stringify options apply to the output, so `skipNull` and `skipEmptyString` also drop a parameter that the filter kept.
+
+@param options - The parse and stringify options, which also apply to the filter. `sort: false` keeps the original parameter order in the output.
 
 @returns The URL with the picked query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
@@ -798,12 +804,13 @@ queryString.pick('https://foo.bar?foo=1&bar=2#hello', (name, value) => value ===
 export function pick(
 	url: string,
 	keys: readonly string[],
-	options?: ParseOptions & StringifyOptions
+	options?: ParseOptions & StringifyOptions,
 ): string;
 export function pick<Options extends ParseOptions & StringifyOptions>(
 	url: string,
+	// eslint-disable-next-line unicorn/consistent-boolean-name -- `filter` is a published parameter name.
 	filter: (key: string, value: ParsedQuery<ParsedValue<Options>>[string]) => boolean,
-	options?: KnownOptions<Options>
+	options?: KnownOptions<Options>,
 ): string;
 
 /**
@@ -812,6 +819,8 @@ Exclude query parameters from a URL. Like `.pick()` but reversed.
 @param url - The URL containing the query parameters to exclude. Leading and trailing whitespace is ignored.
 @param keys - The names of the query parameters to remove. All other query parameters will remain in the URL.
 @param filter - A filter predicate that will be provided the name of each query parameter and its value. The `parseNumbers`, `parseBooleans`, and `types` options also affect `value`. They only affect the value passed to the filter. The query parameters are written back to the URL from the plain string values, so a value like `007` is not rewritten as `7`. The query is decoded only when `encode` is `true`, so a value like `a%20b` is not percent-encoded a second time. With `encode: false`, the filter receives the key and value as they are in the URL. The `decode` option is ignored. The stringify options apply to the output, so `skipNull` and `skipEmptyString` also drop a parameter that the filter kept.
+
+@param options - The parse and stringify options, which also apply to the filter. `sort: false` keeps the original parameter order in the output.
 
 @returns The URL without the excluded query parameters. The query parameters are sorted, like with `.stringify()`. Pass `sort: false` in the options to keep their order. With sorting disabled, integer-index keys come first in ascending numeric order, following JavaScript object enumeration. Repeated keys are grouped together.
 
@@ -827,10 +836,11 @@ queryString.exclude('https://foo.bar?foo=1&bar=2#hello', (name, value) => value 
 export function exclude(
 	url: string,
 	keys: readonly string[],
-	options?: ParseOptions & StringifyOptions
+	options?: ParseOptions & StringifyOptions,
 ): string;
 export function exclude<Options extends ParseOptions & StringifyOptions>(
 	url: string,
+	// eslint-disable-next-line unicorn/consistent-boolean-name -- `filter` is a published parameter name.
 	filter: (key: string, value: ParsedQuery<ParsedValue<Options>>[string]) => boolean,
-	options?: KnownOptions<Options>
+	options?: KnownOptions<Options>,
 ): string;
