@@ -42,7 +42,6 @@
 		"filter"
 	],
 	"dependencies": {
-		"decode-uri-component": "^0.5.0",
 		"filter-obj": "^6.1.0",
 		"split-on-first": "^4.0.0"
 	},

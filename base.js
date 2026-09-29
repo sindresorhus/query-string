@@ -1,4 +1,3 @@
-import decodeComponent from 'decode-uri-component';
 import {includeKeys} from 'filter-obj';
 import splitOnFirst from 'split-on-first';
 
@@ -256,6 +255,148 @@ function encodeArrayItem(value, options) {
 		: percentEncodedSeparator;
 
 	return stringValue.split(arrayFormatSeparator).map(piece => encode(piece, options)).join(encodedSeparator);
+}
+
+// One percent sign, anywhere. Text between two of these is copied in one go, so a value with no escapes in it costs a single native scan instead of a step per character. A value that holds no escape at all, which is the common case, is returned as it is.
+// The `lastIndex` of this and `percentEscape` is shared state, which is only safe because nothing that a caller controls runs while `decodeComponent()` is on the stack. Every user callback, which is a `types` function, a `sort` comparator, a `pick()` filter, and a `replacer`, runs after the loop that decodes the parameters. A callback, a comparator, or an `await` inside `decodeComponent()` would corrupt the two regexes, so set `lastIndex` right before each `exec` and do not reach for a `matchAll` or a `String#replace` here.
+const percentSign = /%/gv;
+
+// One percent escape, like `%C3`. The `y` flag makes it match only where it is anchored, so a `%` that starts nothing is not skipped over. The hexadecimal digits may be in either case, like in `%c3`.
+const percentEscape = /%[\da-f]{2}/ivy;
+
+// What a byte that cannot be decoded becomes, like the `URL` parser and `URLSearchParams` do.
+const replacementCharacter = '�';
+
+// The byte that the percent escape at `position` stands for, or -1 when there is no escape there. A `%` that is not followed by two hexadecimal digits is not an escape, and neither is one that starts the value.
+function readPercentByte(value, position) {
+	percentEscape.lastIndex = position;
+	const match = percentEscape.exec(value);
+	return match === null ? -1 : Number.parseInt(match[0].slice(1), 16);
+}
+
+// The number of bytes in the UTF-8 sequence that starts with this lead byte, or zero when the byte cannot start one. That is a continuation byte (0x80 to 0xBF), and the lead bytes that are only ever invalid: 0xC0 and 0xC1 can only start an overlong encoding, and 0xF5 to 0xFF can only start a code point above U+10FFFF.
+function utf8SequenceLength(leadByte) {
+	if (leadByte < 0x80) {
+		return 1;
+	}
+
+	if (leadByte < 0xC2) {
+		return 0;
+	}
+
+	if (leadByte < 0xE0) {
+		return 2;
+	}
+
+	if (leadByte < 0xF0) {
+		return 3;
+	}
+
+	return leadByte <= 0xF4 ? 4 : 0;
+}
+
+// Whether the second byte of a UTF-8 sequence is valid for this lead byte. Any later byte only has to be a continuation byte. The range is narrower for the lead bytes that would otherwise allow an overlong encoding, a surrogate, or a code point above U+10FFFF.
+function isValidSecondByte(leadByte, byte) {
+	if (byte < 0x80 || byte > 0xBF) {
+		return false;
+	}
+
+	switch (leadByte) {
+		case 0xE0: {
+			return byte >= 0xA0;
+		}
+
+		case 0xED: {
+			return byte <= 0x9F;
+		}
+
+		case 0xF0: {
+			return byte >= 0x90;
+		}
+
+		case 0xF4: {
+			return byte <= 0x8F;
+		}
+
+		default: {
+			return true;
+		}
+	}
+}
+
+// Decode the UTF-8 sequence that starts with the percent escape at `position`. The decoded text and the position just past the sequence are returned.
+function decodeSequence(value, position) {
+	const leadByte = readPercentByte(value, position);
+
+	// A `%` that is not followed by two hexadecimal digits is not an escape, so it is kept as it is.
+	if (leadByte === -1) {
+		return ['%', position + 1];
+	}
+
+	const length = utf8SequenceLength(leadByte);
+
+	// A continuation byte with no lead byte in front of it, or a lead byte that can only ever start an invalid sequence.
+	if (length === 0) {
+		return [replacementCharacter, position + 3];
+	}
+
+	// An ASCII byte is its own character.
+	if (length === 1) {
+		return [String.fromCodePoint(leadByte), position + 3];
+	}
+
+	// The lead byte holds the top bits of the code point, and each continuation byte holds six more. The sequence stops when a byte is missing, because the value ends, or is not valid where it sits.
+	// eslint-disable-next-line no-bitwise -- Unpacking a UTF-8 sequence is bit arithmetic by definition.
+	let codePoint = leadByte & (0x7F >> length);
+	let offset = 1;
+
+	while (offset < length) {
+		const byte = readPercentByte(value, position + (offset * 3));
+		if (!(offset === 1 ? isValidSecondByte(leadByte, byte) : (byte >= 0x80 && byte <= 0xBF))) {
+			// What was read before the sequence stopped is consumed together with it, so `%E4%80%41` is one replacement character and then `A` rather than a replacement character for every byte.
+			return [replacementCharacter, position + (offset * 3)];
+		}
+
+		// eslint-disable-next-line no-bitwise -- Unpacking a UTF-8 sequence is bit arithmetic by definition.
+		codePoint = (codePoint << 6) | (byte & 0x3F);
+		offset++;
+	}
+
+	return [String.fromCodePoint(codePoint), position + (length * 3)];
+}
+
+// Decode the percent escapes in `value`, like `URLSearchParams` does.
+//
+// `decodeURIComponent()` is not used on its own because it throws away the whole string as soon as it sees one byte that is not valid UTF-8, and a query string from the network often has one. `decodeSequence()` is what runs then, using the algorithm the `URL` parser uses: a byte that cannot be decoded becomes U+FFFD, and the bytes around it are still decoded.
+//
+// It is a single left-to-right pass, so the cost is linear in the length of the value. It replaces `decode-uri-component`, whose fallback for a string that `decodeURIComponent()` rejects collected every distinct percent-encoded run into a replacement map and then replaced each entry across the whole string, so a value with N distinct runs cost N passes over N bytes.
+function decodeComponent(value) {
+	try {
+		// Almost every value is valid percent-encoded UTF-8, and the built-in decoder handles those in one pass in C++, which is far faster than the step at a time above. It gives the same answer, so this only decides which of the two paths runs.
+		return decodeURIComponent(value);
+	} catch {
+		// One byte that cannot be decoded makes the built-in decoder throw away the whole value, so the value is decoded the lenient way instead.
+	}
+
+	percentSign.lastIndex = 0;
+
+	let output = '';
+	let position = 0;
+	let match = percentSign.exec(value);
+
+	while (match !== null) {
+		// Everything between the last escape and this one is copied as it is.
+		output += value.slice(position, match.index);
+
+		const [decoded, nextPosition] = decodeSequence(value, match.index);
+		output += decoded;
+		position = nextPosition;
+
+		percentSign.lastIndex = position;
+		match = percentSign.exec(value);
+	}
+
+	return output + value.slice(position);
 }
 
 function decode(value, options) {

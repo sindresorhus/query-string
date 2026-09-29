@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/check-param-names -- The `pick()` and `exclude()` doc comments cover both overloads, so they document `filter` as well as `keys` and `options`. The rule only models the first overload. */
 export type ParseOptions = {
 	/**
-	Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
+	Decode the keys and values. A byte that is not valid UTF-8 becomes the replacement character `U+FFFD`, and the bytes around it are still decoded, like the [`URL` parser](https://developer.mozilla.org/en-US/docs/Web/API/URL) and [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) do. A `%` that is not followed by two hexadecimal digits is not an escape and is kept as it is.
 
 	@default true
 	*/

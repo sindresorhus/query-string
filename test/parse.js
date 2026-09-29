@@ -557,7 +557,89 @@ test('circuit original → parse → stringify with array commas → sorted orig
 
 test('decode keys and values', () => {
 	assert.deepEqual(structuredClone(queryString.parse('st%C3%A5le=foo')), {ståle: 'foo'});
-	assert.deepEqual(structuredClone(queryString.parse('foo=%7B%ab%%7C%de%%7D+%%7Bst%C3%A5le%7D%')), {foo: '{%ab%|%de%} %{ståle}%'});
+	// `%ab` and `%de` are continuation bytes with no lead byte, so each is one replacement character. The `%` around them is not an escape and is kept.
+	assert.deepEqual(structuredClone(queryString.parse('foo=%7B%ab%%7C%de%%7D+%%7Bst%C3%A5le%7D%')), {foo: '{�%|�%} %{ståle}%'});
+});
+
+test('a byte that is not valid UTF-8 becomes the replacement character', () => {
+	// The built-in decoder throws away the whole value for one bad byte, so the value is decoded a lenient way instead, like the `URL` parser and `URLSearchParams` do.
+	const cases = [
+		// A sequence that is cut short. The lead byte and the continuation bytes that were read are consumed together, so this is one replacement character and not one per byte.
+		['%E4', '�'],
+		['%E4%B8', '�'],
+		['%E4%80%41', '�A'],
+		['%C3', '�'],
+		// A lead byte that can only ever start an invalid sequence: an overlong encoding, a surrogate, or a code point above U+10FFFF.
+		['%C0%80', '��'],
+		['%C1%BF', '��'],
+		['%ED%A0%80', '���'],
+		['%F5%80%80%80', '����'],
+		['%FF', '�'],
+		// A `%` that does not start an escape is not a byte and is kept as it is.
+		['%', '%'],
+		['%2', '%2'],
+		['%z', '%z'],
+		// A decoded byte is not decoded again, so `%25` gives a `%` and not a space.
+		['%2525%E25', '%25�5'],
+		// The characters around an invalid byte are still decoded.
+		['a%E4b', 'a�b'],
+		['%E4%80%80%80%41', '䀀�A'],
+	];
+
+	for (const [value, expected] of cases) {
+		assert.equal(queryString.parse(`foo=${value}`).foo, expected, `value: ${value}`);
+	}
+});
+
+test('a raw character next to an invalid escape is kept', () => {
+	// The raw character is not part of the UTF-8 sequence, so it is decoded on its own. The `URL` parser agrees, so this is the WHATWG behavior. Only the `URLSearchParams` constructor loses it, and that is a bug in it: `new URLSearchParams('a=%E4中').get('a')` gives `�-`, with a hyphen that is not in the input at all.
+	assert.equal(queryString.parse('foo=%E4å').foo, '�å');
+	assert.equal(queryString.parse('foo=å%E4').foo, 'å�');
+});
+
+test('the edges of what a UTF-8 sequence may encode are checked', () => {
+	// A sequence that is the right length can still be out of range. The lead byte and the first continuation byte are the only place the range is narrowed, so each edge is checked here.
+	const cases = [
+		// An overlong encoding is a shorter sequence for a code point that has a longer one. It is not the same character, so it is rejected.
+		['%C0%80', '��', 'the lowest two-byte lead is 0xC2, so 0xC0 is only ever an overlong encoding'],
+		['%C1%BF', '��', 'the same for 0xC1'],
+		['%E0%80%80', '���', 'the lowest three-byte lead is 0xE0, whose second byte may not be below 0xA0'],
+		['%E0%9F%BF', '���', 'the same for one below 0xA0'],
+		['%E0%A0%80', 'ࠀ', '0xA0 is the lowest second byte that 0xE0 may take'],
+		['%F0%80%80%80', '����', 'the lowest four-byte lead is 0xF0, whose second byte may not be below 0x90'],
+		['%F0%8F%BF%BF', '����', 'the same for one below 0x90'],
+		['%F0%90%80%80', '𐀀', '0x90 is the lowest second byte that 0xF0 may take, which is the first astral code point'],
+		// A surrogate is not a character, so no sequence may encode one.
+		['%ED%9F%BF', '퟿', 'the highest code point below the surrogates'],
+		['%ED%A0%80', '���', '0xED may not take a second byte of 0xA0 or above'],
+		['%ED%BF%BF', '���', 'the same for 0xBF'],
+		// U+10FFFF is the highest code point there is. A sequence above it is not a Unicode scalar value, and `String.fromCodePoint()` throws for it, so this case must not reach that.
+		['%F4%8F%BF%BF', '􏿿', 'the highest code point there is'],
+		['%F4%90%80%80', '����', '0xF4 may not take a second byte above 0x8F'],
+		['%F4%BF%BF%BF', '����', 'the same for 0xBF'],
+		['%F5%80%80%80', '����', '0xF5 can only ever start a code point above U+10FFFF'],
+		['%FF', '�', '0xFF is not a lead byte at all'],
+	];
+
+	for (const [value, expected, reason] of cases) {
+		assert.equal(queryString.parse(`foo=${value}`).foo, expected, `${value} (${reason})`);
+	}
+});
+
+test('a value that encodes a code point above U+10FFFF is decoded, not thrown on', () => {
+	// Without the range check the sequence would decode to a code point that `String.fromCodePoint()` rejects with a `RangeError`, so `parse()` would throw on a value from the network instead of decoding it. Each of these becomes one replacement character per byte.
+	const cases = [
+		['%F4%90%80%80', 4],
+		['%F5%80%80%80', 4],
+		['%F7%BF%BF%BF', 4],
+		['%FF%FF%FF%FF', 4],
+		// Two three-byte sequences, so six.
+		['%ED%A0%80%ED%B0%80', 6],
+	];
+
+	for (const [value, count] of cases) {
+		assert.equal(queryString.parse(`foo=${value}`).foo, '�'.repeat(count), `value: ${value}`);
+	}
 });
 
 test('disable decoding of keys and values', () => {
@@ -1241,6 +1323,72 @@ test('an option that is explicitly `undefined` uses its default', () => {
 	assert.deepEqual(structuredClone(queryString.parse('foo=1,2', {arrayFormat: 'comma', arrayFormatSeparator: undefined})), {foo: ['1', '2']});
 	assert.deepEqual(structuredClone(queryString.parse('foo=1&bar=true', {parseNumbers: undefined, parseBooleans: undefined, types: undefined})), {foo: '1', bar: 'true'});
 	assert.deepEqual(structuredClone(queryString.parseUrl('https://foo.bar?foo=%26', {decode: undefined})), {url: 'https://foo.bar', query: {foo: '&'}});
+});
+
+test('a value with many distinct percent-encodings decodes the same with and without an invalid sequence', () => {
+	// A value that is valid percent-encoded UTF-8 is decoded by the built-in decoder. Adding one invalid sequence makes it throw, and the value is then decoded the lenient way instead. Both paths have to give the same characters, so this covers a value with thousands of distinct escapes going through the lenient path.
+	const percentByte = value => `%${value.toString(16).toUpperCase().padStart(2, '0')}`;
+
+	// Distinct three-byte sequences. Lead bytes 0xE0 and 0xED are left out, because 0xE0 can only begin an overlong encoding and 0xED can only begin a surrogate.
+	const runs = [];
+	for (let lead = 0xE1; lead <= 0xEF; lead++) {
+		if (lead === 0xED) {
+			continue;
+		}
+
+		for (let second = 0x80; second <= 0xBF; second += 7) {
+			for (let third = 0x80; third <= 0xBF; third += 11) {
+				// eslint-disable-next-line no-bitwise -- Unpacking a UTF-8 sequence is bit arithmetic by definition.
+				const codePoint = ((lead & 0x0F) << 12) | ((second & 0x3F) << 6) | (third & 0x3F);
+				runs.push([percentByte(lead) + percentByte(second) + percentByte(third), String.fromCodePoint(codePoint)]);
+			}
+		}
+	}
+
+	const encoded = runs.map(([bytes]) => bytes).join('z');
+	const expected = runs.map(([, character]) => character).join('z');
+
+	assert.equal(queryString.parse(`a=${encoded}`).a, expected);
+
+	// A truncated three-byte sequence at the end is what makes the built-in decoder throw. Every run still decodes, and the truncated sequence becomes one replacement character.
+	assert.equal(queryString.parse(`a=${encoded}%E4%B8`).a, `${expected}�`);
+
+	// Decoding is off, so every byte is left exactly as it is.
+	assert.equal(queryString.parse(`a=${encoded}%E4%B8`, {decode: false}).a, `${encoded}%E4%B8`);
+});
+
+test('decoding a value with many distinct percent-encodings and one invalid sequence is not quadratic', () => {
+	// The lenient decoder used to collect every distinct run of percent-encoded bytes in a value into a replacement map and then replace each entry across the whole value, so a value with N distinct runs cost N passes over N bytes. An 80 KB value took seconds. Every count below has to grow in step with the size of the value instead.
+	const percentByte = value => `%${value.toString(16).toUpperCase().padStart(2, '0')}`;
+	const leadBytes = [0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xEE, 0xEF];
+	// Every run decodes to a different character, so each one is distinct.
+	const distinctEncodings = count => Array.from({length: count}, (_, index) =>
+		percentByte(leadBytes[index % leadBytes.length])
+		+ percentByte(0x80 + (Math.floor(index / leadBytes.length) % 64))
+		+ percentByte(0x80 + (Math.floor(index / (leadBytes.length * 64)) % 64)),
+	).join('z');
+
+	const count = 4000;
+	const baselineQuery = `a=${distinctEncodings(count)}`;
+	// A truncated three-byte sequence at the end is what makes the built-in decoder throw.
+	const invalidQuery = `${baselineQuery}%E4%B8`;
+
+	// Warm up first, so this measures the decoder and not the cost of the first call going through the interpreter.
+	for (let iteration = 0; iteration < 10; iteration++) {
+		queryString.parse(baselineQuery);
+		queryString.parse(invalidQuery);
+	}
+
+	const baselineStartTime = performance.now();
+	queryString.parse(baselineQuery);
+	const baselineElapsedTime = performance.now() - baselineStartTime;
+
+	const invalidStartTime = performance.now();
+	queryString.parse(invalidQuery);
+	const invalidElapsedTime = performance.now() - invalidStartTime;
+
+	// The two values differ only in the trailing sequence, so the gap between them is the cost of the lenient path alone. It is measured against the baseline rather than an absolute budget, so a busy machine does not decide the result.
+	assert.ok(invalidElapsedTime < (baselineElapsedTime * 20) + 100, `Expected the lenient decoder to stay near the built-in decoder. Invalid: ${invalidElapsedTime}ms. Baseline: ${baselineElapsedTime}ms.`);
 });
 
 test('comma and separator array formats parse a key repeated many times without quadratic slowdown', () => {

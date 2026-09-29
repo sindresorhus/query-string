@@ -72,7 +72,7 @@ Type: `object`
 Type: `boolean`\
 Default: `true`
 
-Decode the keys and values. URL components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
+Decode the keys and values. A byte that is not valid UTF-8 becomes the replacement character `U+FFFD`, and the bytes around it are still decoded, like the [`URL` parser](https://developer.mozilla.org/en-US/docs/Web/API/URL) and [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) do. A `%` that is not followed by two hexadecimal digits is not an escape and is kept as it is.
 
 ##### arrayFormat
 
