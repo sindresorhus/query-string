@@ -1,8 +1,8 @@
-import {expectType, expectError} from 'tsd';
+import {expectTypeOf, expectError} from 'nz';
 import queryString, {type ParsedQuery} from './index.js';
 
 // Stringify
-expectType<string>(
+expectTypeOf(
 	queryString.stringify({
 		str: 'bar',
 		strArray: ['baz'],
@@ -11,22 +11,22 @@ expectType<string>(
 		bool: true,
 		boolArray: [false],
 	}),
-);
+).toBe<string>();
 
-expectType<string>(queryString.stringify({foo: 'bar'}, {strict: false}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {encode: false}));
-expectType<string>(
+expectTypeOf(queryString.stringify({foo: 'bar'}, {strict: false})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {encode: false})).toBe<string>();
+expectTypeOf(
 	queryString.stringify({foo: 'bar'}, {arrayFormat: 'bracket'}),
-);
-expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'index'}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {arrayFormat: 'comma'}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {sort: false}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {sort: true}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {skipNull: true}));
-expectType<string>(queryString.stringify({foo: 'bar'}, {skipEmptyString: true}));
+).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {arrayFormat: 'index'})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {arrayFormat: 'none'})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {arrayFormat: 'comma'})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {sort: false})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {sort: true})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {skipNull: true})).toBe<string>();
+expectTypeOf(queryString.stringify({foo: 'bar'}, {skipEmptyString: true})).toBe<string>();
 const order = ['c', 'a', 'b'];
-expectType<string>(
+expectTypeOf(
 	queryString.stringify(
 		{foo: 'bar'},
 		{
@@ -34,7 +34,7 @@ expectType<string>(
 				order.indexOf(itemLeft) - order.indexOf(itemRight),
 		},
 	),
-);
+).toBe<string>();
 
 // Ensure it accepts an `interface`. Unlike a type alias, an interface has no implicit index signature.
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -69,105 +69,105 @@ const fullQuery: FullQuery = {
 	mixed: ['a', 1, true, undefined],
 };
 
-expectType<string>(queryString.stringify(fullQuery));
-expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery}));
-expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery, fragmentIdentifier: 'top'}, {arrayFormat: 'bracket'}));
+expectTypeOf(queryString.stringify(fullQuery)).toBe<string>();
+expectTypeOf(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery})).toBe<string>();
+expectTypeOf(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: fullQuery, fragmentIdentifier: 'top'}, {arrayFormat: 'bracket'})).toBe<string>();
 
 // A spread object has no index signature either. See https://github.com/microsoft/TypeScript/issues/42021
 const queryWithExtraBits = {...query, baz: 'bang'};
-expectType<string>(queryString.stringify(queryWithExtraBits));
-expectType<string>(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: queryWithExtraBits}));
+expectTypeOf(queryString.stringify(queryWithExtraBits)).toBe<string>();
+expectTypeOf(queryString.stringifyUrl({url: 'https://sindresorhus.com', query: queryWithExtraBits})).toBe<string>();
 
 const urlObject: queryString.UrlObject = {url: 'https://sindresorhus.com', query: fullQuery};
-expectType<string>(queryString.stringifyUrl(urlObject));
+expectTypeOf(queryString.stringifyUrl(urlObject)).toBe<string>();
 
 // Parse
-expectType<queryString.ParsedQuery>(queryString.parse('?foo=bar'));
+expectTypeOf(queryString.parse('?foo=bar')).toBe<queryString.ParsedQuery>();
 
 // A key with no `=` parses to `null`, so the value type has to include it. The
 // whole-result assertions above cannot see this, because they never index in.
 // The type is spelled out rather than written as `ParsedQuery<string>['foo']`,
 // which would only restate whatever the declaration already says.
 /* eslint-disable @typescript-eslint/no-restricted-types, @typescript-eslint/array-type -- The `null` and `Array<T>` here are the point of the assertion. */
-expectType<string | null | (string | null)[]>(queryString.parse('foo')['foo']);
-expectType<string | null | (string | null)[]>(queryString.parse('foo=bar&baz')['foo']);
+expectTypeOf(queryString.parse('foo')['foo']).toBe<string | null | (string | null)[]>();
+expectTypeOf(queryString.parse('foo=bar&baz')['foo']).toBe<string | null | (string | null)[]>();
 /* eslint-enable @typescript-eslint/no-restricted-types, @typescript-eslint/array-type */
 
-expectType<queryString.ParsedQuery>(
+expectTypeOf(
 	queryString.parse('?foo=bar', {decode: false}),
-);
-expectType<queryString.ParsedQuery>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parse('?foo=bar', {arrayFormat: 'bracket'}),
-);
-expectType<queryString.ParsedQuery>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parse('?foo=bar', {arrayFormat: 'index'}),
-);
-expectType<queryString.ParsedQuery>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parse('?foo=bar', {arrayFormat: 'none'}),
-);
-expectType<queryString.ParsedQuery>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parse('?foo=bar', {arrayFormat: 'comma'}),
-);
-expectType<queryString.ParsedQuery<string | number>>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parse('?foo=1', {parseNumbers: true}),
-);
-expectType<queryString.ParsedQuery<string | boolean>>(
+).toBe<queryString.ParsedQuery<string | number>>();
+expectTypeOf(
 	queryString.parse('?foo=true', {parseBooleans: true}),
-);
-expectType<queryString.ParsedQuery<string | boolean | number>>(
+).toBe<queryString.ParsedQuery<string | boolean>>();
+expectTypeOf(
 	queryString.parse('?foo=true', {parseBooleans: true, parseNumbers: true}),
-);
+).toBe<queryString.ParsedQuery<string | boolean | number>>();
 
 // Parse URL
-expectType<queryString.ParsedUrl>(queryString.parseUrl('?foo=bar'));
+expectTypeOf(queryString.parseUrl('?foo=bar')).toBe<queryString.ParsedUrl>();
 
-expectType<queryString.ParsedUrl>(
+expectTypeOf(
 	queryString.parseUrl('?foo=bar', {decode: false}),
-);
-expectType<queryString.ParsedUrl>(
+).toBe<queryString.ParsedUrl>();
+expectTypeOf(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'bracket'}),
-);
-expectType<queryString.ParsedUrl>(
+).toBe<queryString.ParsedUrl>();
+expectTypeOf(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'index'}),
-);
-expectType<queryString.ParsedUrl>(
+).toBe<queryString.ParsedUrl>();
+expectTypeOf(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'none'}),
-);
-expectType<queryString.ParsedUrl>(
+).toBe<queryString.ParsedUrl>();
+expectTypeOf(
 	queryString.parseUrl('?foo=bar', {arrayFormat: 'comma'}),
-);
-expectType<queryString.ParsedUrl<string | number>>(
+).toBe<queryString.ParsedUrl>();
+expectTypeOf(
 	queryString.parseUrl('?foo=1', {parseNumbers: true}),
-);
-expectType<queryString.ParsedUrl<string | boolean>>(
+).toBe<queryString.ParsedUrl<string | number>>();
+expectTypeOf(
 	queryString.parseUrl('?foo=true', {parseBooleans: true}),
-);
-expectType<queryString.ParsedUrl<string | boolean | number>>(
+).toBe<queryString.ParsedUrl<string | boolean>>();
+expectTypeOf(
 	queryString.parseUrl('?foo=true', {parseBooleans: true, parseNumbers: true}),
-);
-expectType<queryString.ParsedQuery<string | number>>(
+).toBe<queryString.ParsedUrl<string | boolean | number>>();
+expectTypeOf(
 	queryString.parseUrl('?foo=1', {parseNumbers: true}).query,
-);
-expectType<queryString.ParsedQuery>(
+).toBe<queryString.ParsedQuery<string | number>>();
+expectTypeOf(
 	queryString.parseUrl('?foo=1', {parseNumbers: false}).query,
-);
-expectType<queryString.ParsedUrl<string | number>>(
+).toBe<queryString.ParsedQuery>();
+expectTypeOf(
 	queryString.parseUrl('?foo=1#bar', {parseNumbers: true, parseFragmentIdentifier: true}),
-);
-expectType<string | undefined>(
+).toBe<queryString.ParsedUrl<string | number>>();
+expectTypeOf(
 	queryString.parseUrl('?foo=1#bar', {parseNumbers: true, parseFragmentIdentifier: true}).fragmentIdentifier,
-);
-expectType<string>(
+).toBe<string | undefined>();
+expectTypeOf(
 	queryString.stringifyUrl(queryString.parseUrl('?foo=1', {parseNumbers: true, parseBooleans: true})),
-);
-expectType<queryString.ParsedUrl>(
+).toBe<string>();
+expectTypeOf(
 	queryString.parseUrl('?foo=true#bar', {parseFragmentIdentifier: true}),
-);
+).toBe<queryString.ParsedUrl>();
 
 // Extract
-expectType<string>(queryString.extract('https://foo.bar/?abc=def&hij=klm'));
+expectTypeOf(queryString.extract('https://foo.bar/?abc=def&hij=klm')).toBe<string>();
 
-expectType<string>(
+expectTypeOf(
 	queryString.stringifyUrl({
 		url: 'https://sindresorhus.com',
 		query: {
@@ -185,78 +185,78 @@ expectType<string>(
 			fooString: 'hi',
 		},
 	}),
-);
+).toBe<string>();
 
 // Pick
-expectType<string>(queryString.pick('https://foo.bar/?abc=def&hij=klm', ['abc']));
+expectTypeOf(queryString.pick('https://foo.bar/?abc=def&hij=klm', ['abc'])).toBe<string>();
 
 // Exclude
-expectType<string>(queryString.exclude('https://foo.bar/?abc=def&hij=klm', ['abc']));
+expectTypeOf(queryString.exclude('https://foo.bar/?abc=def&hij=klm', ['abc'])).toBe<string>();
 
 queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<string>(key);
-	expectType<ParsedQuery[string]>(value);
+	expectTypeOf(key).toBe<string>();
+	expectTypeOf(value).toBe<ParsedQuery[string]>();
 	return true;
 });
 queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | number>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | number>[string]>();
 	return true;
 }, {parseNumbers: true});
 queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | boolean>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | boolean>[string]>();
 	return true;
 }, {parseBooleans: true});
 queryString.pick('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | boolean | number>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | boolean | number>[string]>();
 	return true;
 }, {parseBooleans: true, parseNumbers: true});
 queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<string>(key);
-	expectType<ParsedQuery[string]>(value);
+	expectTypeOf(key).toBe<string>();
+	expectTypeOf(value).toBe<ParsedQuery[string]>();
 	return true;
 });
 queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | number>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | number>[string]>();
 	return true;
 }, {parseNumbers: true});
 queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | boolean>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | boolean>[string]>();
 	return true;
 }, {parseBooleans: true});
 queryString.exclude('https://foo.bar/?abc=def&hij=klm', (key, value) => {
-	expectType<ParsedQuery<string | boolean | number>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | boolean | number>[string]>();
 	return true;
 }, {parseBooleans: true, parseNumbers: true});
 
 // The `types` option types the values.
-expectType<queryString.ParsedQuery<string | number>>(queryString.parse('?a=1', {types: {a: 'number'}}));
-expectType<queryString.ParsedQuery<string | number>>(queryString.parse('?a=1', {types: {a: 'number[]'}}));
-expectType<queryString.ParsedQuery<string | boolean>>(queryString.parse('?a=1', {types: {a: 'boolean'}}));
-expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {types: {a: 'string', b: 'string[]'}}));
-expectType<queryString.ParsedQuery<string | Date>>(queryString.parse('?a=1', {types: {a: value => new Date(value)}}));
-expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseNumbers: true, types: {a: 'boolean'}}));
-expectType<queryString.ParsedQuery<string | number | boolean>>(queryString.parse('?a=1', {parseBooleans: true, types: {a: 'number'}}));
-expectType<queryString.ParsedUrl<string | number>>(queryString.parseUrl('?a=1', {types: {a: 'number'}}));
+expectTypeOf(queryString.parse('?a=1', {types: {a: 'number'}})).toBe<queryString.ParsedQuery<string | number>>();
+expectTypeOf(queryString.parse('?a=1', {types: {a: 'number[]'}})).toBe<queryString.ParsedQuery<string | number>>();
+expectTypeOf(queryString.parse('?a=1', {types: {a: 'boolean'}})).toBe<queryString.ParsedQuery<string | boolean>>();
+expectTypeOf(queryString.parse('?a=1', {types: {a: 'string', b: 'string[]'}})).toBe<queryString.ParsedQuery>();
+expectTypeOf(queryString.parse('?a=1', {types: {a: value => new Date(value)}})).toBe<queryString.ParsedQuery<string | Date>>();
+expectTypeOf(queryString.parse('?a=1', {parseNumbers: true, types: {a: 'boolean'}})).toBe<queryString.ParsedQuery<string | number | boolean>>();
+expectTypeOf(queryString.parse('?a=1', {parseBooleans: true, types: {a: 'number'}})).toBe<queryString.ParsedQuery<string | number | boolean>>();
+expectTypeOf(queryString.parseUrl('?a=1', {types: {a: 'number'}})).toBe<queryString.ParsedUrl<string | number>>();
 queryString.pick('https://foo.bar/?abc=def', (key, value) => {
-	expectType<ParsedQuery<string | number>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | number>[string]>();
 	return true;
 }, {types: {abc: 'number'}});
 queryString.exclude('https://foo.bar/?abc=def', (key, value) => {
-	expectType<ParsedQuery<string | boolean>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | boolean>[string]>();
 	return true;
 }, {types: {abc: 'boolean'}});
 
 // Options declared with the option types, or with a `boolean` variable, do not narrow the values.
 const declaredOptions: queryString.ParseOptions = {parseNumbers: true, types: {a: 'boolean'}};
-expectType<queryString.ParsedQuery>(queryString.parse('?a=1', declaredOptions));
-expectType<queryString.ParsedUrl>(queryString.parseUrl('?a=1', declaredOptions));
+expectTypeOf(queryString.parse('?a=1', declaredOptions)).toBe<queryString.ParsedQuery>();
+expectTypeOf(queryString.parseUrl('?a=1', declaredOptions)).toBe<queryString.ParsedUrl>();
 const isParseNumbers = Boolean(Math.random());
-expectType<queryString.ParsedQuery>(queryString.parse('?a=1', {parseNumbers: isParseNumbers}));
+expectTypeOf(queryString.parse('?a=1', {parseNumbers: isParseNumbers})).toBe<queryString.ParsedQuery>();
 const sharedOptions: queryString.ParseOptions & queryString.StringifyOptions = {arrayFormat: 'comma'};
-expectType<queryString.ParsedQuery>(queryString.parse('?a=1', sharedOptions));
-expectType<string>(queryString.pick('https://foo.bar/?abc=def', (key, value) => value === '1', sharedOptions));
+expectTypeOf(queryString.parse('?a=1', sharedOptions)).toBe<queryString.ParsedQuery>();
+expectTypeOf(queryString.pick('https://foo.bar/?abc=def', (key, value) => value === '1', sharedOptions)).toBe<string>();
 queryString.pick('https://foo.bar/?abc=def', (key, value) => {
-	expectType<ParsedQuery<string | number | boolean>[string]>(value);
+	expectTypeOf(value).toBe<ParsedQuery<string | number | boolean>[string]>();
 	return true;
 }, {
 	parseNumbers: true,
@@ -276,7 +276,7 @@ const parseWrapper = <Options extends queryString.ParseOptions>(options: Options
 const parseUrlWrapper = <Options extends queryString.ParseOptions>(options: Options) => queryString.parseUrl('?a=1', options);
 const pickWrapper = <Options extends queryString.ParseOptions & queryString.StringifyOptions>(options: Options) => queryString.pick('https://foo.bar/?a=1', () => true, options);
 const excludeWrapper = <Options extends queryString.ParseOptions & queryString.StringifyOptions>(options: Options) => queryString.exclude('https://foo.bar/?a=1', () => true, options);
-expectType<queryString.ParsedQuery>(parseWrapper({parseNumbers: true}));
-expectType<queryString.ParsedUrl>(parseUrlWrapper({parseNumbers: true}));
-expectType<string>(pickWrapper({parseNumbers: true}));
-expectType<string>(excludeWrapper({parseNumbers: true}));
+expectTypeOf(parseWrapper({parseNumbers: true})).toBe<queryString.ParsedQuery>();
+expectTypeOf(parseUrlWrapper({parseNumbers: true})).toBe<queryString.ParsedUrl>();
+expectTypeOf(pickWrapper({parseNumbers: true})).toBe<string>();
+expectTypeOf(excludeWrapper({parseNumbers: true})).toBe<string>();

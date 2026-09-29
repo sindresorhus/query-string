@@ -1,4 +1,4 @@
-/* eslint-disable node-test/require-assertion -- The assertions here come from `deepEqual()` below, which the rule cannot see. `deep-equal` is used rather than `assert.deepEqual()` because `parse()` returns null-prototype objects, and `assert.deepEqual()` compares the prototype of both sides. `fastCheck.assert()` throws when a property fails, which fails the test. */
+/* eslint-disable node-test/require-assertion -- Each property returns the result of `deepEqual()`, and `fastCheck.assert()` throws when a property returns `false`, which fails the test. The rule cannot see this. A property must return the result, because one that returns nothing always passes. `deep-equal` is used rather than `assert.deepEqual()` because `parse()` returns null-prototype objects, and `assert.deepEqual()` compares the prototype of both sides. */
 import test from 'node:test';
 import deepEqual from 'deep-equal';
 import fastCheck from 'fast-check';
@@ -84,7 +84,7 @@ test('parsing a stringified query string is a fixed point', () => {
 			optionsArbitrary,
 			(object, options) => {
 				const once = queryString.parse(queryString.stringify(object, options), options);
-				deepEqual(queryString.parse(queryString.stringify(once, options), options), once);
+				return deepEqual(queryString.parse(queryString.stringify(once, options), options), once);
 			},
 		),
 		{
@@ -102,8 +102,8 @@ test('pick and exclude with a predicate preserve every query parameter', () => {
 			(object, options) => {
 				const url = 'https://foo.bar/?' + queryString.stringify(object, options);
 				const before = queryString.parseUrl(url, options).query;
-				deepEqual(queryString.parseUrl(queryString.pick(url, () => true, options), options).query, before);
-				deepEqual(queryString.parseUrl(queryString.exclude(url, () => false, options), options).query, before);
+				return deepEqual(queryString.parseUrl(queryString.pick(url, () => true, options), options).query, before)
+					&& deepEqual(queryString.parseUrl(queryString.exclude(url, () => false, options), options).query, before);
 			},
 		),
 		{
@@ -122,7 +122,7 @@ test('parseUrl and stringifyUrl round trip a query string', () => {
 				const parseOptions = {...options, parseFragmentIdentifier: true};
 				const parsed = queryString.parseUrl(url, parseOptions);
 				const stringified = queryString.stringifyUrl({url: parsed.url, query: parsed.query, fragmentIdentifier: parsed.fragmentIdentifier}, options);
-				deepEqual(queryString.parseUrl(stringified, parseOptions), parsed);
+				return deepEqual(queryString.parseUrl(stringified, parseOptions), parsed);
 			},
 		),
 		{
@@ -138,7 +138,7 @@ test('the extracted query string parses to the same object as `parseUrl()`', () 
 			queryParametersArbitrary,
 			object => {
 				const url = 'https://foo.bar/?' + queryString.stringify(object);
-				deepEqual(queryString.parse(queryString.extract(url)), queryString.parseUrl(url).query);
+				return deepEqual(queryString.parse(queryString.extract(url)), queryString.parseUrl(url).query);
 			},
 		),
 		{
@@ -154,7 +154,7 @@ test('a query string round trips through a custom sort function', () => {
 			object => {
 				const sort = (a, b) => (a < b ? 1 : (a > b ? -1 : 0));
 				const options = {sort, arrayFormat: 'none'};
-				deepEqual(queryString.parse(queryString.stringify(object, options), options), object);
+				return deepEqual(queryString.parse(queryString.stringify(object, options), options), object);
 			},
 		),
 		{
@@ -172,7 +172,7 @@ test('parsing a query string with `parseNumbers` or `parseBooleans` is a fixed p
 				object => {
 					const options = {[option]: true, arrayFormat: 'none'};
 					const once = queryString.parse(queryString.stringify(object, options), options);
-					deepEqual(queryString.parse(queryString.stringify(once, options), options), once);
+					return deepEqual(queryString.parse(queryString.stringify(once, options), options), once);
 				},
 			),
 			{
@@ -188,7 +188,7 @@ test('a query string round trips through an identity replacer', () => {
 			queryParametersArbitrary,
 			object => {
 				const options = {arrayFormat: 'none', replacer: (key, value) => value};
-				deepEqual(queryString.parse(queryString.stringify(object, options), options), object);
+				return deepEqual(queryString.parse(queryString.stringify(object, options), options), object);
 			},
 		),
 		{

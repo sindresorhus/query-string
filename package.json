@@ -16,8 +16,8 @@
 		"node": ">=22"
 	},
 	"scripts": {
-		"benchmark": "node benchmark.js",
-		"test": "xo && node --test && tsd"
+		"benchmark": "node --experimental-bench --bench benchmark.js",
+		"test": "xo && node --test && nz"
 	},
 	"files": [
 		"index.js",
@@ -46,15 +46,10 @@
 		"split-on-first": "^4.0.0"
 	},
 	"devDependencies": {
-		"benchmark": "^2.1.4",
+		"@typescript/native": "npm:typescript@^7.0.2",
 		"deep-equal": "^2.2.3",
 		"fast-check": "^4.10.2",
-		"tsd": "^0.33.0",
+		"nz": "^0.1.0",
 		"xo": "^5.0.1"
-	},
-	"tsd": {
-		"compilerOptions": {
-			"module": "node16"
-		}
 	}
 }

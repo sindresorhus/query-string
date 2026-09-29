@@ -1,8 +1,9 @@
-import Benchmark from 'benchmark';
+// `node:bench` is not in Node.js 22, so the benchmark needs a later Node.js version than the package does.
+import assert from 'node:assert/strict';
+import {suite, bench} from 'node:bench';
 import queryString from './index.js';
 
 const {stringify, stringifyUrl} = queryString;
-const suite = new Benchmark.Suite();
 
 // Fixtures
 const TEST_OBJECT = {
@@ -26,49 +27,57 @@ const TEST_URL = stringifyUrl({url: TEST_HOST, query: TEST_OBJECT});
 const defineTestCase = (methodName, input, options) => {
 	const function_ = queryString[methodName];
 	const label = options ? ` (${stringify(options)})` : '';
+	const expected = function_(input, options || {});
+	// `extract` is far cheaper than the other methods, so it needs more operations per sample.
+	const operations = methodName === 'extract' ? 1_000_000 : 10_000;
 
-	suite.add(methodName + label, () => function_(input, options || {}));
+	bench(methodName + label, b => {
+		const results = [];
+
+		b.start();
+		for (let index = 0; index < operations; index++) {
+			results.push(function_(input, options || {}));
+		}
+
+		b.end(operations);
+
+		// Validated outside the measured region, so the results are observable and the work cannot be eliminated.
+		for (const result of results) {
+			assert.deepEqual(result, expected);
+		}
+	});
 };
 
 // Define all test cases
+suite('query-string', () => {
+	// Parse
+	defineTestCase('parse', TEST_STRING);
+	defineTestCase('parse', TEST_STRING, {parseNumbers: true});
+	defineTestCase('parse', TEST_STRING, {parseBooleans: true});
+	defineTestCase('parse', TEST_STRING, {sort: false});
+	defineTestCase('parse', TEST_STRING, {decode: false});
+	defineTestCase('parse', TEST_BRACKETS_STRING, {arrayFormat: 'bracket'});
+	defineTestCase('parse', TEST_INDEX_STRING, {arrayFormat: 'index'});
+	defineTestCase('parse', TEST_COMMA_STRING, {arrayFormat: 'comma'});
+	defineTestCase('parse', TEST_BRACKET_SEPARATOR_STRING, {arrayFormat: 'bracket-separator'});
 
-// Parse
-defineTestCase('parse', TEST_STRING);
-defineTestCase('parse', TEST_STRING, {parseNumbers: true});
-defineTestCase('parse', TEST_STRING, {parseBooleans: true});
-defineTestCase('parse', TEST_STRING, {sort: false});
-defineTestCase('parse', TEST_STRING, {decode: false});
-defineTestCase('parse', TEST_BRACKETS_STRING, {arrayFormat: 'bracket'});
-defineTestCase('parse', TEST_INDEX_STRING, {arrayFormat: 'index'});
-defineTestCase('parse', TEST_COMMA_STRING, {arrayFormat: 'comma'});
-defineTestCase('parse', TEST_BRACKET_SEPARATOR_STRING, {arrayFormat: 'bracket-separator'});
+	// Stringify
+	defineTestCase('stringify', TEST_OBJECT);
+	defineTestCase('stringify', TEST_OBJECT, {strict: false});
+	defineTestCase('stringify', TEST_OBJECT, {encode: false});
+	defineTestCase('stringify', TEST_OBJECT, {skipNull: true});
+	defineTestCase('stringify', TEST_OBJECT, {skipEmptyString: true});
+	defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket'});
+	defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'index'});
+	defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'comma'});
+	defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket-separator'});
 
-// Stringify
-defineTestCase('stringify', TEST_OBJECT);
-defineTestCase('stringify', TEST_OBJECT, {strict: false});
-defineTestCase('stringify', TEST_OBJECT, {encode: false});
-defineTestCase('stringify', TEST_OBJECT, {skipNull: true});
-defineTestCase('stringify', TEST_OBJECT, {skipEmptyString: true});
-defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket'});
-defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'index'});
-defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'comma'});
-defineTestCase('stringify', TEST_OBJECT, {arrayFormat: 'bracket-separator'});
+	// Extract
+	defineTestCase('extract', TEST_URL);
 
-// Extract
-defineTestCase('extract', TEST_URL);
+	// ParseUrl
+	defineTestCase('parseUrl', TEST_URL);
 
-// ParseUrl
-defineTestCase('parseUrl', TEST_URL);
-
-// StringifyUrl
-defineTestCase('stringifyUrl', {url: TEST_HOST, query: TEST_OBJECT});
-
-// Log/display the results
-suite.on('cycle', event => {
-	const {name, hz} = event.target;
-	const opsPerSec = Math.round(hz).toLocaleString();
-
-	console.log(name.padEnd(46, '_') + opsPerSec.padStart(3, '_') + ' ops/s');
+	// StringifyUrl
+	defineTestCase('stringifyUrl', {url: TEST_HOST, query: TEST_OBJECT});
 });
-
-suite.run();

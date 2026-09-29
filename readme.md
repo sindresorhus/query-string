@@ -200,6 +200,8 @@ Default: `true`
 
 Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
+If omitted, keys are sorted using `Array#sort()`.
+
 ##### parseNumbers
 
 Type: `boolean`\
@@ -500,7 +502,7 @@ queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
 //=> 'b=1&c=2&a=3'
 ```
 
-If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in UTF-16 code unit order. This is not the same as Unicode code point order: a character outside the Basic Multilingual Plane, like an emoji, is stored as a surrogate pair whose leading code unit is below U+E000, so it sorts before a character in the U+E000–U+FFFF range.
+If omitted, keys are sorted using `Array#sort()`.
 
 ##### skipNull
 

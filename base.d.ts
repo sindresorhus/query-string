@@ -137,7 +137,7 @@ export type ParseOptions = {
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
-	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in UTF-16 code unit order. This is not the same as Unicode code point order: a character outside the Basic Multilingual Plane, like an emoji, is stored as a surrogate pair whose leading code unit is below U+E000, so it sorts before a character in the U+E000–U+FFFF range.
+	If omitted, keys are sorted using `Array#sort`.
 
 	@default true
 
@@ -532,7 +532,7 @@ export type StringifyOptions = {
 	/**
 	Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
-	If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in UTF-16 code unit order. This is not the same as Unicode code point order: a character outside the Basic Multilingual Plane, like an emoji, is stored as a surrogate pair whose leading code unit is below U+E000, so it sorts before a character in the U+E000–U+FFFF range.
+	If omitted, keys are sorted using `Array#sort`.
 
 	@default true
 
@@ -844,3 +844,5 @@ export function exclude<Options extends ParseOptions & StringifyOptions>(
 	filter: (key: string, value: ParsedQuery<ParsedValue<Options>>[string]) => boolean,
 	options?: KnownOptions<Options>,
 ): string;
+
+export {}; // eslint-disable-line unicorn/require-module-specifiers -- It stops the implicit export of the declarations without `export`.

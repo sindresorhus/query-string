@@ -42,14 +42,16 @@ test('parse multiple query string retain order when not sorted', () => {
 
 test('a `sort` that is not a boolean or a function sorts, like `stringify()` sorts', () => {
 	// `parse()` passed the option straight to `Array#sort()`, which throws for anything that is not a function, so any other value crashed with a message about a comparison function. `stringify()` reads the same option as a function or nothing, so it sorted. One options object shared by both has to work.
+	// The keys are compared as an array, because `assert.deepEqual()` does not check the order of the keys of an object.
 	for (const sort of [null, 0, '', 1, 'asc', [], {}]) {
-		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort})), {a: '2', b: '1'}, `sort: ${JSON.stringify(sort)}`);
-		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort: true})), {a: '2', b: '1'}, 'sort: true');
-		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort: false})), {b: '1', a: '2'}, 'sort: false');
+		assert.deepEqual(Object.keys(queryString.parse('b=1&a=2', {sort})), ['a', 'b'], `sort: ${JSON.stringify(sort)}`);
 	}
 
-	// A function is still the comparator, and it is still applied to the keys.
-	assert.deepEqual(structuredClone(queryString.parse('c=3&b=2&a=1', {sort: (left, right) => left.localeCompare(right)})), {a: '1', b: '2', c: '3'});
+	assert.deepEqual(Object.keys(queryString.parse('b=1&a=2', {sort: true})), ['a', 'b'], 'sort: true');
+	assert.deepEqual(Object.keys(queryString.parse('b=1&a=2', {sort: false})), ['b', 'a'], 'sort: false');
+
+	// A function is still the comparator, and it is still applied to the keys. It sorts in reverse, so the result is not the same as the default sort.
+	assert.deepEqual(Object.keys(queryString.parse('a=1&c=3&b=2', {sort: (left, right) => right.localeCompare(left)})), ['c', 'b', 'a']);
 });
 
 test('parse multiple query string sorted keys', () => {
@@ -609,6 +611,29 @@ test('a raw character next to an invalid escape is kept', () => {
 	assert.equal(queryString.parse('foo=å%E4').foo, 'å�');
 });
 
+test('decoding is not disturbed by a callback that parses again', () => {
+	// The decoder keeps the `lastIndex` of two shared regular expressions, which is only safe while nothing a caller controls runs. A `types` function runs after the parameters are decoded, so parsing again from inside one must not disturb the value that is being decoded.
+	const inner = '%F0%9F%98%80%E4%B8%C3%A9%FF%C3%A9';
+
+	for (const arrayFormat of ['none', 'bracket', 'index', 'comma', 'separator', 'colon-list-separator', 'bracket-separator']) {
+		assert.deepEqual(
+			structuredClone(queryString.parse(`a=${inner}`, {
+				arrayFormat,
+				types: {
+					a(value) {
+						// Parse something with its own escapes while the outer value is mid-decode.
+						queryString.parse(`b=${inner}`, {decode: true});
+						queryString.parse(`c=%${value.length}`, {decode: false});
+						return value;
+					},
+				},
+			})),
+			{a: '😀�é�é'},
+			arrayFormat,
+		);
+	}
+});
+
 test('the edges of what a UTF-8 sequence may encode are checked', () => {
 	// A sequence that is the right length can still be out of range. The lead byte and the first continuation byte are the only place the range is narrowed, so each edge is checked here.
 	const cases = [
@@ -621,6 +646,14 @@ test('the edges of what a UTF-8 sequence may encode are checked', () => {
 		['%F0%80%80%80', '����', 'the lowest four-byte lead is 0xF0, whose second byte may not be below 0x90'],
 		['%F0%8F%BF%BF', '����', 'the same for one below 0x90'],
 		['%F0%90%80%80', '𐀀', '0x90 is the lowest second byte that 0xF0 may take, which is the first astral code point'],
+		// A continuation byte is 0x80 to 0xBF, and 0xC0 or above is not one whatever the lead byte says, so it is never a part of the sequence.
+		['%C2%C0', '��', '0xC0 is not a continuation byte'],
+		['%C2%BF', '¿', '0xBF is the highest continuation byte'],
+		['%E1%C0%80', '���', 'the same inside a three-byte sequence, which is one replacement character per byte'],
+		['%E1%FF%80', '���', 'the same for 0xFF'],
+		['%E1%BF%80', '῀', 'the same sequence with the highest continuation byte, which is a real character'],
+		['%F0%C0%80%80', '����', 'the same inside a four-byte sequence'],
+		['%F0%BF%BF%BF', '\u{3FFFF}', 'the same with the highest continuation byte'],
 		// A surrogate is not a character, so no sequence may encode one.
 		['%ED%9F%BF', '퟿', 'the highest code point below the surrogates'],
 		['%ED%A0%80', '���', '0xED may not take a second byte of 0xA0 or above'],
@@ -1058,6 +1091,16 @@ test('index array format preserves distinct explicit index strings', () => {
 	assert.deepEqual(structuredClone(queryString.parse('foo[01]=a&foo[01]=b', {arrayFormat: 'index'})), {foo: ['b']});
 });
 
+test('index array format does not let a later explicit index drop an entry written without one', () => {
+	// A scalar is parked under the empty key, which sorts before any index, and the next free index is then raised past it. Without that, the entry written without an index would be given index 0 and a later `foo[0]` would overwrite it, so the value would be lost with no error.
+	assert.deepEqual(structuredClone(queryString.parse('foo=1&foo[]=2&foo[0]=3', {arrayFormat: 'index'})), {foo: ['1', '3', '2']});
+	assert.deepEqual(structuredClone(queryString.parse('foo=1&foo[]=2&foo[0]=3&foo[]=4', {arrayFormat: 'index'})), {foo: ['1', '3', '2', '4']});
+
+	// The same without a scalar in front, where the first explicit index is 0 and an unindexed entry has to go after it.
+	assert.deepEqual(structuredClone(queryString.parse('foo[0]=1&foo[]=2', {arrayFormat: 'index'})), {foo: ['1', '2']});
+	assert.deepEqual(structuredClone(queryString.parse('foo&foo[]=2&foo[0]=3', {arrayFormat: 'index'})), {foo: [null, '3', '2']});
+});
+
 test('index array format appends entries without an index', () => {
 	// `foo[]` is what PHP and Rack write for an array item without an index, and it is what `arrayFormat: 'bracket'` produces. Every such entry landed on the same empty index and silently overrode the previous one.
 	assert.deepEqual(structuredClone(queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'index'})), {foo: ['1', '2', '3']});
@@ -1341,7 +1384,7 @@ test('a value with many distinct percent-encodings decodes the same with and wit
 	// A value that is valid percent-encoded UTF-8 is decoded by the built-in decoder. Adding one invalid sequence makes it throw, and the value is then decoded the lenient way instead. Both paths have to give the same characters, so this covers a value with thousands of distinct escapes going through the lenient path.
 	const percentByte = value => `%${value.toString(16).toUpperCase().padStart(2, '0')}`;
 
-	// Distinct three-byte sequences. Lead bytes 0xE0 and 0xED are left out, because 0xE0 can only begin an overlong encoding and 0xED can only begin a surrogate.
+	// Distinct three-byte sequences. Lead bytes 0xE0 and 0xED are left out, because they only allow part of the second-byte range: below 0xA0, 0xE0 begins an overlong encoding, and above 0x9F, 0xED begins a surrogate. Every second byte the loop below makes is then valid.
 	const runs = [];
 	for (let lead = 0xE1; lead <= 0xEF; lead++) {
 		if (lead === 0xED) {
@@ -1443,9 +1486,7 @@ test('rejects an invalid `arrayFormatSeparator`', () => {
 	for (const [message, arrayFormatSeparators] of Object.entries(invalid)) {
 		for (const arrayFormatSeparator of arrayFormatSeparators) {
 			const callback = () => queryString.parse('foo=a|b', {arrayFormat: 'separator', arrayFormatSeparator});
-			// The class and the message are checked separately, because `assert.throws()` cannot do both in one call.
-			assert.throws(callback, TypeError);
-			assert.throws(callback, {message});
+			assert.throws(callback, {name: 'TypeError', message});
 		}
 	}
 

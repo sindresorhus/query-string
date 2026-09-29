@@ -818,34 +818,23 @@ test('should sort keys when sort is true and the object has one key', () => {
 });
 
 test('throws a TypeError for unsupported value types', () => {
-	// The class and the message are checked separately, because `assert.throws()`
-	// cannot do both in one call.
-	assert.throws(() => queryString.stringify({a: {}}), TypeError);
-	assert.throws(() => queryString.stringify({a: {}}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a: new Date()}), TypeError);
-	assert.throws(() => queryString.stringify({a: new Date()}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a: new Map()}), TypeError);
-	assert.throws(() => queryString.stringify({a: new Map()}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a() {}}), TypeError);
-	assert.throws(() => queryString.stringify({a() {}}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a: Symbol('a')}), TypeError);
-	assert.throws(() => queryString.stringify({a: Symbol('a')}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a: {}}, {encode: false}), TypeError);
-	assert.throws(() => queryString.stringify({a: {}}, {encode: false}), {message: /Unsupported value type/v});
-	assert.throws(() => queryString.stringify({a: {}}, {strict: false}), TypeError);
-	assert.throws(() => queryString.stringify({a: {}}, {strict: false}), {message: /Unsupported value type/v});
+	const expectation = {name: 'TypeError', message: /Unsupported value type/v};
+	assert.throws(() => queryString.stringify({a: {}}), expectation);
+	assert.throws(() => queryString.stringify({a: new Date()}), expectation);
+	assert.throws(() => queryString.stringify({a: new Map()}), expectation);
+	assert.throws(() => queryString.stringify({a() {}}), expectation);
+	assert.throws(() => queryString.stringify({a: Symbol('a')}), expectation);
+	assert.throws(() => queryString.stringify({a: {}}, {encode: false}), expectation);
+	assert.throws(() => queryString.stringify({a: {}}, {strict: false}), expectation);
 });
 
 test('throws a TypeError for unsupported value types inside arrays', () => {
+	const expectation = {name: 'TypeError', message: /Unsupported value type/v};
+
 	for (const arrayFormat of ['none', 'bracket', 'index', 'comma', 'separator', 'bracket-separator', 'colon-list-separator']) {
-		// The class and the message are checked separately, because `assert.throws()`
-		// cannot do both in one call.
-		assert.throws(() => queryString.stringify({a: [1, {}]}, {arrayFormat}), TypeError, `${arrayFormat}: object`);
-		assert.throws(() => queryString.stringify({a: [1, {}]}, {arrayFormat}), {message: /Unsupported value type/v}, `${arrayFormat}: object`);
-		assert.throws(() => queryString.stringify({a: [[1, 2]]}, {arrayFormat}), TypeError, `${arrayFormat}: nested array`);
-		assert.throws(() => queryString.stringify({a: [[1, 2]]}, {arrayFormat}), {message: /Unsupported value type/v}, `${arrayFormat}: nested array`);
-		assert.throws(() => queryString.stringify({a: [new Date()]}, {arrayFormat, encode: false}), TypeError, `${arrayFormat}: encode false`);
-		assert.throws(() => queryString.stringify({a: [new Date()]}, {arrayFormat, encode: false}), {message: /Unsupported value type/v}, `${arrayFormat}: encode false`);
+		assert.throws(() => queryString.stringify({a: [1, {}]}, {arrayFormat}), expectation, `${arrayFormat}: object`);
+		assert.throws(() => queryString.stringify({a: [[1, 2]]}, {arrayFormat}), expectation, `${arrayFormat}: nested array`);
+		assert.throws(() => queryString.stringify({a: [new Date()]}, {arrayFormat, encode: false}), expectation, `${arrayFormat}: encode false`);
 	}
 });
 
@@ -995,9 +984,7 @@ test('rejects an invalid `arrayFormatSeparator`', () => {
 	for (const [message, arrayFormatSeparators] of Object.entries(invalid)) {
 		for (const arrayFormatSeparator of arrayFormatSeparators) {
 			const callback = () => queryString.stringify({foo: ['a', 'b']}, {arrayFormat: 'separator', arrayFormatSeparator});
-			// The class and the message are checked separately, because `assert.throws()` cannot do both in one call.
-			assert.throws(callback, TypeError);
-			assert.throws(callback, {message});
+			assert.throws(callback, {name: 'TypeError', message});
 		}
 	}
 
