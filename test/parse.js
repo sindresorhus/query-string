@@ -40,6 +40,18 @@ test('parse multiple query string retain order when not sorted', () => {
 	}
 });
 
+test('a `sort` that is not a boolean or a function sorts, like `stringify()` sorts', () => {
+	// `parse()` passed the option straight to `Array#sort()`, which throws for anything that is not a function, so any other value crashed with a message about a comparison function. `stringify()` reads the same option as a function or nothing, so it sorted. One options object shared by both has to work.
+	for (const sort of [null, 0, '', 1, 'asc', [], {}]) {
+		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort})), {a: '2', b: '1'}, `sort: ${JSON.stringify(sort)}`);
+		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort: true})), {a: '2', b: '1'}, 'sort: true');
+		assert.deepEqual(structuredClone(queryString.parse('b=1&a=2', {sort: false})), {b: '1', a: '2'}, 'sort: false');
+	}
+
+	// A function is still the comparator, and it is still applied to the keys.
+	assert.deepEqual(structuredClone(queryString.parse('c=3&b=2&a=1', {sort: (left, right) => left.localeCompare(right)})), {a: '1', b: '2', c: '3'});
+});
+
 test('parse multiple query string sorted keys', () => {
 	const fixture = ['a', 'b', 'c'];
 	const parsed = queryString.parse('a=foo&c=bar&b=yay');

@@ -594,9 +594,9 @@ export function parse(query, options) {
 	}
 
 	// TODO: Remove the use of `reduce`.
-	// The default sort is the documented one, and a test covers its code-unit ordering.
-	// eslint-disable-next-line unicorn/no-array-reduce, unicorn/require-array-sort-compare
-	return (options.sort === true ? Object.keys(returnValue).toSorted() : Object.keys(returnValue).toSorted(options.sort)).reduce((result, key) => {
+	// The default sort is the documented one, and a test covers its code-unit ordering. A `sort` that is neither `false` nor a function sorts, which is how `stringify()` reads the same option, so that one options object works for both. Passing the option straight to `toSorted()` instead threw for any other value, with a message about a comparison function.
+	// eslint-disable-next-line unicorn/no-array-reduce
+	return Object.keys(returnValue).toSorted(typeof options.sort === 'function' ? options.sort : undefined).reduce((result, key) => {
 		result[key] = returnValue[key];
 		return result;
 	}, Object.create(null));
