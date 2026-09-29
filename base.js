@@ -776,7 +776,8 @@ export function pick(input, filter, options) {
 
 	// `parseNumbers`, `parseBooleans`, and `types` only apply to the `value` the predicate receives. The URL is written back from the plain string values, so a value like `007` is kept as-is instead of being rewritten as `7`.
 	// The query is decoded exactly when it is encoded again, so a value like `a%20b` is not percent-encoded a second time. When the output is not encoded, the input is not decoded either, since decoding without re-encoding would corrupt it. The `decode` option is ignored: decoding the predicate's view differently from the output would give the two views different keys, so a percent-encoded key, or a `+` in a key, would not find its value.
-	const shouldDecode = options.encode ?? true;
+	// An `encode` that is not a boolean is read for its truthiness, the same way `stringify()` reads it, so that `null` turns encoding off. Reading it as nullish instead would decode the query and then write it back unencoded, which puts a decoded `&` or `#` into the URL. `definedOptions()` has already dropped an `encode` that is `undefined`, so that is the only way to mean the default.
+	const shouldDecode = options.encode === undefined ? true : Boolean(options.encode);
 	const {url, query} = parseUrl(input, {
 		...options,
 		decode: shouldDecode,

@@ -85,6 +85,23 @@ test('picks elements in a URL with `encode: false` and an explicit `decode: true
 	assert.equal(queryString.pick('https://foo.bar?a=%20&b=1', ['a'], {encode: false, decode: true}), 'https://foo.bar?a=%20');
 });
 
+test('an `encode` that is not a boolean turns encoding off, like `stringify()` reads it', () => {
+	// The query is decoded exactly when it is encoded again, so decoding it and then writing it back unencoded puts a decoded `&` or `#` into the URL. Every other consumer of `encode` reads it for its truthiness, where `null` is off, so `null` has to be off here too.
+	for (const encode of [null, 0, '', NaN]) {
+		assert.equal(queryString.pick('https://foo.bar?a=x%26y&b=1', ['a'], {encode}), 'https://foo.bar?a=x%26y', `encode: ${String(encode)}`);
+		assert.equal(queryString.pick('https://foo.bar?a=x%23y&b=1', ['a'], {encode}), 'https://foo.bar?a=x%23y', `encode: ${String(encode)}`);
+		assert.equal(queryString.exclude('https://foo.bar?a=x%26y&b=1', ['b'], {encode}), 'https://foo.bar?a=x%26y', `encode: ${String(encode)}`);
+	}
+
+	// A truthy value still encodes, and leaving the option out still encodes.
+	for (const encode of [true, 1, 'yes']) {
+		assert.equal(queryString.pick('https://foo.bar?a=x%26y&b=1', ['a'], {encode}), 'https://foo.bar?a=x%26y', `encode: ${String(encode)}`);
+	}
+
+	assert.equal(queryString.pick('https://foo.bar?a=x%26y&b=1', ['a']), 'https://foo.bar?a=x%26y');
+	assert.equal(queryString.pick('https://foo.bar?a=x%26y&b=1', ['a'], {encode: undefined}), 'https://foo.bar?a=x%26y');
+});
+
 test('picks elements in a URL with `encode: false` and a filter predicate that sees the raw values', () => {
 	assert.equal(queryString.pick('https://foo.bar?a=%20&b=1', (name, value) => value === '%20', {encode: false}), 'https://foo.bar?a=%20');
 });
